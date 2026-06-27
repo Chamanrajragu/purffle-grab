@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Bundled binaries — fetched via scripts/setup.ps1 (too large for git; ffmpeg > 100MB)
+bin/*.exe
+
+# Build output & tooling
+release/
+dist/
+out/
+nsis-tool/
+*.7z
+
+# Runtime data
+data/
+downloads/
+.cap-data/
+.cap-dl/
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db

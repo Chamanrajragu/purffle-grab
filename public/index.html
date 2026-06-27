@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PurffleGrab</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body data-theme="dark">
+  <div class="app">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">P</div>
+        <div class="brand-txt"><span class="brand-name">PurffleGrab</span><span class="brand-sub">media downloader</span></div>
+      </div>
+
+      <nav class="side-nav">
+        <button class="side-btn active" data-view="download"><span class="ic">⬇</span> Download</button>
+        <button class="side-btn" data-view="search"><span class="ic">🔎</span> Search</button>
+        <button class="side-btn" data-view="history"><span class="ic">🕘</span> History</button>
+        <button class="side-btn" data-view="settings"><span class="ic">⚙</span> Settings</button>
+      </nav>
+
+      <div class="side-foot">
+        <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
+        <span class="ver">v2.0 · a Purffle tool</span>
+      </div>
+    </aside>
+
+    <!-- ===== CONTENT ===== -->
+    <main class="content">
+
+      <!-- ===== DOWNLOAD VIEW ===== -->
+      <section id="view-download" class="view active">
+        <div class="view-head">
+          <h2>Download</h2>
+          <p>Spotify &amp; YouTube — videos, playlists, tracks. Paste one link or many.</p>
+        </div>
+
+        <div id="dropzone" class="dropzone">
+          <textarea id="urlInput" rows="2" placeholder="Paste Spotify / YouTube links here (one per line)… or drop them anywhere"></textarea>
+          <div class="dz-actions">
+            <button id="pasteBtn" class="btn-soft" title="Paste from clipboard">📋 Paste</button>
+            <button id="clearBtn" class="btn-soft" title="Clear">✕</button>
+            <button id="analyzeBtn" class="btn-primary"><span class="btn-label">Analyze</span><span class="spinner" hidden></span></button>
+          </div>
+          <div class="dz-hint">Tip: drop links straight onto the window — or just paste, it auto-detects.</div>
+        </div>
+        <div class="examples">
+          <span>Try:</span>
+          <button class="chip" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">a YouTube video</button>
+          <button class="chip" data-url="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M">a Spotify playlist</button>
+        </div>
+        <div id="analyzeError" class="error-msg" hidden></div>
+
+        <div id="sourceCards" class="source-cards"></div>
+
+        <section id="panel" class="card options-card" hidden>
+          <h3 class="card-title">Options</h3>
+
+          <div class="presets">
+            <span class="preset-label">Quick presets:</span>
+            <button class="preset" data-preset="video4k">🎬 Best video (4K)</button>
+            <button class="preset" data-preset="video1080">📺 1080p MP4</button>
+            <button class="preset" data-preset="mp3hq">🎵 MP3 320</button>
+            <button class="preset" data-preset="phone">📱 Phone MP4 720</button>
+            <button class="preset" data-preset="flac">💿 FLAC lossless</button>
+          </div>
+
+          <div class="options">
+            <div class="opt-group" id="typeGroup">
+              <label class="opt-label">What do you want?</label>
+              <div class="seg" id="contentTypeSeg">
+                <button class="seg-btn active" data-type="video">🎬 Video</button>
+                <button class="seg-btn" data-type="audio">🎵 Audio only</button>
+              </div>
+            </div>
+
+            <div class="opt-row">
+              <div class="opt-group" id="resGroup">
+                <label class="opt-label">Video quality</label>
+                <select id="resolution" class="select">
+                  <option value="best">Best available</option>
+                  <option value="2160">4K — 2160p</option>
+                  <option value="1440">2K — 1440p</option>
+                  <option value="1080" selected>Full HD — 1080p</option>
+                  <option value="720">HD — 720p</option>
+                  <option value="480">480p</option>
+                  <option value="360">360p</option>
+                </select>
+              </div>
+              <div class="opt-group" id="audioGroup">
+                <label class="opt-label">Audio format</label>
+                <select id="audioFormat" class="select">
+                  <option value="mp3" selected>MP3 (most compatible)</option>
+                  <option value="m4a">M4A (AAC)</option>
+                  <option value="flac">FLAC (lossless)</option>
+                  <option value="wav">WAV</option>
+                  <option value="opus">Opus</option>
+                </select>
+              </div>
+              <div class="opt-group" id="bitrateGroup">
+                <label class="opt-label">Audio bitrate</label>
+                <select id="audioBitrate" class="select">
+                  <option value="">Best</option>
+                  <option value="320">320 kbps</option>
+                  <option value="256">256 kbps</option>
+                  <option value="192">192 kbps</option>
+                  <option value="128">128 kbps</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="opt-group checks">
+              <label class="check"><input type="checkbox" id="embedThumb" checked /><span>Embed cover/thumbnail</span></label>
+              <label class="check"><input type="checkbox" id="embedMeta" checked /><span>Embed title &amp; artist</span></label>
+              <label class="check"><input type="checkbox" id="saveThumb" /><span>Save thumbnail image</span></label>
+              <label class="check"><input type="checkbox" id="embedChapters" /><span>Embed chapters</span></label>
+              <label class="check"><input type="checkbox" id="sponsorblock" /><span>SponsorBlock</span></label>
+              <label class="check"><input type="checkbox" id="normalize" /><span>Normalize loudness</span></label>
+            </div>
+
+            <details class="advanced">
+              <summary>Advanced — subtitles &amp; clip</summary>
+              <div class="adv-body">
+                <div class="opt-group">
+                  <label class="check"><input type="checkbox" id="subsEnabled" /><span>Download subtitles / captions</span></label>
+                  <div class="sub-inline">
+                    <input type="text" id="subsLangs" class="text-input small" value="en" placeholder="langs e.g. en,es" />
+                    <label class="check"><input type="checkbox" id="subsAuto" checked /><span>auto-generated</span></label>
+                    <label class="check"><input type="checkbox" id="subsEmbed" checked /><span>embed into video</span></label>
+                  </div>
+                </div>
+                <div class="opt-group">
+                  <label class="opt-label">Clip / trim (single video) — mm:ss or seconds</label>
+                  <div class="sub-inline">
+                    <input type="text" id="clipStart" class="text-input small" placeholder="start e.g. 0:30" />
+                    <span class="dash">→</span>
+                    <input type="text" id="clipEnd" class="text-input small" placeholder="end e.g. 1:45" />
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <button id="downloadBtn" class="btn-primary btn-big"><span class="btn-label">⬇ Download <span id="dlCount"></span></span><span class="spinner" hidden></span></button>
+        </section>
+
+        <section id="progress" class="card progress-card" hidden>
+          <div class="progress-head">
+            <h3 id="progTitle">Downloading…</h3>
+            <div class="prog-right"><span id="progMeta" class="prog-meta"></span><span id="progPct" class="prog-pct">0%</span></div>
+          </div>
+          <div class="bar"><div id="progBar" class="bar-fill"></div></div>
+          <ul id="itemList" class="item-list"></ul>
+          <button id="cancelBtn" class="btn-soft cancel">✕ Cancel</button>
+          <div id="doneActions" class="done-actions" hidden>
+            <button id="zipBtn" class="btn-primary">⬇ Download all (.zip)</button>
+            <button id="folderBtn" class="btn-soft">📂 Open folder</button>
+            <button id="againBtn" class="btn-soft">↺ Grab another</button>
+          </div>
+        </section>
+      </section>
+
+      <!-- ===== SEARCH VIEW ===== -->
+      <section id="view-search" class="view">
+        <div class="view-head"><h2>Search</h2><p>No link? Search YouTube by name, then pick what to grab.</p></div>
+        <div class="dropzone slim">
+          <input id="searchInput" type="text" placeholder="Search songs, videos, artists…" />
+          <button id="searchBtn" class="btn-primary"><span class="btn-label">Search</span><span class="spinner" hidden></span></button>
+        </div>
+        <div id="searchError" class="error-msg" hidden></div>
+        <div id="searchResults" class="results-grid"></div>
+        <div id="searchActions" class="search-actions" hidden>
+          <span id="selCount" class="sel-count">0 selected</span>
+          <button id="searchDownloadBtn" class="btn-primary">⬇ Download selected</button>
+        </div>
+      </section>
+
+      <!-- ===== HISTORY VIEW ===== -->
+      <section id="view-history" class="view">
+        <div class="view-head"><h2>History</h2><p>Everything you've grabbed. Open, zip, or re-download.</p></div>
+        <div class="history-bar"><button id="refreshHistory" class="btn-soft">↻ Refresh</button><button id="clearHistory" class="btn-soft danger">🗑 Clear all</button></div>
+        <div id="historyList" class="history-list"></div>
+      </section>
+
+      <!-- ===== SETTINGS VIEW ===== -->
+      <section id="view-settings" class="view">
+        <div class="view-head"><h2>Settings</h2><p>Make PurffleGrab yours.</p></div>
+        <div class="card">
+          <h3 class="card-title">Download folder</h3>
+          <div class="sub-inline"><input type="text" id="outputDir" class="text-input" placeholder="Where files are saved…" /><button id="pickFolder" class="btn-soft">📁 Browse</button></div>
+          <p class="hint" id="dirHint"></p>
+
+          <h3 class="card-title mt">Defaults &amp; behaviour</h3>
+          <div class="opt-row">
+            <div class="opt-group"><label class="opt-label">Default type</label><select id="defType" class="select"><option value="video">Video</option><option value="audio">Audio only</option></select></div>
+            <div class="opt-group"><label class="opt-label">Default quality</label><select id="defRes" class="select"><option value="best">Best</option><option value="2160">4K</option><option value="1440">2K</option><option value="1080">1080p</option><option value="720">720p</option></select></div>
+            <div class="opt-group"><label class="opt-label">Default audio format</label><select id="defFmt" class="select"><option value="mp3">MP3</option><option value="m4a">M4A</option><option value="flac">FLAC</option><option value="wav">WAV</option></select></div>
+            <div class="opt-group"><label class="opt-label">Simultaneous downloads</label><select id="defConc" class="select"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+          </div>
+          <div class="opt-group checks">
+            <label class="check"><input type="checkbox" id="defNotify" checked /><span>Desktop notification when done</span></label>
+          </div>
+          <button id="saveSettings" class="btn-primary">💾 Save settings</button><span id="settingsSaved" class="saved-msg" hidden>Saved ✓</span>
+
+          <h3 class="card-title mt">Downloader engine</h3>
+          <p class="hint">Keep the YouTube engine (yt-dlp) up to date for best reliability.</p>
+          <button id="updateEngine" class="btn-soft">⬆ Update engine</button>
+          <pre id="engineOut" class="engine-out" hidden></pre>
+        </div>
+        <p class="disclaimer">For personal use only. Respect copyright and the terms of service of the platforms you download from.</p>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
