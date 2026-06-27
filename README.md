@@ -130,7 +130,7 @@ Built with [Electron](https://www.electronjs.org/), [yt-dlp](https://github.com/
 
 ## 📄 License
 
-[MIT](LICENSE) © Purffle (Pykara Technologies). Bundled tools retain their own licenses.
+[MIT](LICENSE) © Purffle. Bundled tools retain their own licenses.
 
 ---
 
