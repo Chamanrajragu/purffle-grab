@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Primary SEO -->
+<title>PurffleGrab — Free Spotify &amp; YouTube Downloader for Windows (MP3, MP4, 4K)</title>
+<meta name="description" content="PurffleGrab is a free Spotify and YouTube downloader for Windows. Download playlists, videos and music to MP3, MP4 or 4K in one click. No ads, no account, FFmpeg + yt-dlp bundled." />
+<meta name="keywords" content="spotify downloader, youtube downloader, youtube to mp3, download spotify playlist, spotify to mp3, youtube to mp4, 4k video downloader, free music downloader, youtube playlist downloader, windows downloader" />
+<meta name="author" content="Purffle" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://chamanrajragu.github.io/purffle-grab/" />
+<link rel="icon" href="icon.png" type="image/png" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="PurffleGrab" />
+<meta property="og:title" content="PurffleGrab — Free Spotify &amp; YouTube Downloader for Windows" />
+<meta property="og:description" content="Download Spotify playlists, YouTube videos and music to MP3, MP4 or 4K — free, ad-free, one click. FFmpeg + yt-dlp bundled." />
+<meta property="og:url" content="https://chamanrajragu.github.io/purffle-grab/" />
+<meta property="og:image" content="https://chamanrajragu.github.io/purffle-grab/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="PurffleGrab — Free Spotify &amp; YouTube Downloader for Windows" />
+<meta name="twitter:description" content="Download Spotify playlists & YouTube videos to MP3, MP4 or 4K — free, no ads, one click." />
+<meta name="twitter:image" content="https://chamanrajragu.github.io/purffle-grab/og-image.png" />
+
+<!-- Structured data: SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PurffleGrab",
+  "operatingSystem": "Windows 10, Windows 11",
+  "applicationCategory": "MultimediaApplication",
+  "description": "Free Spotify and YouTube downloader for Windows. Download playlists, videos and music to MP3, MP4 or 4K. No ads, no account, FFmpeg and yt-dlp bundled.",
+  "url": "https://chamanrajragu.github.io/purffle-grab/",
+  "downloadUrl": "https://github.com/Chamanrajragu/purffle-grab/releases/latest",
+  "softwareVersion": "2.0.0",
+  "license": "https://github.com/Chamanrajragu/purffle-grab/blob/main/LICENSE",
+  "author": { "@type": "Organization", "name": "Purffle", "url": "https://purffle.com" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<!-- Structured data: FAQ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Is PurffleGrab free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. PurffleGrab is completely free and open-source — no ads, no account, no limits." } },
+    { "@type": "Question", "name": "How do I download a Spotify playlist to MP3?", "acceptedAnswer": { "@type": "Answer", "text": "Paste the Spotify playlist link, click Analyze, choose Audio then MP3, tick the tracks you want and click Download." } },
+    { "@type": "Question", "name": "Can PurffleGrab download YouTube videos in 4K?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose the Best video (4K) preset or set the quality to 2160p." } },
+    { "@type": "Question", "name": "Do I need to install FFmpeg or Python?", "acceptedAnswer": { "@type": "Answer", "text": "No. FFmpeg and the yt-dlp engine are bundled inside the installer. Nothing else to install." } }
+  ]
+}
+</script>
+
+<style>
+  :root{--bg:#0b0a12;--card:rgba(255,255,255,.04);--bd:rgba(255,255,255,.09);--tx:#f3f0fb;--mut:#a298c0;--v:#8b5cf6;--p:#ec4899;--c:#22d3ee}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:radial-gradient(1100px 560px at 80% -10%,#1b1430 0%,#0b0a12 55%);color:var(--tx);line-height:1.6}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--v),var(--p));display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff}
+  .brand b{font-size:19px;font-weight:800}
+  .nav a{color:var(--mut);text-decoration:none;margin-left:22px;font-weight:600;font-size:15px}
+  .nav a:hover{color:var(--tx)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--v),var(--p));color:#fff;text-decoration:none;font-weight:700;padding:14px 26px;border-radius:12px;box-shadow:0 10px 28px rgba(139,92,246,.4);transition:.15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.lg{font-size:18px;padding:17px 34px}
+  .hero{text-align:center;padding:60px 0 30px}
+  .hero h1{font-size:52px;font-weight:900;letter-spacing:-1.5px;line-height:1.08}
+  .grad{background:linear-gradient(90deg,var(--c),var(--v),var(--p));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{font-size:20px;color:var(--mut);max-width:640px;margin:20px auto 30px}
+  .pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .pill{background:var(--card);border:1px solid var(--bd);border-radius:999px;padding:8px 16px;font-size:14px;color:var(--mut);font-weight:600}
+  .shot{margin:46px auto 0;max-width:920px;border-radius:16px;border:1px solid var(--bd);box-shadow:0 30px 80px rgba(0,0,0,.5);display:block;width:100%}
+  section{padding:56px 0}
+  h2{font-size:34px;font-weight:800;text-align:center;letter-spacing:-.6px}
+  .lead{text-align:center;color:var(--mut);max-width:620px;margin:14px auto 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:40px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:22px}
+  .card .ic{font-size:26px}
+  .card h3{font-size:17px;margin:12px 0 6px}
+  .card p{color:var(--mut);font-size:14.5px}
+  .gallery{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px}
+  .gallery img{width:100%;border-radius:14px;border:1px solid var(--bd)}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:40px}
+  .step{text-align:center}
+  .step .n{width:46px;height:46px;margin:0 auto 12px;border-radius:50%;background:linear-gradient(135deg,var(--v),var(--p));display:grid;place-items:center;font-weight:800;font-size:20px}
+  details{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:6px 18px;margin-top:12px;max-width:760px;margin-left:auto;margin-right:auto}
+  summary{cursor:pointer;font-weight:600;padding:12px 0}
+  details p{color:var(--mut);padding:0 0 14px}
+  .cta{text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:54px 24px;margin:30px 0}
+  footer{border-top:1px solid var(--bd);padding:30px 0;color:var(--mut);font-size:14px;text-align:center}
+  .kw{color:#6c6486;font-size:12.5px;margin-top:14px}
+  @media(max-width:680px){.hero h1{font-size:36px}.gallery{grid-template-columns:1fr}.nav{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo">P</div><b>PurffleGrab</b></div>
+    <nav class="nav">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab">GitHub</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>Free <span class="grad">Spotify &amp; YouTube</span><br/>Downloader for Windows</h1>
+    <p class="sub">Download Spotify playlists, YouTube videos and music to <b>MP3, MP4 or 4K</b> — in one click. No ads, no account, nothing extra to install.</p>
+    <a class="btn lg" href="https://github.com/Chamanrajragu/purffle-grab/releases/latest">⬇ Download for Windows — Free</a>
+    <div class="pills">
+      <span class="pill">🎬 YouTube 4K</span><span class="pill">🎵 Spotify → MP3</span>
+      <span class="pill">📂 Playlists</span><span class="pill">💿 FLAC / WAV</span>
+      <span class="pill">🚫 No ads</span><span class="pill">🔓 Open source</span>
+    </div>
+    <img class="shot" src="screenshots/02-options-dark.png" alt="PurffleGrab downloading a Spotify playlist with track picker and quality options on Windows" />
+  </div>
+
+  <section id="features">
+    <h2>Everything you need to grab media</h2>
+    <p class="lead">One clean app for Spotify and YouTube — videos, playlists and music, your way.</p>
+    <div class="grid">
+      <div class="card"><div class="ic">🎬</div><h3>YouTube in up to 4K</h3><p>Download any video or whole playlist as MP4 — 4K, 1080p, 720p — or audio only.</p></div>
+      <div class="card"><div class="ic">🎵</div><h3>Spotify to MP3</h3><p>Grab tracks &amp; playlists with the right title, artist and album cover automatically tagged.</p></div>
+      <div class="card"><div class="ic">📋</div><h3>Batch &amp; drag-drop</h3><p>Paste many links at once or drop them on the window. Pick exactly which playlist tracks you want.</p></div>
+      <div class="card"><div class="ic">⚡</div><h3>One-click presets</h3><p>4K · 1080p MP4 · MP3 320 · Phone 720 · FLAC lossless. No guesswork.</p></div>
+      <div class="card"><div class="ic">🎚️</div><h3>Pro options</h3><p>SponsorBlock, subtitles, clip/trim, loudness normalize, embed chapters &amp; thumbnails.</p></div>
+      <div class="card"><div class="ic">🔒</div><h3>Private &amp; free</h3><p>Runs 100% on your PC. No sign-up, no ads, no limits, fully open source.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>See it in action</h2>
+    <div class="gallery">
+      <img src="screenshots/01-home-dark.png" alt="PurffleGrab home screen — paste a Spotify or YouTube link" loading="lazy" />
+      <img src="screenshots/03-options-light.png" alt="PurffleGrab light theme with download options" loading="lazy" />
+      <img src="screenshots/04-search-light.png" alt="Search YouTube by keyword and download results" loading="lazy" />
+      <img src="screenshots/02-options-dark.png" alt="Spotify playlist track picker and audio format options" loading="lazy" />
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>How to download in 3 steps</h2>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Paste a link</h3><p>A Spotify or YouTube URL — one or many.</p></div>
+      <div class="step"><div class="n">2</div><h3>Pick format</h3><p>Video or audio, quality, and which tracks.</p></div>
+      <div class="step"><div class="n">3</div><h3>Download</h3><p>Saved to your Music folder, ready to play.</p></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>Frequently asked questions</h2>
+    <details open><summary>Is PurffleGrab free?</summary><p>Yes — completely free and open-source. No ads, no accounts, no limits.</p></details>
+    <details><summary>How do I download a Spotify playlist to MP3?</summary><p>Paste the playlist link, click Analyze, choose Audio → MP3, tick the tracks you want, and click Download.</p></details>
+    <details><summary>Can it download YouTube videos in 4K?</summary><p>Yes — choose the Best video (4K) preset or set quality to 2160p.</p></details>
+    <details><summary>Do I need to install FFmpeg or Python?</summary><p>No. FFmpeg and the yt-dlp engine are bundled inside the installer.</p></details>
+    <details><summary>Is it safe?</summary><p>PurffleGrab is open-source — you can read every line of code on GitHub. It runs locally and uploads nothing.</p></details>
+  </section>
+
+  <div class="cta">
+    <h2>Start grabbing — it's free</h2>
+    <p class="lead">Install on Windows in seconds. Spotify, YouTube, playlists, 4K, MP3 — all in one app.</p>
+    <p style="margin-top:24px"><a class="btn lg" href="https://github.com/Chamanrajragu/purffle-grab/releases/latest">⬇ Download PurffleGrab</a></p>
+  </div>
+
+  <footer>
+    <p>PurffleGrab — a <a href="https://purffle.com">Purffle</a> tool · <a href="https://github.com/Chamanrajragu/purffle-grab">Source on GitHub</a> · MIT License</p>
+    <p style="margin-top:8px">For personal use. Respect the terms of service of the platforms you download from.</p>
+    <p class="kw">free spotify downloader · youtube to mp3 · youtube downloader 4k · spotify playlist downloader · download youtube playlist · youtube to mp4 · music downloader for windows · spotify to mp3 converter</p>
+  </footer>
+</div>
+</body>
+</html>

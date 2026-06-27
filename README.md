@@ -11,6 +11,9 @@
 [![Downloads](https://img.shields.io/github/downloads/Chamanrajragu/purffle-grab/total?style=flat-square&color=22d3ee)](https://github.com/Chamanrajragu/purffle-grab/releases)
 [![License](https://img.shields.io/github/license/Chamanrajragu/purffle-grab?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078d6?style=flat-square)](https://github.com/Chamanrajragu/purffle-grab/releases)
+[![Website](https://img.shields.io/badge/🌐_Website-purffle--grab-22d3ee?style=flat-square)](https://chamanrajragu.github.io/purffle-grab/)
+
+### 🌐 [**Visit the website →**](https://chamanrajragu.github.io/purffle-grab/)
 
 </div>
 

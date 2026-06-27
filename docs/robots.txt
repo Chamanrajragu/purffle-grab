@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://chamanrajragu.github.io/purffle-grab/sitemap.xml
