@@ -17,6 +17,13 @@
 
 </div>
 
+<div align="center">
+
+### ⭐ Star this repo if you find it useful — it really helps! &nbsp;·&nbsp; 🌐 [**Live page → purffle.com/purffle-grab**](https://purffle.com/purffle-grab/)
+
+</div>
+
+
 ---
 
 **PurffleGrab** is a free, open-source **Spotify and YouTube downloader** for Windows. Paste a link —
@@ -138,3 +145,23 @@ Built with [Electron](https://www.electronjs.org/), [yt-dlp](https://github.com/
 <sub>Keywords: free spotify downloader · youtube to mp3 · youtube downloader 4k · spotify playlist downloader ·
 download youtube playlist · youtube to mp4 · music downloader for windows · spotify to mp3 converter</sub>
 </div>
+
+
+---
+
+<!-- purffle-ecosystem -->
+## 🧩 The Purffle toolset
+
+**PurffleGrab** is part of **[Purffle](https://purffle.com)** — a growing set of free, open-source tools built in the open. **If this saved you time, please drop a ⭐ — it genuinely helps the project reach more people!**
+
+| Tool | What it does |
+|------|--------------|
+| 🎵 **[PurffleGrab](https://github.com/Chamanrajragu/purffle-grab)** 👈 | Free Spotify & YouTube downloader — MP3, MP4, 4K |
+| 🎥 **[PurffleVision](https://github.com/Chamanrajragu/purffle-vision)** | AI video creation — any topic to a finished video |
+| ⚡ **[PurffleShorts](https://github.com/Chamanrajragu/purffle-shorts)** | Autonomous YouTube Shorts generator |
+| 📈 **[PurffleTrader](https://github.com/Chamanrajragu/purffle-trader)** | Crypto paper-trading bot — Binance, EMA + RSI |
+| 🤖 **[PurffleCopyBot](https://github.com/Chamanrajragu/purffle-copybot)** | Copy-trading bot — mirror top Hyperliquid traders |
+
+<sub>🌐 [purffle.com](https://purffle.com) · 💼 by [Chaman Raj](https://github.com/Chamanrajragu) · ⭐ Star to support open-source</sub>
+
+<sub>Keywords: free spotify downloader, youtube to mp3, youtube downloader 4k, spotify playlist downloader, music downloader windows</sub>
