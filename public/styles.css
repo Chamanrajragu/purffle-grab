@@ -689,6 +689,7 @@ body {
   display: grid; place-items: center;
   z-index: 100; animation: fadeIn 0.2s ease;
 }
+.modal[hidden] { display: none !important; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .modal-content {
   background: var(--side-solid); border: 1px solid var(--border);
@@ -727,6 +728,7 @@ kbd {
 
 /* ===== Tour ===== */
 .tour-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: grid; place-items: center; backdrop-filter: blur(4px); }
+.tour-overlay[hidden] { display: none !important; }
 .tour-card {
   background: var(--side-solid); border: 1px solid var(--border);
   border-radius: 22px; padding: 32px;

@@ -122,6 +122,8 @@ function showTour() {
   try { if (localStorage.getItem('pg-toured-v3')) return; } catch {}
   tourStep = 0;
   renderTourStep();
+  // Hide any modals first so tour is clearly on top
+  $$('.modal').forEach(m => m.hidden = true);
   $('#tourOverlay').hidden = false;
 }
 function renderTourStep() {
@@ -138,6 +140,10 @@ $('#tourNext').addEventListener('click', () => {
   renderTourStep();
 });
 $('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} });
+// Prevent clicks inside tour card from bubbling to overlay
+$('#tourCard').addEventListener('click', (e) => e.stopPropagation());
+// Click overlay background to dismiss tour
+$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
