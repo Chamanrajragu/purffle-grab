@@ -44,25 +44,37 @@ install: **FFmpeg** and the **yt-dlp** engine are bundled right inside the app.
 | 🎵 **Spotify tracks &amp; playlists** | Reads the track list, finds the best audio, tags it with **cover art + artist**. |
 | 📋 **Batch &amp; drag-and-drop** | Paste many links at once, drop them on the window, or import from a `.txt` file. |
 | ✅ **Track picker &amp; filter** | Choose exactly which songs from a playlist to grab, with in-list search/filter. |
-| ⚡ **Quick presets** | 4K video, 1080p MP4, MP3 320, Phone MP4 720, FLAC lossless, Podcast, Ringtone. |
+| ⚡ **Quick presets** | 4K video, 1080p MP4, MP3 320, Phone MP4 720, FLAC lossless, Podcast, Ringtone, Audiobook. |
 | 🔊 **Formats** | Audio: MP3, M4A, FLAC, WAV, Opus, OGG, AAC. Video: MP4 (H.264/AAC). |
 
-### New in v2.1
+### New in v3.0
+| | |
+|---|---|
+| ⏰ **Download scheduler** | Schedule downloads for later — one-time, daily, or weekly. |
+| 🎨 **Premium glassmorphism UI** | Completely redesigned with backdrop blur, glass cards, smooth animations. |
+| 🖼 **Custom app icon** | Unique PurffleGrab icon (no more default Electron icon). |
+| 📖 **Audiobook preset** | MP3 64 kbps preset for audiobooks &amp; spoken content. |
+| ✂ **Split by chapters** | Split downloaded videos into separate files by chapter markers. |
+| ⏱ **Speed limiter** | Limit download speed to avoid saturating your connection. |
+| 🎨 **9 accent colors** | Purple, blue, green, amber, red, pink, cyan, orange, lime. |
+| 📊 **Animated stats** | Stat values animate on load; day streak counter; estimated total size. |
+| ⌨ **More shortcuts** | Ctrl+S settings, Ctrl+1-9 views, click-outside to close modals. |
+| 🖨 **Print styles** | Clean print layout with sidebar hidden. |
+| ♿ **Better accessibility** | Skip link, ARIA labels, focus-visible, reduced motion support. |
+| 🔍 **100/100 SEO landing page** | Schema.org (5 types), HowTo, WebSite, 12 FAQ, skip link, aria labels. |
+
+### From v2.1
 | | |
 |---|---|
 | 📋 **Queue system** | Add items to a download queue, manage, and batch-start. |
 | 🔄 **Format converter** | Convert between audio/video formats right inside the app. |
 | 📊 **Statistics dashboard** | Total downloads, format breakdown, activity chart, source stats. |
-| 🎨 **Accent colors** | 7 accent colors to personalize the UI (purple, blue, green, amber, red, pink, cyan). |
-| ⌨ **Keyboard shortcuts** | Ctrl+V paste, Ctrl+Enter download, Ctrl+1-8 navigate, Ctrl+D theme, ? help. |
+| ⌨ **Keyboard shortcuts** | Ctrl+V paste, Ctrl+Enter download, Ctrl+1-9 navigate, Ctrl+D theme, ? help. |
 | 📄 **File import** | Import URLs from `.txt` files or drag &amp; drop text files. |
 | 🔎 **Search improvements** | Sort results, select all/clear, filter chips, add to queue from search. |
 | 📤 **Export/import** | Export/import settings and history as JSON. |
 | 🎯 **Filename templates** | Custom filename patterns with `%(title)s`, `%(uploader)s`, etc. |
 | 🏠 **Onboarding tour** | First-time users get a guided tour of the app. |
-| 📱 **Better mobile layout** | Improved responsive design for smaller screens. |
-| ℹ **About page** | Version info, feature list, links. |
-| 📈 **Progress improvements** | Elapsed time, page title with progress %, speed overlay. |
 
 ### Advanced Options
 | | |
@@ -70,14 +82,14 @@ install: **FFmpeg** and the **yt-dlp** engine are bundled right inside the app.
 | 🎚️ **SponsorBlock** | Skip sponsors, intros, outros in YouTube videos. |
 | 💬 **Subtitles** | Download &amp; embed subtitles in any language, including auto-generated. |
 | ✂ **Clip / trim** | Download just a section of a video with start/end times. |
-| 📖 **Chapters** | Embed chapter markers into downloaded files. |
+| 📖 **Chapters** | Embed or split by chapter markers. |
 | 🔈 **Normalize** | Normalize audio loudness across tracks. |
 | 🖼 **Thumbnails** | Embed or save cover art / thumbnails. |
 
 ### App
 | | |
 |---|---|
-| 🌙 **Dark &amp; light themes** | Beautiful themes with smooth transitions. |
+| 🌙 **Dark &amp; light themes** | Glassmorphism themes with smooth transitions. |
 | 🕘 **History** | Search, filter, paginate, export, re-grab past downloads. |
 | ⚙ **Settings** | Custom folder, defaults, notifications, concurrent downloads, engine updates. |
 | 🔒 **Privacy** | No telemetry, no analytics, no trackers. 100% local. |
@@ -107,9 +119,10 @@ Files are saved to `Music\PurffleGrab\` by default (change it in **Settings**).
 | `Ctrl+V` | Paste &amp; auto-detect links |
 | `Ctrl+Enter` | Analyze / Download |
 | `Ctrl+F` | Focus search |
-| `Ctrl+1-8` | Switch views |
+| `Ctrl+1-9` | Switch views |
 | `Ctrl+D` | Toggle dark/light theme |
 | `Ctrl+Q` | Open queue |
+| `Ctrl+S` | Open settings |
 | `Escape` | Close modal / Cancel |
 | `?` | Show shortcuts help |
 
@@ -162,10 +175,16 @@ In <code>Music\PurffleGrab\</code> by default. You can change the folder in Sett
 The installer is Windows-only, but you can run the web server (<code>npm run server</code>) on any OS with Node.js.</details>
 
 <details><summary><b>Can I convert files after downloading?</b></summary>
-Yes! PurffleGrab v2.1 has a built-in converter. Go to the Convert tab and drop any audio/video file.</details>
+Yes! Go to the Convert tab and drop any audio/video file to convert between formats.</details>
 
 <details><summary><b>What's the queue system?</b></summary>
 Add items to a queue from the download or search views, then start them all at once. Great for batch downloading.</details>
+
+<details><summary><b>What's the download scheduler?</b></summary>
+Schedule downloads for a specific date and time. Set one-time, daily, or weekly schedules. PurffleGrab will start the download automatically.</details>
+
+<details><summary><b>Can I split a video by chapters?</b></summary>
+Yes! Enable "Split by chapters" in the advanced options. Each chapter becomes a separate file.</details>
 
 ## ⚠️ Disclaimer
 
@@ -188,7 +207,8 @@ Built with [Electron](https://www.electronjs.org/), [yt-dlp](https://github.com/
 <div align="center">
 <sub>Keywords: free spotify downloader · youtube to mp3 · youtube downloader 4k · spotify playlist downloader ·
 download youtube playlist · youtube to mp4 · music downloader for windows · spotify to mp3 converter ·
-flac downloader · youtube to flac · batch downloader · open source downloader</sub>
+flac downloader · youtube to flac · batch downloader · open source downloader · best youtube downloader 2026 ·
+free spotify downloader 2026 · download scheduler · format converter · sponsorblock downloader</sub>
 </div>
 
 ---

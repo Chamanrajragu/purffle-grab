@@ -1,4 +1,4 @@
-// PurffleGrab front-end (v2.1) — feature-packed edition.
+// PurffleGrab front-end (v3.0) — premium edition.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -8,6 +8,7 @@ let activeES = null;
 let searchSel = new Set();
 let searchResults = [];
 let downloadQueue = [];
+let scheduledDownloads = [];
 let prefs = { defaults: {}, theme: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6' };
 let downloadStartTime = null;
 
@@ -15,11 +16,23 @@ let downloadStartTime = null;
 function setBtnLoading(btn, loading) { if (!btn) return; btn.disabled = loading; const l = btn.querySelector('.btn-label'); if (l) l.style.opacity = loading ? 0 : 1; const s = btn.querySelector('.spinner'); if (s) s.hidden = !loading; }
 function fmtDur(s) { if (!s) return ''; const h = Math.floor(s / 3600); const m = Math.floor((s % 3600) / 60); const x = Math.round(s % 60); if (h) return `${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`; return `${m}:${String(x).padStart(2, '0')}`; }
 function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-function toast(m) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(t._t); t._t = setTimeout(() => (t.hidden = true), 2600); }
+function toast(m) { const t = $('#toast'); t.textContent = m; t.hidden = false; clearTimeout(t._t); t._t = setTimeout(() => (t.hidden = true), 3000); }
 function showErr(sel, m) { const e = $(sel); e.textContent = m; e.hidden = false; }
-function fmtBytes(b) { if (!b) return ''; const u = ['B','KB','MB','GB']; let i = 0; while (b >= 1024 && i < u.length - 1) { b /= 1024; i++; } return b.toFixed(i ? 1 : 0) + ' ' + u[i]; }
+function fmtBytes(b) { if (!b) return '0 B'; const u = ['B','KB','MB','GB','TB']; let i = 0; while (b >= 1024 && i < u.length - 1) { b /= 1024; i++; } return b.toFixed(i ? 1 : 0) + ' ' + u[i]; }
 function fmtTime(sec) { if (!sec || sec < 0) return ''; sec = Math.round(sec); const m = Math.floor(sec / 60); const s = sec % 60; return m ? `${m}m ${s}s` : `${s}s`; }
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function animateValue(el, start, end, dur) {
+  const range = end - start;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / dur, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(start + range * eased);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
 
 // ---- nav ----
 $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
@@ -29,6 +42,7 @@ $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
   if (b.dataset.view === 'settings') loadSettings();
   if (b.dataset.view === 'stats') loadStats();
   if (b.dataset.view === 'queue') renderQueue();
+  if (b.dataset.view === 'scheduler') renderSchedule();
 }));
 function goto(view) {
   $$('.side-btn').forEach((x) => x.classList.toggle('active', x.dataset.view === view));
@@ -64,13 +78,11 @@ try { const c = localStorage.getItem('pg-accent'); if (c) applyAccent(c); } catc
 $('#kbShortcuts').addEventListener('click', () => { $('#shortcutsModal').hidden = false; });
 $$('[data-close]').forEach(b => b.addEventListener('click', () => { b.closest('.modal').hidden = true; }));
 document.addEventListener('keydown', (e) => {
-  // Close modals on Escape
   if (e.key === 'Escape') {
     $$('.modal').forEach(m => m.hidden = true);
     $('#tourOverlay').hidden = true;
     return;
   }
-  // Don't capture when typing in inputs
   const tag = e.target.tagName;
   const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 
@@ -82,27 +94,32 @@ document.addEventListener('keydown', (e) => {
   }
   if (e.ctrlKey && e.key === 'd') { e.preventDefault(); $('#themeToggle').click(); }
   if (e.ctrlKey && e.key === 'q') { e.preventDefault(); goto('queue'); }
+  if (e.ctrlKey && e.key === 's' && !isInput) { e.preventDefault(); goto('settings'); }
   if (e.ctrlKey && e.key === 'f' && !isInput) { e.preventDefault(); goto('search'); setTimeout(() => $('#searchInput').focus(), 100); }
-  if (e.ctrlKey && e.key >= '1' && e.key <= '8') {
+  if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     e.preventDefault();
-    const views = ['download','search','queue','history','stats','converter','settings','about'];
+    const views = ['download','search','queue','history','stats','converter','scheduler','settings','about'];
     const idx = parseInt(e.key) - 1;
     if (views[idx]) goto(views[idx]);
   }
   if (e.key === '?' && !isInput) { e.preventDefault(); $('#shortcutsModal').hidden = false; }
 });
 
+// Close modal on background click
+$$('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.hidden = true; }));
+
 // ---- onboarding tour ----
 const TOUR_STEPS = [
   { title: 'Welcome to PurffleGrab! 🎉', desc: 'The cleanest way to download media from Spotify and YouTube. Let us show you around!' },
-  { title: 'Paste & Download ⬇', desc: 'Just paste a Spotify or YouTube link in the box and hit Analyze. You can paste multiple links at once!' },
-  { title: 'Search YouTube 🔎', desc: 'No link? Use the Search tab to find videos and music directly by name.' },
+  { title: 'Paste & Download ⬇', desc: 'Just paste a Spotify or YouTube link in the box and hit Analyze. You can paste multiple links at once or import from a file!' },
+  { title: 'Search YouTube 🔎', desc: 'No link? Use the Search tab to find videos and music directly by name. Select results and download them.' },
   { title: 'Queue System 📋', desc: 'Add items to the queue and download them all at once. Great for batch downloading!' },
-  { title: 'You\'re all set! ✅', desc: 'Explore the Stats, Converter, and Settings tabs for more power. Hit ? anytime for keyboard shortcuts.' },
+  { title: 'Scheduler ⏰', desc: 'New! Schedule downloads for later. Set a date and time, and PurffleGrab will grab it automatically.' },
+  { title: 'You\'re all set! ✅', desc: 'Explore Stats, Converter, and Settings for more power. Hit ? anytime for keyboard shortcuts.' },
 ];
 let tourStep = 0;
 function showTour() {
-  try { if (localStorage.getItem('pg-toured')) return; } catch {}
+  try { if (localStorage.getItem('pg-toured-v3')) return; } catch {}
   tourStep = 0;
   renderTourStep();
   $('#tourOverlay').hidden = false;
@@ -117,17 +134,17 @@ function renderTourStep() {
 }
 $('#tourNext').addEventListener('click', () => {
   tourStep++;
-  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured', '1'); } catch {} return; }
+  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} return; }
   renderTourStep();
 });
-$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured', '1'); } catch {} });
+$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
-urlInput.addEventListener('input', () => { urlInput.style.height = 'auto'; urlInput.style.height = Math.min(urlInput.scrollHeight, 160) + 'px'; });
+urlInput.addEventListener('input', () => { urlInput.style.height = 'auto'; urlInput.style.height = Math.min(urlInput.scrollHeight, 180) + 'px'; });
 $('#clearBtn').addEventListener('click', () => { urlInput.value = ''; urlInput.style.height = 'auto'; urlInput.focus(); });
 $('#pasteBtn').addEventListener('click', async () => {
-  try { const t = await navigator.clipboard.readText(); if (t) { urlInput.value = (urlInput.value ? urlInput.value + '\n' : '') + t.trim(); urlInput.dispatchEvent(new Event('input')); toast('Pasted from clipboard'); } }
+  try { const t = await navigator.clipboard.readText(); if (t) { urlInput.value = (urlInput.value ? urlInput.value + '\n' : '') + t.trim(); urlInput.dispatchEvent(new Event('input')); toast('📋 Pasted from clipboard'); } }
   catch { toast('Clipboard not available — paste with Ctrl+V.'); }
 });
 
@@ -142,7 +159,7 @@ $('#fileImport').addEventListener('change', (e) => {
     if (urls.length) {
       urlInput.value = (urlInput.value ? urlInput.value + '\n' : '') + urls.join('\n');
       urlInput.dispatchEvent(new Event('input'));
-      toast(`Imported ${urls.length} link${urls.length > 1 ? 's' : ''}`);
+      toast(`📄 Imported ${urls.length} link${urls.length > 1 ? 's' : ''}`);
     } else { toast('No URLs found in that file.'); }
   };
   reader.readAsText(file);
@@ -157,7 +174,6 @@ document.addEventListener('drop', (ev) => {
   const txt = ev.dataTransfer?.getData('text') || '';
   const urls = txt.match(/https?:\/\/\S+/g);
   if (urls) { urlInput.value = (urlInput.value ? urlInput.value + '\n' : '') + urls.join('\n'); urlInput.dispatchEvent(new Event('input')); goto('download'); toast(`Dropped ${urls.length} link${urls.length > 1 ? 's' : ''}`); }
-  // Handle dropped files
   const files = ev.dataTransfer?.files;
   if (files?.length) {
     for (const file of files) {
@@ -165,7 +181,7 @@ document.addEventListener('drop', (ev) => {
         const reader = new FileReader();
         reader.onload = () => {
           const u = reader.result.match(/https?:\/\/\S+/g) || [];
-          if (u.length) { urlInput.value = (urlInput.value ? urlInput.value + '\n' : '') + u.join('\n'); urlInput.dispatchEvent(new Event('input')); toast(`Imported ${u.length} links from ${file.name}`); }
+          if (u.length) { urlInput.value = (urlInput.value ? urlInput.value + '\n' : '') + u.join('\n'); urlInput.dispatchEvent(new Event('input')); toast(`📄 Imported ${u.length} links from ${file.name}`); }
         };
         reader.readAsText(file);
       }
@@ -223,7 +239,6 @@ function renderSourceCard(idx) {
     card.querySelectorAll('input[data-ti]').forEach((cb) => (cb.checked = selected.has(Number(cb.dataset.ti))));
     updateSelInfo(card, selected, data.count); updateDlCount();
   }));
-  // Track filter/search within playlist
   const trackSearch = card.querySelector('.track-search');
   if (trackSearch) {
     trackSearch.addEventListener('input', debounce(() => {
@@ -255,6 +270,7 @@ const PRESETS = {
   flac: { type: 'audio', audioFormat: 'flac', audioBitrate: '' },
   podcast: { type: 'audio', audioFormat: 'mp3', audioBitrate: '128' },
   ringtone: { type: 'audio', audioFormat: 'm4a', audioBitrate: '256' },
+  audiobook: { type: 'audio', audioFormat: 'mp3', audioBitrate: '64' },
 };
 $$('.preset').forEach((p) => p.addEventListener('click', () => {
   const c = PRESETS[p.dataset.preset]; if (!c) return;
@@ -272,6 +288,8 @@ function gatherOptions() {
   return { contentType: type, resolution: $('#resolution').value, audioFormat: $('#audioFormat').value, audioBitrate: $('#audioBitrate').value,
     embedThumbnail: $('#embedThumb').checked, embedMetadata: $('#embedMeta').checked, saveThumbnail: $('#saveThumb').checked,
     embedChapters: $('#embedChapters').checked, sponsorblock: $('#sponsorblock').checked, normalize: $('#normalize').checked,
+    splitChapters: $('#splitChapters')?.checked || false,
+    speedLimit: $('#speedLimit')?.value?.trim() || '',
     filenameTemplate: $('#filenameTemplate')?.value?.trim() || '',
     subtitles: { enabled: $('#subsEnabled').checked, langs: $('#subsLangs').value || 'en', auto: $('#subsAuto').checked, embed: $('#subsEmbed').checked },
     clip: { start: $('#clipStart').value.trim(), end: $('#clipEnd').value.trim() } };
@@ -285,7 +303,7 @@ function addToQueue(srcList, options) {
   saveQueue();
   renderQueue();
   updateQueueBadge();
-  toast(`Added ${items.length} item${items.length > 1 ? 's' : ''} to queue`);
+  toast(`📋 Added ${items.length} item${items.length > 1 ? 's' : ''} to queue`);
 }
 function saveQueue() { try { localStorage.setItem('pg-queue', JSON.stringify(downloadQueue)); } catch {} }
 function loadQueue() { try { downloadQueue = JSON.parse(localStorage.getItem('pg-queue') || '[]'); } catch { downloadQueue = []; } updateQueueBadge(); }
@@ -350,7 +368,6 @@ async function startDownload(srcList, options) {
   const list = srcList || gatherSources();
   if (!list.length) { toast('Nothing selected.'); return; }
 
-  // Check if "add to queue" is checked
   if ($('#addToQueue')?.checked && !options) {
     addToQueue(list, opts);
     return;
@@ -383,13 +400,11 @@ function renderProgress(job) {
   $('#progMeta').textContent = [job.speed, job.eta ? 'ETA ' + job.eta : ''].filter(Boolean).join(' · ');
   if (job.title) $('#progTitle').textContent = ['complete', 'cancelled', 'error'].includes(job.status) ? job.title : `Downloading ${job.title}…`;
 
-  // Elapsed time display
   if (downloadStartTime) {
     const elapsed = Math.round((Date.now() - downloadStartTime) / 1000);
     $('#progTimeInfo').textContent = `Elapsed: ${fmtTime(elapsed)}`;
   }
 
-  // Update page title with progress
   document.title = pct < 100 ? `(${pct}%) Downloading — PurffleGrab` : 'PurffleGrab';
 
   $('#itemList').innerHTML = job.items.map((it, i) => {
@@ -421,14 +436,14 @@ function finishProgress(job) {
   $('#shareDoneBtn').onclick = () => {
     const text = `I just downloaded "${job.title}" with PurffleGrab! https://github.com/Chamanrajragu/purffle-grab`;
     if (navigator.share) { navigator.share({ title: 'PurffleGrab', text }).catch(() => {}); }
-    else { navigator.clipboard?.writeText(text).then(() => toast('Copied share text!')); }
+    else { navigator.clipboard?.writeText(text).then(() => toast('📋 Copied share text!')); }
   };
   if (job.status === 'complete' && lastDoneJob !== job.id) { lastDoneJob = job.id; notifyDone(done); saveDownloadStats(job); }
   downloadStartTime = null;
 }
 function notifyDone(n) {
   if (!prefs.notify) return;
-  try { if (Notification.permission === 'granted') new Notification('PurffleGrab', { body: `Done — ${n} ${n === 1 ? 'file' : 'files'} saved.`, icon: '/favicon.ico' }); else if (Notification.permission !== 'denied') Notification.requestPermission(); } catch {}
+  try { if (Notification.permission === 'granted') new Notification('PurffleGrab', { body: `Done — ${n} ${n === 1 ? 'file' : 'files'} saved.`, icon: '/favicon.svg' }); else if (Notification.permission !== 'denied') Notification.requestPermission(); } catch {}
 }
 $('#cancelBtn').addEventListener('click', () => { if (activeJobId) fetch(`/api/cancel/${activeJobId}`, { method: 'POST' }); });
 
@@ -438,15 +453,18 @@ function saveDownloadStats(job) {
     const stats = JSON.parse(localStorage.getItem('pg-stats') || '{}');
     if (!stats.downloads) stats.downloads = [];
     const opts = job.options || {};
+    const doneCount = job.items.filter(i => i.status === 'done').length;
     stats.downloads.push({
       date: new Date().toISOString().slice(0, 10),
-      count: job.items.filter(i => i.status === 'done').length,
+      count: doneCount,
       failed: job.items.filter(i => i.status === 'failed').length,
       format: opts.contentType === 'audio' ? (opts.audioFormat || 'mp3') : 'mp4',
       source: job.sources?.[0]?.url?.includes('spotify') ? 'spotify' : 'youtube',
     });
-    // Keep last 500 entries
-    if (stats.downloads.length > 500) stats.downloads = stats.downloads.slice(-500);
+    // Track total size (estimate)
+    if (!stats.totalSize) stats.totalSize = 0;
+    stats.totalSize += doneCount * 5 * 1024 * 1024; // rough 5MB estimate per file
+    if (stats.downloads.length > 1000) stats.downloads = stats.downloads.slice(-1000);
     localStorage.setItem('pg-stats', JSON.stringify(stats));
   } catch {}
 }
@@ -463,19 +481,33 @@ function loadStats() {
     const spotify = dl.filter(d => d.source === 'spotify').reduce((a, d) => a + d.count, 0);
     const youtube = dl.filter(d => d.source === 'youtube').reduce((a, d) => a + d.count, 0);
 
-    $('#statTotal').textContent = total;
-    $('#statSuccess').textContent = total - failed;
-    $('#statAudio').textContent = audio;
-    $('#statVideo').textContent = video;
-    $('#statSpotify').textContent = spotify;
-    $('#statYoutube').textContent = youtube;
+    // Animate stat values
+    animateValue($('#statTotal'), 0, total, 800);
+    animateValue($('#statSuccess'), 0, total - failed, 800);
+    animateValue($('#statAudio'), 0, audio, 800);
+    animateValue($('#statVideo'), 0, video, 800);
+    animateValue($('#statSpotify'), 0, spotify, 800);
+    animateValue($('#statYoutube'), 0, youtube, 800);
+    $('#statSize').textContent = fmtBytes(stats.totalSize || 0);
+
+    // Calculate streak
+    const today = new Date().toISOString().slice(0, 10);
+    const uniqueDates = [...new Set(dl.map(d => d.date))].sort().reverse();
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 365; i++) {
+      const key = d.toISOString().slice(0, 10);
+      if (uniqueDates.includes(key)) { streak++; d.setDate(d.getDate() - 1); }
+      else break;
+    }
+    animateValue($('#statStreak'), 0, streak, 600);
 
     // Activity chart - last 14 days
     const chart = $('#statsChart');
     const days = {};
     for (let i = 13; i >= 0; i--) {
-      const d = new Date(); d.setDate(d.getDate() - i);
-      const key = d.toISOString().slice(0, 10);
+      const dd = new Date(); dd.setDate(dd.getDate() - i);
+      const key = dd.toISOString().slice(0, 10);
       days[key] = 0;
     }
     dl.forEach(d => { if (days[d.date] !== undefined) days[d.date] += d.count; });
@@ -483,7 +515,7 @@ function loadStats() {
     chart.innerHTML = Object.entries(days).map(([date, count]) => {
       const h = Math.max(4, (count / maxVal) * 180);
       const label = date.slice(5);
-      return `<div class="chart-bar" style="height:${h}px" data-label="${label}" data-value="${count}" title="${date}: ${count}"></div>`;
+      return `<div class="chart-bar" style="height:${h}px" data-label="${label}" data-value="${count}" title="${date}: ${count} downloads"></div>`;
     }).join('');
 
     // Format breakdown
@@ -492,8 +524,8 @@ function loadStats() {
     const fmtChart = $('#formatChart');
     const fmtMax = Math.max(1, ...Object.values(formats));
     fmtChart.innerHTML = Object.entries(formats).sort((a, b) => b[1] - a[1]).map(([fmt, count]) => {
-      return `<div class="format-item"><span class="format-label">${fmt.toUpperCase()}</span><div class="format-bar" style="width:${Math.max(20, (count / fmtMax) * 120)}px"></div><span class="format-count">${count}</span></div>`;
-    }).join('') || '<p class="hint">No data yet.</p>';
+      return `<div class="format-item"><span class="format-label">${fmt.toUpperCase()}</span><div class="format-bar" style="width:${Math.max(24, (count / fmtMax) * 140)}px"></div><span class="format-count">${count}</span></div>`;
+    }).join('') || '<p class="hint">No data yet. Start downloading to see stats!</p>';
   } catch {
     $('#statTotal').textContent = '0';
   }
@@ -508,12 +540,11 @@ async function doSearch() {
 }
 function renderSearch(results) {
   $('#resultCount').textContent = results.length ? `${results.length} results` : '';
-  if (!results.length) { $('#searchResults').innerHTML = '<p class="hint center">No results.</p>'; return; }
+  if (!results.length) { $('#searchResults').innerHTML = '<p class="hint center">No results found. Try different keywords.</p>'; return; }
   $('#searchResults').innerHTML = results.map((r) => `<div class="result" data-url="${esc(r.url)}"><div class="res-thumb"><img src="${r.thumbnail}" alt="${esc(r.title)}" onerror="this.style.opacity=0" loading="lazy"/><span class="res-dur">${fmtDur(r.duration)}</span><span class="res-check">✓</span></div><div class="res-info"><p class="res-title">${esc(r.title)}</p><p class="res-up">${esc(r.uploader)}${r.duration ? ' · ' + fmtDur(r.duration) : ''}</p></div></div>`).join('');
   $$('#searchResults .result').forEach((el) => el.addEventListener('click', () => { const u = el.dataset.url; searchSel.has(u) ? searchSel.delete(u) : searchSel.add(u); el.classList.toggle('sel', searchSel.has(u)); $('#selCount').textContent = `${searchSel.size} selected`; $('#searchActions').hidden = searchSel.size === 0; }));
 }
 
-// Search sorting
 $('#searchSort')?.addEventListener('change', () => {
   const sort = $('#searchSort').value;
   let sorted = [...searchResults];
@@ -522,14 +553,11 @@ $('#searchSort')?.addEventListener('change', () => {
   renderSearch(sorted);
 });
 
-// Search filter chips
 $$('.filter-chip').forEach(c => c.addEventListener('click', () => {
   $$('.filter-chip').forEach(x => x.classList.toggle('active', x === c));
-  // Re-render with filter (simplified - just visual)
   renderSearch(searchResults);
 }));
 
-// Search select all / clear
 $('#searchSelectAll')?.addEventListener('click', () => {
   searchResults.forEach(r => searchSel.add(r.url));
   $$('#searchResults .result').forEach(el => el.classList.add('sel'));
@@ -557,16 +585,14 @@ let historyPage = 0;
 const HISTORY_PAGE_SIZE = 20;
 async function loadHistory() {
   const res = await fetch('/api/history'); const { history } = await res.json(); const wrap = $('#historyList');
-  if (!history.length) { wrap.innerHTML = '<p class="hint center">No downloads yet.</p>'; $('#historyPagination').hidden = true; return; }
+  if (!history.length) { wrap.innerHTML = '<p class="hint center">No downloads yet. Start grabbing!</p>'; $('#historyPagination').hidden = true; return; }
 
-  // Filter
   const filterStatus = $('#historyFilter')?.value || 'all';
   const filterText = ($('#historySearch')?.value || '').toLowerCase().trim();
   let filtered = history;
   if (filterStatus !== 'all') filtered = filtered.filter(h => h.status === filterStatus);
   if (filterText) filtered = filtered.filter(h => (h.title || '').toLowerCase().includes(filterText));
 
-  // Pagination
   const totalPages = Math.ceil(filtered.length / HISTORY_PAGE_SIZE);
   historyPage = Math.min(historyPage, totalPages - 1);
   const page = filtered.slice(historyPage * HISTORY_PAGE_SIZE, (historyPage + 1) * HISTORY_PAGE_SIZE);
@@ -580,7 +606,6 @@ async function loadHistory() {
     el.querySelector('[data-act="regrab"]').onclick = () => { if (h) startDownload(h.sources, h.options); };
   });
 
-  // Pagination controls
   const pagEl = $('#historyPagination');
   if (totalPages > 1) {
     pagEl.hidden = false;
@@ -593,7 +618,6 @@ $('#clearHistory').addEventListener('click', async () => { await fetch('/api/his
 $('#historyFilter')?.addEventListener('change', () => { historyPage = 0; loadHistory(); });
 $('#historySearch')?.addEventListener('input', debounce(() => { historyPage = 0; loadHistory(); }, 300));
 
-// Export history
 $('#exportHistory')?.addEventListener('click', async () => {
   const res = await fetch('/api/history');
   const { history } = await res.json();
@@ -601,7 +625,7 @@ $('#exportHistory')?.addEventListener('click', async () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = `purfflegrab-history-${new Date().toISOString().slice(0,10)}.json`; a.click();
   URL.revokeObjectURL(url);
-  toast('History exported!');
+  toast('📤 History exported!');
 });
 
 // ---- converter ----
@@ -619,7 +643,7 @@ converterFile?.addEventListener('change', e => { if (e.target.files[0]) handleCo
 let converterSelectedFile = null;
 function handleConverterFile(file) {
   converterSelectedFile = file;
-  $('#converterFileName').textContent = `${file.name} (${fmtBytes(file.size)})`;
+  $('#converterFileName').textContent = `📁 ${file.name} (${fmtBytes(file.size)})`;
   $('#converterInfo').hidden = false;
   $('#convertResult').hidden = true;
 }
@@ -645,7 +669,7 @@ $('#convertBtn')?.addEventListener('click', async () => {
     $('#convertBar').style.width = '100%';
     $('#convertResult').hidden = false;
     $('#convertResult').innerHTML = `<div class="done-actions"><a href="${url}" download="${esc(name)}" class="btn-primary">⬇ Download ${esc(name)}</a></div>`;
-    toast('Conversion complete!');
+    toast('✅ Conversion complete!');
   } catch (err) {
     toast(err.message);
     $('#convertResult').hidden = false;
@@ -654,6 +678,73 @@ $('#convertBtn')?.addEventListener('click', async () => {
     setBtnLoading($('#convertBtn'), false);
   }
 });
+
+// ---- scheduler ----
+function loadSchedule() { try { scheduledDownloads = JSON.parse(localStorage.getItem('pg-schedule') || '[]'); } catch { scheduledDownloads = []; } }
+function saveSchedule() { try { localStorage.setItem('pg-schedule', JSON.stringify(scheduledDownloads)); } catch {} }
+function renderSchedule() {
+  const list = $('#scheduleList');
+  if (!scheduledDownloads.length) {
+    list.innerHTML = '<p class="hint center">No scheduled downloads yet. Schedule one above!</p>';
+    return;
+  }
+  list.innerHTML = scheduledDownloads.map((s, i) => {
+    const dt = new Date(s.datetime);
+    const isPast = dt < new Date();
+    return `<div class="queue-item" data-si="${i}">
+      <div class="qi-info">
+        <div class="qi-title">${esc(s.url)}</div>
+        <div class="qi-meta">${dt.toLocaleString()} · ${s.repeat} ${isPast ? '· <b style="color:var(--amber)">past</b>' : ''}</div>
+      </div>
+      <span class="st ${isPast ? 'done' : 'queued'}">${isPast ? 'past' : 'scheduled'}</span>
+      <div class="qi-actions">
+        ${!isPast ? `<button class="mini" data-sact="now">▶ Now</button>` : ''}
+        <button class="mini danger" data-sact="remove">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  $$('#scheduleList .queue-item').forEach(el => {
+    const i = Number(el.dataset.si);
+    el.querySelector('[data-sact="remove"]')?.addEventListener('click', () => { scheduledDownloads.splice(i, 1); saveSchedule(); renderSchedule(); });
+    el.querySelector('[data-sact="now"]')?.addEventListener('click', () => {
+      const s = scheduledDownloads[i];
+      urlInput.value = s.url;
+      goto('download');
+      analyze();
+    });
+  });
+}
+$('#scheduleAddBtn')?.addEventListener('click', () => {
+  const url = $('#scheduleUrl')?.value?.trim();
+  const date = $('#scheduleDate')?.value;
+  const time = $('#scheduleTime')?.value;
+  const repeat = $('#scheduleRepeat')?.value || 'once';
+  if (!url) { toast('Please enter a URL'); return; }
+  if (!date || !time) { toast('Please set date and time'); return; }
+  const datetime = new Date(`${date}T${time}`).toISOString();
+  scheduledDownloads.push({ url, datetime, repeat, status: 'scheduled', addedAt: Date.now() });
+  saveSchedule();
+  renderSchedule();
+  $('#scheduleUrl').value = '';
+  toast('⏰ Download scheduled!');
+});
+
+// Check for scheduled downloads every minute
+setInterval(() => {
+  const now = new Date();
+  scheduledDownloads.forEach(s => {
+    if (s.status !== 'scheduled') return;
+    const dt = new Date(s.datetime);
+    if (dt <= now) {
+      s.status = 'started';
+      saveSchedule();
+      urlInput.value = s.url;
+      analyze();
+      toast(`⏰ Scheduled download started: ${s.url.slice(0, 40)}…`);
+    }
+  });
+}, 60000);
 
 // ---- settings ----
 async function loadSettings() {
@@ -674,19 +765,18 @@ $('#saveSettings').addEventListener('click', async () => {
     defaults: { contentType: $('#defType').value, resolution: $('#defRes').value, audioFormat: $('#defFmt').value } };
   const res = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await res.json();
-  if (res.ok) { prefs = data.settings; const m = $('#settingsSaved'); m.hidden = false; setTimeout(() => (m.hidden = true), 1800); toast('Settings saved!'); } else toast(data.error);
+  if (res.ok) { prefs = data.settings; const m = $('#settingsSaved'); m.hidden = false; setTimeout(() => (m.hidden = true), 2000); toast('💾 Settings saved!'); } else toast(data.error);
 });
 $('#updateEngine').addEventListener('click', async () => { const out = $('#engineOut'); out.hidden = false; out.textContent = 'Updating…'; try { const res = await fetch('/api/update-engine', { method: 'POST' }); const data = await res.json(); out.textContent = res.ok ? (data.output || 'Up to date.') : ('Error: ' + data.error); } catch (e) { out.textContent = 'Error: ' + e.message; } });
 $('#checkEngine')?.addEventListener('click', async () => { const out = $('#engineOut'); out.hidden = false; out.textContent = 'Checking…'; try { const res = await fetch('/api/check-engine', { method: 'POST' }); const data = await res.json(); out.textContent = res.ok ? (data.output || 'Check complete.') : ('Error: ' + data.error); } catch (e) { out.textContent = 'Error: ' + e.message; } });
 
-// Export/import settings
 $('#exportSettings')?.addEventListener('click', async () => {
   const res = await fetch('/api/settings'); const { settings } = await res.json();
   const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'purfflegrab-settings.json'; a.click();
   URL.revokeObjectURL(url);
-  toast('Settings exported!');
+  toast('📤 Settings exported!');
 });
 $('#importSettings')?.addEventListener('click', () => $('#settingsImportFile').click());
 $('#settingsImportFile')?.addEventListener('change', async (e) => {
@@ -696,7 +786,7 @@ $('#settingsImportFile')?.addEventListener('change', async (e) => {
     try {
       const settings = JSON.parse(reader.result);
       const res = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings) });
-      if (res.ok) { toast('Settings imported!'); loadSettings(); } else toast('Import failed');
+      if (res.ok) { toast('📥 Settings imported!'); loadSettings(); } else toast('Import failed');
     } catch { toast('Invalid settings file'); }
   };
   reader.readAsText(file);
@@ -718,5 +808,6 @@ $$('.chip').forEach((c) => c.addEventListener('click', () => { urlInput.value = 
 // ---- init ----
 loadSettings();
 loadQueue();
+loadSchedule();
 try { if (Notification.permission === 'default') Notification.requestPermission(); } catch {}
-setTimeout(showTour, 500);
+setTimeout(showTour, 600);

@@ -1,7 +1,7 @@
 {
   "name": "purfflegrab",
-  "version": "2.1.0",
-  "description": "PurffleGrab — a clean, free Spotify & YouTube downloader",
+  "version": "3.0.0",
+  "description": "PurffleGrab — free, open-source Spotify & YouTube downloader for Windows. MP3, FLAC, MP4, 4K.",
   "author": "Purffle",
   "type": "module",
   "main": "electron/main.js",

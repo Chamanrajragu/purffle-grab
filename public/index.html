@@ -10,9 +10,11 @@
   <meta property="og:title" content="PurffleGrab — Free Spotify & YouTube Downloader" />
   <meta property="og:description" content="Download videos, playlists and music from Spotify & YouTube. MP3, FLAC, MP4, up to 4K." />
   <meta property="og:type" content="website" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <title>PurffleGrab</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 </head>
 <body data-theme="dark">
@@ -20,25 +22,26 @@
     <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar">
       <div class="brand">
-        <div class="logo">P</div>
-        <div class="brand-txt"><span class="brand-name">PurffleGrab</span><span class="brand-sub">media downloader</span></div>
+        <div class="logo"></div>
+        <div class="brand-txt"><span class="brand-name">PurffleGrab</span><span class="brand-sub">Media Grabber</span></div>
       </div>
 
-      <nav class="side-nav">
+      <nav class="side-nav" aria-label="App navigation">
         <button class="side-btn active" data-view="download"><span class="ic">⬇</span><span class="nav-text"> Download</span></button>
         <button class="side-btn" data-view="search"><span class="ic">🔎</span><span class="nav-text"> Search</span></button>
         <button class="side-btn" data-view="queue"><span class="ic">📋</span><span class="nav-text"> Queue</span><span id="queueBadge" class="nav-badge" hidden>0</span></button>
         <button class="side-btn" data-view="history"><span class="ic">🕘</span><span class="nav-text"> History</span></button>
         <button class="side-btn" data-view="stats"><span class="ic">📊</span><span class="nav-text"> Stats</span></button>
         <button class="side-btn" data-view="converter"><span class="ic">🔄</span><span class="nav-text"> Convert</span></button>
+        <button class="side-btn" data-view="scheduler"><span class="ic">⏰</span><span class="nav-text"> Scheduler</span><span class="new-dot"></span></button>
         <button class="side-btn" data-view="settings"><span class="ic">⚙</span><span class="nav-text"> Settings</span></button>
         <button class="side-btn" data-view="about"><span class="ic">ℹ</span><span class="nav-text"> About</span></button>
       </nav>
 
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
-        <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
-        <span class="ver">v2.1 · a Purffle tool</span>
+        <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts (?)"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
+        <span class="ver">v3.0 · a Purffle tool</span>
       </div>
     </aside>
 
@@ -64,8 +67,8 @@
         </div>
         <div class="examples">
           <span>Try:</span>
-          <button class="chip" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">a YouTube video</button>
-          <button class="chip" data-url="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M">a Spotify playlist</button>
+          <button class="chip" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">🎬 a YouTube video</button>
+          <button class="chip" data-url="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M">🎵 a Spotify playlist</button>
         </div>
         <div id="analyzeError" class="error-msg" hidden></div>
 
@@ -82,7 +85,8 @@
             <button class="preset" data-preset="phone">📱 Phone MP4 720</button>
             <button class="preset" data-preset="flac">💿 FLAC lossless</button>
             <button class="preset" data-preset="podcast">🎙 Podcast MP3 128</button>
-            <button class="preset" data-preset="ringtone">📱 Ringtone M4A</button>
+            <button class="preset" data-preset="ringtone">🔔 Ringtone M4A</button>
+            <button class="preset" data-preset="audiobook">📖 Audiobook MP3 64</button>
           </div>
 
           <div class="options">
@@ -134,17 +138,18 @@
             </div>
 
             <div class="opt-group checks">
-              <label class="check"><input type="checkbox" id="embedThumb" checked /><span>Embed cover/thumbnail</span></label>
+              <label class="check"><input type="checkbox" id="embedThumb" checked /><span>Embed cover / thumbnail</span></label>
               <label class="check"><input type="checkbox" id="embedMeta" checked /><span>Embed title &amp; artist</span></label>
               <label class="check"><input type="checkbox" id="saveThumb" /><span>Save thumbnail image</span></label>
               <label class="check"><input type="checkbox" id="embedChapters" /><span>Embed chapters</span></label>
               <label class="check"><input type="checkbox" id="sponsorblock" /><span>SponsorBlock (skip sponsors)</span></label>
               <label class="check"><input type="checkbox" id="normalize" /><span>Normalize loudness</span></label>
+              <label class="check"><input type="checkbox" id="splitChapters" /><span>Split by chapters</span></label>
               <label class="check"><input type="checkbox" id="addToQueue" /><span>Add to queue instead of downloading now</span></label>
             </div>
 
             <details class="advanced">
-              <summary>Advanced — subtitles, clip &amp; filename</summary>
+              <summary>Advanced — subtitles, clip, filename &amp; speed limit</summary>
               <div class="adv-body">
                 <div class="opt-group">
                   <label class="check"><input type="checkbox" id="subsEnabled" /><span>Download subtitles / captions</span></label>
@@ -165,7 +170,11 @@
                 <div class="opt-group">
                   <label class="opt-label">Custom filename template</label>
                   <input type="text" id="filenameTemplate" class="text-input" placeholder="%(title)s - %(uploader)s.%(ext)s" aria-label="Filename template" />
-                  <p class="hint">Variables: %(title)s, %(uploader)s, %(upload_date)s, %(id)s, %(ext)s, %(resolution)s</p>
+                  <p class="hint">Variables: %(title)s, %(uploader)s, %(upload_date)s, %(id)s, %(ext)s, %(resolution)s, %(playlist_index)s</p>
+                </div>
+                <div class="opt-group">
+                  <label class="opt-label">Speed limit (e.g. 5M, 500K, 0 = unlimited)</label>
+                  <input type="text" id="speedLimit" class="text-input small" placeholder="0" aria-label="Download speed limit" />
                 </div>
               </div>
             </details>
@@ -209,7 +218,7 @@
           </div>
         </div>
         <div class="search-sort">
-          <label class="opt-label">Sort by:</label>
+          <label class="opt-label" style="margin:0">Sort:</label>
           <select id="searchSort" class="select mini-select" aria-label="Sort results">
             <option value="relevance">Relevance</option>
             <option value="date">Upload date</option>
@@ -266,39 +275,17 @@
       <section id="view-stats" class="view">
         <div class="view-head"><h2>Statistics</h2><p>Your download activity at a glance.</p></div>
         <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">📥</div>
-            <div class="stat-value" id="statTotal">0</div>
-            <div class="stat-label">Total downloads</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-value" id="statSuccess">0</div>
-            <div class="stat-label">Successful</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🎵</div>
-            <div class="stat-value" id="statAudio">0</div>
-            <div class="stat-label">Audio files</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🎬</div>
-            <div class="stat-value" id="statVideo">0</div>
-            <div class="stat-label">Video files</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🟢</div>
-            <div class="stat-value" id="statSpotify">0</div>
-            <div class="stat-label">From Spotify</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">🔴</div>
-            <div class="stat-value" id="statYoutube">0</div>
-            <div class="stat-label">From YouTube</div>
-          </div>
+          <div class="stat-card"><div class="stat-icon">📥</div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total downloads</div></div>
+          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statSuccess">0</div><div class="stat-label">Successful</div></div>
+          <div class="stat-card"><div class="stat-icon">🎵</div><div class="stat-value" id="statAudio">0</div><div class="stat-label">Audio files</div></div>
+          <div class="stat-card"><div class="stat-icon">🎬</div><div class="stat-value" id="statVideo">0</div><div class="stat-label">Video files</div></div>
+          <div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-value" id="statSpotify">0</div><div class="stat-label">From Spotify</div></div>
+          <div class="stat-card"><div class="stat-icon">🔴</div><div class="stat-value" id="statYoutube">0</div><div class="stat-label">From YouTube</div></div>
+          <div class="stat-card"><div class="stat-icon">💾</div><div class="stat-value" id="statSize">0</div><div class="stat-label">Total size</div></div>
+          <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-value" id="statStreak">0</div><div class="stat-label">Day streak</div></div>
         </div>
         <div class="card mt">
-          <h3 class="card-title">Recent activity</h3>
+          <h3 class="card-title">Recent activity (14 days)</h3>
           <div id="statsChart" class="stats-chart"></div>
         </div>
         <div class="card mt">
@@ -309,10 +296,10 @@
 
       <!-- ===== CONVERTER VIEW ===== -->
       <section id="view-converter" class="view">
-        <div class="view-head"><h2>Convert</h2><p>Convert downloaded files between formats.</p></div>
+        <div class="view-head"><h2>Convert</h2><p>Convert downloaded files between formats. Drag &amp; drop or click to select.</p></div>
         <div class="card">
           <div class="converter-drop" id="converterDrop">
-            <p class="converter-drop-text">Drop a file here or click to select</p>
+            <p class="converter-drop-text">Drop an audio or video file here, or click to browse</p>
             <input type="file" id="converterFile" hidden accept="audio/*,video/*" />
           </div>
           <div id="converterInfo" class="converter-info" hidden>
@@ -327,6 +314,7 @@
                   <option value="wav">WAV</option>
                   <option value="opus">Opus</option>
                   <option value="ogg">OGG</option>
+                  <option value="aac">AAC</option>
                   <option value="mp4">MP4</option>
                   <option value="webm">WebM</option>
                   <option value="mkv">MKV</option>
@@ -345,6 +333,43 @@
           </div>
           <div id="convertProgress" class="bar mt" hidden><div id="convertBar" class="bar-fill"></div></div>
           <div id="convertResult" hidden></div>
+        </div>
+      </section>
+
+      <!-- ===== SCHEDULER VIEW ===== -->
+      <section id="view-scheduler" class="view">
+        <div class="view-head"><h2>Scheduler</h2><p>Schedule downloads for later. Set a time and PurffleGrab will grab it automatically.</p></div>
+        <div class="card">
+          <h3 class="card-title">Schedule a download</h3>
+          <div class="opt-group">
+            <label class="opt-label">URL to download</label>
+            <input type="text" id="scheduleUrl" class="text-input" placeholder="Paste Spotify / YouTube link" aria-label="URL to schedule" />
+          </div>
+          <div class="opt-row mt">
+            <div class="opt-group">
+              <label class="opt-label">Date</label>
+              <input type="date" id="scheduleDate" class="text-input" aria-label="Schedule date" />
+            </div>
+            <div class="opt-group">
+              <label class="opt-label">Time</label>
+              <input type="time" id="scheduleTime" class="text-input" aria-label="Schedule time" />
+            </div>
+            <div class="opt-group">
+              <label class="opt-label">Repeat</label>
+              <select id="scheduleRepeat" class="select" aria-label="Repeat schedule">
+                <option value="once">Once</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+              </select>
+            </div>
+          </div>
+          <button id="scheduleAddBtn" class="btn-primary" style="margin-top:16px">⏰ Schedule download</button>
+        </div>
+        <div class="card mt">
+          <h3 class="card-title">Scheduled downloads</h3>
+          <div id="scheduleList" class="queue-list">
+            <p class="hint center">No scheduled downloads yet.</p>
+          </div>
         </div>
       </section>
 
@@ -368,6 +393,8 @@
             <label class="check"><input type="checkbox" id="defAutoStart" /><span>Auto-start queued downloads</span></label>
             <label class="check"><input type="checkbox" id="defShowSpeed" checked /><span>Show download speed overlay</span></label>
             <label class="check"><input type="checkbox" id="defConfirmClose" checked /><span>Confirm before closing during download</span></label>
+            <label class="check"><input type="checkbox" id="defAutoUpdate" /><span>Auto-update yt-dlp on startup</span></label>
+            <label class="check"><input type="checkbox" id="defMinToTray" /><span>Minimize to system tray</span></label>
           </div>
 
           <h3 class="card-title mt">Appearance</h3>
@@ -382,6 +409,8 @@
                 <button class="swatch" data-color="#ef4444" style="background:#ef4444" title="Red"></button>
                 <button class="swatch" data-color="#ec4899" style="background:#ec4899" title="Pink"></button>
                 <button class="swatch" data-color="#06b6d4" style="background:#06b6d4" title="Cyan"></button>
+                <button class="swatch" data-color="#f97316" style="background:#f97316" title="Orange"></button>
+                <button class="swatch" data-color="#84cc16" style="background:#84cc16" title="Lime"></button>
               </div>
             </div>
           </div>
@@ -411,8 +440,8 @@
         <div class="view-head"><h2>About PurffleGrab</h2></div>
         <div class="card about-card">
           <div class="about-hero">
-            <div class="about-logo">P</div>
-            <h3>PurffleGrab <span class="about-ver">v2.1.0</span></h3>
+            <div class="about-logo">⬇</div>
+            <h3>PurffleGrab <span class="about-ver">v3.0.0</span></h3>
             <p class="about-tagline">The cleanest way to grab media from the web.</p>
           </div>
           <div class="about-features">
@@ -422,15 +451,17 @@
             <div class="about-feat"><span>🔄</span> Built-in format converter</div>
             <div class="about-feat"><span>✂</span> Video trimming &amp; clipping</div>
             <div class="about-feat"><span>📊</span> Download statistics &amp; analytics</div>
+            <div class="about-feat"><span>⏰</span> Download scheduler</div>
             <div class="about-feat"><span>🔎</span> YouTube search built in</div>
-            <div class="about-feat"><span>🎨</span> Dark &amp; light themes with accent colors</div>
+            <div class="about-feat"><span>🎨</span> Dark &amp; light themes with 9 accent colors</div>
             <div class="about-feat"><span>⌨</span> Keyboard shortcuts for power users</div>
             <div class="about-feat"><span>📱</span> Responsive design — works on any screen</div>
+            <div class="about-feat"><span>🔒</span> No telemetry, no ads, fully private</div>
           </div>
           <div class="about-links">
-            <a href="https://github.com/Chamanrajragu/purffle-grab" target="_blank" class="btn-soft">⭐ Star on GitHub</a>
-            <a href="https://github.com/Chamanrajragu/purffle-grab/issues" target="_blank" class="btn-soft">🐛 Report a bug</a>
-            <a href="https://purffle.com" target="_blank" class="btn-soft">🌐 Purffle.com</a>
+            <a href="https://github.com/Chamanrajragu/purffle-grab" target="_blank" rel="noopener" class="btn-soft">⭐ Star on GitHub</a>
+            <a href="https://github.com/Chamanrajragu/purffle-grab/issues" target="_blank" rel="noopener" class="btn-soft">🐛 Report a bug</a>
+            <a href="https://purffle.com" target="_blank" rel="noopener" class="btn-soft">🌐 Purffle.com</a>
           </div>
           <p class="about-copy">Made with ♥ by Purffle · Open source under MIT License</p>
         </div>
@@ -447,9 +478,10 @@
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>V</kbd><span>Paste &amp; auto-detect links</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>Enter</kbd><span>Analyze / Download</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>F</kbd><span>Focus search</span></div>
-        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>1-8</kbd><span>Switch views</span></div>
-        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>D</kbd><span>Toggle dark/light theme</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>1-9</kbd><span>Switch views</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>D</kbd><span>Toggle dark / light theme</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>Q</kbd><span>Open queue</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd><span>Open settings</span></div>
         <div class="shortcut"><kbd>Escape</kbd><span>Close modal / Cancel</span></div>
         <div class="shortcut"><kbd>?</kbd><span>Show this help</span></div>
       </div>
@@ -459,7 +491,7 @@
   <!-- ===== ONBOARDING TOUR ===== -->
   <div id="tourOverlay" class="tour-overlay" hidden>
     <div id="tourCard" class="tour-card">
-      <div class="tour-step-indicator"><span id="tourStepNum">1</span> / <span id="tourStepTotal">5</span></div>
+      <div class="tour-step-indicator"><span id="tourStepNum">1</span> / <span id="tourStepTotal">6</span></div>
       <h3 id="tourTitle"></h3>
       <p id="tourDesc"></p>
       <div class="tour-actions">
