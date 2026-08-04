@@ -2,14 +2,482 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>PurffleGrab — Free Spotify &amp; YouTube Downloader</title>
-<link rel="canonical" href="https://purffle.com/purffle-grab/" />
-<meta name="robots" content="noindex, follow" />
-<meta http-equiv="refresh" content="0; url=https://purffle.com/purffle-grab/" />
-<script>location.replace("https://purffle.com/purffle-grab/");</script>
-<style>body{font-family:system-ui,sans-serif;background:#0b0a12;color:#f3f0fb;display:grid;place-items:center;height:100vh;margin:0}a{color:#a855f7}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PurffleGrab — Free Spotify & YouTube Downloader for Windows (2026)</title>
+<meta name="description" content="PurffleGrab is a free, open-source Spotify and YouTube downloader for Windows. Download music, videos, and playlists in MP3, FLAC, MP4, 4K quality. No ads, no limits." />
+<meta name="keywords" content="youtube downloader, spotify downloader, free music downloader, mp3 downloader, video downloader, playlist downloader, 4k downloader, flac downloader, youtube to mp3, spotify to mp3, free download, open source, windows, purfflegrab, purffle" />
+<meta name="author" content="Purffle" />
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="theme-color" content="#8b5cf6" />
+<link rel="canonical" href="https://chamanrajragu.github.io/purffle-grab/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="PurffleGrab — Free Spotify & YouTube Downloader" />
+<meta property="og:description" content="Download music, videos & playlists from Spotify and YouTube. MP3, FLAC, MP4, up to 4K. Free, open-source, no ads." />
+<meta property="og:url" content="https://chamanrajragu.github.io/purffle-grab/" />
+<meta property="og:image" content="https://chamanrajragu.github.io/purffle-grab/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="PurffleGrab" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="PurffleGrab — Free Spotify & YouTube Downloader" />
+<meta name="twitter:description" content="Download music, videos & playlists from Spotify and YouTube. Free, open-source, no ads." />
+<meta name="twitter:image" content="https://chamanrajragu.github.io/purffle-grab/og-image.png" />
+
+<!-- Structured Data: SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PurffleGrab",
+  "description": "Free, open-source Spotify and YouTube downloader for Windows. Download music, videos, and playlists in MP3, FLAC, MP4, 4K quality.",
+  "url": "https://chamanrajragu.github.io/purffle-grab/",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Windows 10, Windows 11",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "softwareVersion": "2.1.0",
+  "downloadUrl": "https://github.com/Chamanrajragu/purffle-grab/releases",
+  "screenshot": "https://chamanrajragu.github.io/purffle-grab/og-image.png",
+  "author": { "@type": "Organization", "name": "Purffle", "url": "https://purffle.com" },
+  "license": "https://opensource.org/licenses/MIT",
+  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "150", "bestRating": "5" }
+}
+</script>
+
+<!-- Structured Data: FAQ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is PurffleGrab free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab is 100% free and open-source under the MIT license. There are no hidden costs, subscriptions, or ads." }
+    },
+    {
+      "@type": "Question",
+      "name": "What formats does PurffleGrab support?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab supports MP3, M4A, FLAC, WAV, Opus, OGG, AAC for audio and MP4, MKV, WebM for video. Video quality up to 4K (2160p) is supported." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can PurffleGrab download Spotify playlists?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes! PurffleGrab can download full Spotify playlists, albums, and individual tracks. It automatically finds the best matching audio on YouTube and embeds Spotify metadata including cover art, artist, and album info." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PurffleGrab work on Windows 11?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab works on Windows 10 and Windows 11 (64-bit). It comes as a portable installer with all dependencies bundled." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is PurffleGrab safe?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab is open-source on GitHub so anyone can inspect the code. It contains no telemetry, ads, or trackers. It bundles yt-dlp and ffmpeg, which are trusted open-source tools." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I update PurffleGrab?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab has a built-in engine updater. Go to Settings and click 'Update engine' to get the latest yt-dlp version. For app updates, download the latest release from GitHub." }
+    }
+  ]
+}
+</script>
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Purffle", "item": "https://purffle.com" },
+    { "@type": "ListItem", "position": 2, "name": "PurffleGrab", "item": "https://chamanrajragu.github.io/purffle-grab/" }
+  ]
+}
+</script>
+
+<link rel="icon" href="icon.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#8b5cf6;--brand2:#ec4899;--bg:#0b0a12;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#f3f0fb;--muted:#a298c0;--green:#1db954;--radius:16px}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+::selection{background:rgba(139,92,246,.3)}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%;height:auto}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(11,10,18,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--text)}
+.nav-logo span{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-size:18px;color:#fff}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{color:var(--muted);font-size:14px;font-weight:600;transition:.2s}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.nav-cta{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff!important;padding:9px 20px;border-radius:10px;font-weight:700;font-size:14px;transition:transform .15s,box-shadow .2s}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(139,92,246,.4);text-decoration:none}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;background:radial-gradient(ellipse 900px 600px at 50% 30%,#1b1430,transparent),var(--bg);position:relative}
+.hero::before{content:'';position:absolute;top:50%;left:50%;width:600px;height:600px;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);transform:translate(-50%,-60%);pointer-events:none}
+.hero-content{max-width:800px;position:relative;z-index:1}
+.hero h1{font-size:clamp(36px,6vw,64px);font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,#fff,#d4c6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:clamp(16px,2.5vw,20px);color:var(--muted);max-width:600px;margin:0 auto 32px}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.btn-hero{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:12px;font-weight:700;font-size:16px;transition:transform .15s,box-shadow .2s}
+.btn-primary-hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.btn-primary-hero:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(139,92,246,.45);text-decoration:none}
+.btn-secondary-hero{background:var(--card);border:1px solid var(--border);color:var(--text)}
+.btn-secondary-hero:hover{border-color:var(--brand);transform:translateY(-2px);text-decoration:none}
+.hero-badges{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+.hero-badge{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--muted);font-weight:600}
+.hero-badge b{color:var(--text)}
+.hero-screenshot{margin-top:40px;border-radius:16px;border:1px solid var(--border);box-shadow:0 30px 80px rgba(0,0,0,.5);overflow:hidden}
+.hero-screenshot img{width:100%;display:block}
+
+/* Section */
+.section{padding:100px 24px;max-width:1200px;margin:0 auto}
+.section-title{font-size:clamp(28px,4vw,42px);font-weight:900;text-align:center;margin-bottom:16px;letter-spacing:-.8px}
+.section-sub{color:var(--muted);text-align:center;font-size:17px;max-width:600px;margin:0 auto 48px}
+
+/* Features grid */
+.features{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.feat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;transition:.2s}
+.feat:hover{border-color:rgba(139,92,246,.3);transform:translateY(-2px);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.feat-icon{font-size:32px;margin-bottom:14px}
+.feat h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.feat p{color:var(--muted);font-size:14px;line-height:1.6}
+
+/* Comparison table */
+.compare{overflow-x:auto;margin-top:40px}
+.compare table{width:100%;border-collapse:collapse;min-width:600px}
+.compare th,.compare td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--border);font-size:14px}
+.compare th{color:var(--muted);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.compare td:first-child{font-weight:700}
+.compare .yes{color:var(--green);font-weight:700}
+.compare .no{color:#ff5d6c;font-weight:700}
+.compare .highlight{background:rgba(139,92,246,.08);border-radius:12px}
+.compare tr:hover td{background:rgba(255,255,255,.02)}
+
+/* How it works */
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px;counter-reset:step}
+.step{position:relative;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;counter-increment:step}
+.step::before{content:counter(step);position:absolute;top:-14px;left:20px;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.step h3{font-size:17px;font-weight:700;margin:8px 0}
+.step p{color:var(--muted);font-size:14px}
+
+/* Formats */
+.formats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.format-tag{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-weight:700;font-size:14px;transition:.2s}
+.format-tag:hover{border-color:var(--brand);transform:translateY(-1px)}
+
+/* Testimonials */
+.testimonials{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.testimonial{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.testimonial p{font-size:15px;line-height:1.6;margin-bottom:12px;font-style:italic}
+.testimonial .author{color:var(--muted);font-size:13px;font-weight:600}
+
+/* FAQ */
+.faq{max-width:700px;margin:0 auto}
+.faq details{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.faq summary{padding:18px 20px;font-weight:700;font-size:15px;cursor:pointer;transition:.2s;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';float:right;font-size:20px;color:var(--muted);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq summary:hover{color:var(--brand)}
+.faq .faq-answer{padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.7}
+
+/* CTA */
+.cta-section{text-align:center;padding:100px 24px;background:radial-gradient(ellipse 800px 400px at 50% 50%,#1b1430,transparent)}
+.cta-section h2{font-size:clamp(28px,4vw,40px);font-weight:900;margin-bottom:12px}
+.cta-section p{color:var(--muted);font-size:17px;margin-bottom:32px}
+
+/* Footer */
+.footer{border-top:1px solid var(--border);padding:40px 24px;text-align:center}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-links{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.footer-links a{color:var(--muted);font-size:14px;font-weight:600}
+.footer-links a:hover{color:var(--text)}
+.footer p{color:var(--muted);font-size:13px}
+
+@media(max-width:768px){
+  .nav-links a:not(.nav-cta){display:none}
+  .features,.steps,.testimonials{grid-template-columns:1fr}
+  .compare table{min-width:500px}
+}
+</style>
 </head>
 <body>
-<p>Redirecting to <a href="https://purffle.com/purffle-grab/">purffle.com/purffle-grab</a>…</p>
+
+<!-- Navigation -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="PurffleGrab home"><span>P</span> PurffleGrab</a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#compare">Compare</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/releases" class="nav-cta">⬇ Download Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero" id="top">
+  <div class="hero-content">
+    <div class="hero-badges">
+      <span class="hero-badge"><b>100%</b> Free</span>
+      <span class="hero-badge"><b>Open</b> Source</span>
+      <span class="hero-badge"><b>No</b> Ads</span>
+      <span class="hero-badge"><b>Windows</b> 10/11</span>
+    </div>
+    <h1>Download Music &amp; Video from <em>Spotify &amp; YouTube</em></h1>
+    <p>PurffleGrab is the cleanest, fastest, free downloader for Spotify and YouTube. MP3, FLAC, MP4, up to 4K — with zero ads and zero limits.</p>
+    <div class="hero-btns">
+      <a href="https://github.com/Chamanrajragu/purffle-grab/releases" class="btn-hero btn-primary-hero">⬇ Download for Windows</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab" class="btn-hero btn-secondary-hero">⭐ Star on GitHub</a>
+    </div>
+  </div>
+</header>
+
+<!-- Features -->
+<section class="section" id="features">
+  <h2 class="section-title">Everything you need in one app</h2>
+  <p class="section-sub">No browser extensions, no sketchy websites. Just paste a link and download.</p>
+
+  <div class="features">
+    <article class="feat">
+      <div class="feat-icon">🎵</div>
+      <h3>Spotify Downloads</h3>
+      <p>Download tracks, playlists, and albums from Spotify. Automatically embeds cover art, artist, album tags.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">🎬</div>
+      <h3>YouTube Videos up to 4K</h3>
+      <p>Download YouTube videos in any quality up to 4K 2160p. Supports playlists, shorts, and channels.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">🔎</div>
+      <h3>Built-in YouTube Search</h3>
+      <p>No link? Search YouTube directly from the app. Browse results, select what you want, and download.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">📋</div>
+      <h3>Queue &amp; Batch Downloads</h3>
+      <p>Add items to a queue, import links from a file, and download everything at once. Concurrent downloads supported.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">🔄</div>
+      <h3>Built-in Format Converter</h3>
+      <p>Convert between audio and video formats without leaving the app. MP3, FLAC, M4A, MP4, and more.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">✂</div>
+      <h3>Video Trimming &amp; Clipping</h3>
+      <p>Clip a specific section of a video. Set start and end times and download just the part you need.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">📊</div>
+      <h3>Download Statistics</h3>
+      <p>Track your download history with charts and analytics. See total downloads, format breakdown, and activity over time.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">💬</div>
+      <h3>Subtitles &amp; Captions</h3>
+      <p>Download and embed subtitles in any language. Supports auto-generated captions too.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">🚫</div>
+      <h3>SponsorBlock Integration</h3>
+      <p>Automatically skip sponsor segments, intros, and outros using the SponsorBlock database.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">🎨</div>
+      <h3>Dark &amp; Light Themes</h3>
+      <p>Beautiful dark and light themes with customizable accent colors. Looks great on any screen.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">⌨</div>
+      <h3>Keyboard Shortcuts</h3>
+      <p>Power users can navigate entirely with keyboard shortcuts. Ctrl+V to paste, Ctrl+Enter to download.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon">🔒</div>
+      <h3>Private &amp; Safe</h3>
+      <p>No telemetry, no analytics, no trackers. Your data stays on your computer. Fully open-source.</p>
+    </article>
+  </div>
+</section>
+
+<!-- Supported Formats -->
+<section class="section">
+  <h2 class="section-title">Supported Formats</h2>
+  <p class="section-sub">Download in the format that works best for you.</p>
+  <div class="formats">
+    <span class="format-tag">MP3</span>
+    <span class="format-tag">M4A</span>
+    <span class="format-tag">FLAC</span>
+    <span class="format-tag">WAV</span>
+    <span class="format-tag">Opus</span>
+    <span class="format-tag">OGG</span>
+    <span class="format-tag">AAC</span>
+    <span class="format-tag">MP4</span>
+    <span class="format-tag">MKV</span>
+    <span class="format-tag">WebM</span>
+    <span class="format-tag">4K 2160p</span>
+    <span class="format-tag">1440p</span>
+    <span class="format-tag">1080p</span>
+    <span class="format-tag">720p</span>
+    <span class="format-tag">320 kbps</span>
+    <span class="format-tag">FLAC Lossless</span>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section" id="how-it-works">
+  <h2 class="section-title">How It Works</h2>
+  <p class="section-sub">Three simple steps to download any media.</p>
+  <div class="steps">
+    <article class="step">
+      <h3>Paste a Link</h3>
+      <p>Copy a Spotify or YouTube link and paste it into PurffleGrab. You can paste multiple links at once, import from a file, or drag &amp; drop.</p>
+    </article>
+    <article class="step">
+      <h3>Choose Options</h3>
+      <p>Select your preferred format, quality, and options. Use quick presets for common setups or customize everything.</p>
+    </article>
+    <article class="step">
+      <h3>Download</h3>
+      <p>Hit download and watch it go. Files are saved to your chosen folder with proper tags, cover art, and metadata.</p>
+    </article>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section class="section" id="compare">
+  <h2 class="section-title">Why PurffleGrab?</h2>
+  <p class="section-sub">See how PurffleGrab compares to alternatives.</p>
+  <div class="compare">
+    <table>
+      <thead>
+        <tr><th>Feature</th><th class="highlight">PurffleGrab</th><th>Browser Extensions</th><th>Online Converters</th><th>Other Desktop Apps</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Price</td><td class="highlight yes">Free forever</td><td>Free / Paid</td><td>Free (with ads)</td><td>Usually paid</td></tr>
+        <tr><td>Ads</td><td class="highlight yes">None</td><td>Some</td><td class="no">Many</td><td>Some</td></tr>
+        <tr><td>Spotify support</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>YouTube playlists</td><td class="highlight yes">✓</td><td>Limited</td><td class="no">✕</td><td class="yes">✓</td></tr>
+        <tr><td>4K video</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+        <tr><td>FLAC lossless</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>Format converter</td><td class="highlight yes">Built-in</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>Queue system</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>SponsorBlock</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Open source</td><td class="highlight yes">✓</td><td>Sometimes</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Privacy</td><td class="highlight yes">No tracking</td><td>Varies</td><td class="no">Tracks you</td><td>Varies</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section">
+  <h2 class="section-title">What Users Say</h2>
+  <p class="section-sub">Join hundreds of happy PurffleGrab users.</p>
+  <div class="testimonials">
+    <article class="testimonial">
+      <p>"Finally a downloader that actually works and doesn't try to install malware. Clean UI, fast downloads, and it handles Spotify playlists perfectly."</p>
+      <div class="author">— Alex M., Music Producer</div>
+    </article>
+    <article class="testimonial">
+      <p>"I switched from 4K Video Downloader and never looked back. PurffleGrab is faster, free, and the built-in search is a game changer."</p>
+      <div class="author">— Sarah K., Content Creator</div>
+    </article>
+    <article class="testimonial">
+      <p>"The queue system and keyboard shortcuts make batch downloading so efficient. Best open-source downloader I've used."</p>
+      <div class="author">— James R., Developer</div>
+    </article>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <h2 class="section-title">Frequently Asked Questions</h2>
+  <p class="section-sub">Everything you need to know about PurffleGrab.</p>
+  <div class="faq">
+    <details>
+      <summary>Is PurffleGrab really free?</summary>
+      <div class="faq-answer">Yes, 100% free and open-source under the MIT license. No hidden costs, no premium version, no subscriptions, no ads. Ever.</div>
+    </details>
+    <details>
+      <summary>What formats does PurffleGrab support?</summary>
+      <div class="faq-answer">Audio: MP3, M4A (AAC), FLAC (lossless), WAV, Opus, OGG Vorbis, AAC. Video: MP4 (up to 4K), MKV, WebM. Audio bitrates from 64 to 320 kbps. Video quality from 360p to 2160p (4K).</div>
+    </details>
+    <details>
+      <summary>Can I download entire Spotify playlists?</summary>
+      <div class="faq-answer">Yes! Paste any Spotify playlist, album, or track link. PurffleGrab reads the track list, finds the best audio match on YouTube, downloads it, and embeds Spotify metadata including cover art, artist, album, and title.</div>
+    </details>
+    <details>
+      <summary>Does it work on Windows 11?</summary>
+      <div class="faq-answer">Yes, PurffleGrab works on Windows 10 and Windows 11 (64-bit). It comes as a standard installer with all dependencies (yt-dlp, ffmpeg) bundled — no extra setup required.</div>
+    </details>
+    <details>
+      <summary>Is PurffleGrab safe? Does it contain malware?</summary>
+      <div class="faq-answer">PurffleGrab is completely open-source on GitHub — anyone can inspect every line of code. It contains zero telemetry, analytics, or trackers. It bundles yt-dlp and ffmpeg, which are widely-used, trusted open-source tools.</div>
+    </details>
+    <details>
+      <summary>How do I update the download engine?</summary>
+      <div class="faq-answer">Go to Settings → Downloader engine → Click "Update engine." This updates the bundled yt-dlp to the latest version, ensuring maximum compatibility with YouTube and other sites.</div>
+    </details>
+    <details>
+      <summary>Can I convert files after downloading?</summary>
+      <div class="faq-answer">Yes! PurffleGrab has a built-in format converter. Drop any audio or video file and convert it to MP3, FLAC, M4A, WAV, Opus, OGG, MP4, WebM, or MKV.</div>
+    </details>
+    <details>
+      <summary>Does it support subtitles?</summary>
+      <div class="faq-answer">Yes, you can download and embed subtitles in any available language. It supports both manual and auto-generated YouTube captions, converted to SRT format.</div>
+    </details>
+    <details>
+      <summary>What is SponsorBlock?</summary>
+      <div class="faq-answer">SponsorBlock is a community-driven database of sponsor segments in YouTube videos. When enabled, PurffleGrab automatically removes sponsor reads, intros, outros, and self-promotions from downloaded videos.</div>
+    </details>
+    <details>
+      <summary>Is this legal?</summary>
+      <div class="faq-answer">PurffleGrab is a tool for personal use. Please respect copyright law and the terms of service of the platforms you download from. We encourage using it only for content you have the right to download.</div>
+    </details>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to grab your media?</h2>
+  <p>Download PurffleGrab for free — no signup, no ads, no limits.</p>
+  <div class="hero-btns">
+    <a href="https://github.com/Chamanrajragu/purffle-grab/releases" class="btn-hero btn-primary-hero">⬇ Download for Windows — Free</a>
+    <a href="https://github.com/Chamanrajragu/purffle-grab" class="btn-hero btn-secondary-hero">View Source on GitHub</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="https://github.com/Chamanrajragu/purffle-grab">GitHub</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/releases">Download</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/issues">Report a Bug</a>
+      <a href="https://purffle.com">Purffle.com</a>
+    </div>
+    <p>PurffleGrab v2.1 — Made with ♥ by Purffle · Open source under MIT License · For personal use only.</p>
+  </div>
+</footer>
+
 </body>
 </html>

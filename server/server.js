@@ -4,6 +4,7 @@
 import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
+import os from 'node:os';
 import { randomUUID } from 'node:crypto';
 import { exec, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -12,7 +13,7 @@ import archiver from 'archiver';
 import { isSpotifyUrl, getSpotifyData } from './spotify.js';
 import {
   probeYoutube, probeYoutubePlaylist, searchYoutube, updateYtdlp,
-  downloadYoutube, downloadSpotifyTrack,
+  downloadYoutube, downloadSpotifyTrack, run, YTDLP, FFMPEG,
 } from './media.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -287,6 +288,75 @@ export function startServer(opts = {}) {
   app.post('/api/update-engine', async (_q, res) => {
     try { const { stdout } = await updateYtdlp(); res.json({ ok: true, output: stdout.trim() }); }
     catch (err) { res.status(400).json({ error: err.message }); }
+  });
+  app.post('/api/check-engine', async (_q, res) => {
+    try { const { stdout } = await run(YTDLP(), ['--version']); res.json({ ok: true, output: `yt-dlp version: ${stdout.trim()}` }); }
+    catch (err) { res.status(400).json({ error: err.message }); }
+  });
+
+  // ---- file converter ----
+  app.post('/api/convert', async (req, res) => {
+    // Handle multipart upload - simple approach using raw body
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', async () => {
+      try {
+        const body = Buffer.concat(chunks);
+        const boundary = req.headers['content-type']?.match(/boundary=(.+)/)?.[1];
+        if (!boundary) return res.status(400).json({ error: 'Invalid request' });
+
+        // Parse multipart
+        const parts = {};
+        const sep = `--${boundary}`;
+        const str = body.toString('latin1');
+        const sections = str.split(sep).slice(1, -1);
+        for (const section of sections) {
+          const headerEnd = section.indexOf('\r\n\r\n');
+          const header = section.slice(0, headerEnd);
+          const content = section.slice(headerEnd + 4, section.endsWith('\r\n') ? -2 : undefined);
+          const nameMatch = header.match(/name="([^"]+)"/);
+          const fileMatch = header.match(/filename="([^"]+)"/);
+          if (nameMatch) {
+            if (fileMatch) {
+              const start = body.indexOf(Buffer.from('\r\n\r\n', 'latin1'), body.indexOf(Buffer.from(header.slice(0, 40), 'latin1'))) + 4;
+              const nextSep = body.indexOf(Buffer.from(`\r\n${sep}`, 'latin1'), start);
+              parts[nameMatch[1]] = { filename: fileMatch[1], data: body.slice(start, nextSep) };
+            } else {
+              parts[nameMatch[1]] = content.trim();
+            }
+          }
+        }
+
+        const file = parts.file;
+        const format = parts.format || 'mp3';
+        if (!file) return res.status(400).json({ error: 'No file uploaded' });
+
+        const tmpDir = path.join(os.tmpdir(), `pg-convert-${randomUUID().slice(0,8)}`);
+        fs.mkdirSync(tmpDir, { recursive: true });
+        const inPath = path.join(tmpDir, file.filename);
+        const outName = file.filename.replace(/\.[^.]+$/, '') + '.' + format;
+        const outPath = path.join(tmpDir, outName);
+        fs.writeFileSync(inPath, file.data);
+
+        const { FFMPEG } = await import('./media.js');
+        const ffArgs = ['-y', '-i', inPath];
+        if (['mp3','m4a','flac','wav','opus','ogg','aac'].includes(format)) {
+          ffArgs.push('-vn'); // audio only
+          if (format === 'mp3') ffArgs.push('-codec:a', 'libmp3lame', '-q:a', '2');
+          else if (format === 'flac') ffArgs.push('-codec:a', 'flac');
+          else if (format === 'opus') ffArgs.push('-codec:a', 'libopus');
+          else if (format === 'ogg') ffArgs.push('-codec:a', 'libvorbis');
+        }
+        ffArgs.push(outPath);
+
+        await run(FFMPEG(), ffArgs);
+        res.download(outPath, outName, () => {
+          try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
+        });
+      } catch (err) {
+        res.status(500).json({ error: err.message || 'Conversion failed' });
+      }
+    });
   });
 
   const PORT = opts.port || process.env.PORT || 7777;

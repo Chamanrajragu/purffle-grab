@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PurffleGrab — free Spotify & YouTube downloader. Download videos, playlists, and music in MP3, FLAC, MP4, 4K quality." />
+  <meta name="keywords" content="youtube downloader, spotify downloader, mp3 downloader, video downloader, playlist downloader, free music download" />
+  <meta name="author" content="Purffle" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <meta property="og:title" content="PurffleGrab — Free Spotify & YouTube Downloader" />
+  <meta property="og:description" content="Download videos, playlists and music from Spotify & YouTube. MP3, FLAC, MP4, up to 4K." />
+  <meta property="og:type" content="website" />
   <title>PurffleGrab</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,15 +25,20 @@
       </div>
 
       <nav class="side-nav">
-        <button class="side-btn active" data-view="download"><span class="ic">⬇</span> Download</button>
-        <button class="side-btn" data-view="search"><span class="ic">🔎</span> Search</button>
-        <button class="side-btn" data-view="history"><span class="ic">🕘</span> History</button>
-        <button class="side-btn" data-view="settings"><span class="ic">⚙</span> Settings</button>
+        <button class="side-btn active" data-view="download"><span class="ic">⬇</span><span class="nav-text"> Download</span></button>
+        <button class="side-btn" data-view="search"><span class="ic">🔎</span><span class="nav-text"> Search</span></button>
+        <button class="side-btn" data-view="queue"><span class="ic">📋</span><span class="nav-text"> Queue</span><span id="queueBadge" class="nav-badge" hidden>0</span></button>
+        <button class="side-btn" data-view="history"><span class="ic">🕘</span><span class="nav-text"> History</span></button>
+        <button class="side-btn" data-view="stats"><span class="ic">📊</span><span class="nav-text"> Stats</span></button>
+        <button class="side-btn" data-view="converter"><span class="ic">🔄</span><span class="nav-text"> Convert</span></button>
+        <button class="side-btn" data-view="settings"><span class="ic">⚙</span><span class="nav-text"> Settings</span></button>
+        <button class="side-btn" data-view="about"><span class="ic">ℹ</span><span class="nav-text"> About</span></button>
       </nav>
 
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
-        <span class="ver">v2.0 · a Purffle tool</span>
+        <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
+        <span class="ver">v2.1 · a Purffle tool</span>
       </div>
     </aside>
 
@@ -41,13 +53,14 @@
         </div>
 
         <div id="dropzone" class="dropzone">
-          <textarea id="urlInput" rows="2" placeholder="Paste Spotify / YouTube links here (one per line)… or drop them anywhere"></textarea>
+          <textarea id="urlInput" rows="2" placeholder="Paste Spotify / YouTube links here (one per line)… or drop them anywhere" aria-label="Paste download links"></textarea>
           <div class="dz-actions">
-            <button id="pasteBtn" class="btn-soft" title="Paste from clipboard">📋 Paste</button>
+            <button id="pasteBtn" class="btn-soft" title="Paste from clipboard (Ctrl+V)">📋 Paste</button>
+            <button id="importBtn" class="btn-soft" title="Import links from a text file">📄 Import</button>
             <button id="clearBtn" class="btn-soft" title="Clear">✕</button>
             <button id="analyzeBtn" class="btn-primary"><span class="btn-label">Analyze</span><span class="spinner" hidden></span></button>
           </div>
-          <div class="dz-hint">Tip: drop links straight onto the window — or just paste, it auto-detects.</div>
+          <div class="dz-hint">Tip: drop links onto the window, paste with Ctrl+V, or import from a .txt file. Press Ctrl+Enter to analyze.</div>
         </div>
         <div class="examples">
           <span>Try:</span>
@@ -68,6 +81,8 @@
             <button class="preset" data-preset="mp3hq">🎵 MP3 320</button>
             <button class="preset" data-preset="phone">📱 Phone MP4 720</button>
             <button class="preset" data-preset="flac">💿 FLAC lossless</button>
+            <button class="preset" data-preset="podcast">🎙 Podcast MP3 128</button>
+            <button class="preset" data-preset="ringtone">📱 Ringtone M4A</button>
           </div>
 
           <div class="options">
@@ -82,7 +97,7 @@
             <div class="opt-row">
               <div class="opt-group" id="resGroup">
                 <label class="opt-label">Video quality</label>
-                <select id="resolution" class="select">
+                <select id="resolution" class="select" aria-label="Video quality">
                   <option value="best">Best available</option>
                   <option value="2160">4K — 2160p</option>
                   <option value="1440">2K — 1440p</option>
@@ -94,22 +109,26 @@
               </div>
               <div class="opt-group" id="audioGroup">
                 <label class="opt-label">Audio format</label>
-                <select id="audioFormat" class="select">
+                <select id="audioFormat" class="select" aria-label="Audio format">
                   <option value="mp3" selected>MP3 (most compatible)</option>
                   <option value="m4a">M4A (AAC)</option>
                   <option value="flac">FLAC (lossless)</option>
                   <option value="wav">WAV</option>
                   <option value="opus">Opus</option>
+                  <option value="ogg">OGG Vorbis</option>
+                  <option value="aac">AAC</option>
                 </select>
               </div>
               <div class="opt-group" id="bitrateGroup">
                 <label class="opt-label">Audio bitrate</label>
-                <select id="audioBitrate" class="select">
+                <select id="audioBitrate" class="select" aria-label="Audio bitrate">
                   <option value="">Best</option>
                   <option value="320">320 kbps</option>
                   <option value="256">256 kbps</option>
                   <option value="192">192 kbps</option>
                   <option value="128">128 kbps</option>
+                  <option value="96">96 kbps</option>
+                  <option value="64">64 kbps</option>
                 </select>
               </div>
             </div>
@@ -119,17 +138,18 @@
               <label class="check"><input type="checkbox" id="embedMeta" checked /><span>Embed title &amp; artist</span></label>
               <label class="check"><input type="checkbox" id="saveThumb" /><span>Save thumbnail image</span></label>
               <label class="check"><input type="checkbox" id="embedChapters" /><span>Embed chapters</span></label>
-              <label class="check"><input type="checkbox" id="sponsorblock" /><span>SponsorBlock</span></label>
+              <label class="check"><input type="checkbox" id="sponsorblock" /><span>SponsorBlock (skip sponsors)</span></label>
               <label class="check"><input type="checkbox" id="normalize" /><span>Normalize loudness</span></label>
+              <label class="check"><input type="checkbox" id="addToQueue" /><span>Add to queue instead of downloading now</span></label>
             </div>
 
             <details class="advanced">
-              <summary>Advanced — subtitles &amp; clip</summary>
+              <summary>Advanced — subtitles, clip &amp; filename</summary>
               <div class="adv-body">
                 <div class="opt-group">
                   <label class="check"><input type="checkbox" id="subsEnabled" /><span>Download subtitles / captions</span></label>
                   <div class="sub-inline">
-                    <input type="text" id="subsLangs" class="text-input small" value="en" placeholder="langs e.g. en,es" />
+                    <input type="text" id="subsLangs" class="text-input small" value="en" placeholder="langs e.g. en,es" aria-label="Subtitle languages" />
                     <label class="check"><input type="checkbox" id="subsAuto" checked /><span>auto-generated</span></label>
                     <label class="check"><input type="checkbox" id="subsEmbed" checked /><span>embed into video</span></label>
                   </div>
@@ -137,10 +157,15 @@
                 <div class="opt-group">
                   <label class="opt-label">Clip / trim (single video) — mm:ss or seconds</label>
                   <div class="sub-inline">
-                    <input type="text" id="clipStart" class="text-input small" placeholder="start e.g. 0:30" />
+                    <input type="text" id="clipStart" class="text-input small" placeholder="start e.g. 0:30" aria-label="Clip start time" />
                     <span class="dash">→</span>
-                    <input type="text" id="clipEnd" class="text-input small" placeholder="end e.g. 1:45" />
+                    <input type="text" id="clipEnd" class="text-input small" placeholder="end e.g. 1:45" aria-label="Clip end time" />
                   </div>
+                </div>
+                <div class="opt-group">
+                  <label class="opt-label">Custom filename template</label>
+                  <input type="text" id="filenameTemplate" class="text-input" placeholder="%(title)s - %(uploader)s.%(ext)s" aria-label="Filename template" />
+                  <p class="hint">Variables: %(title)s, %(uploader)s, %(upload_date)s, %(id)s, %(ext)s, %(resolution)s</p>
                 </div>
               </div>
             </details>
@@ -155,11 +180,14 @@
             <div class="prog-right"><span id="progMeta" class="prog-meta"></span><span id="progPct" class="prog-pct">0%</span></div>
           </div>
           <div class="bar"><div id="progBar" class="bar-fill"></div></div>
+          <div id="progTimeInfo" class="prog-time-info"></div>
           <ul id="itemList" class="item-list"></ul>
           <button id="cancelBtn" class="btn-soft cancel">✕ Cancel</button>
           <div id="doneActions" class="done-actions" hidden>
             <button id="zipBtn" class="btn-primary">⬇ Download all (.zip)</button>
             <button id="folderBtn" class="btn-soft">📂 Open folder</button>
+            <button id="convertDoneBtn" class="btn-soft">🔄 Convert</button>
+            <button id="shareDoneBtn" class="btn-soft">📤 Share</button>
             <button id="againBtn" class="btn-soft">↺ Grab another</button>
           </div>
         </section>
@@ -168,23 +196,156 @@
       <!-- ===== SEARCH VIEW ===== -->
       <section id="view-search" class="view">
         <div class="view-head"><h2>Search</h2><p>No link? Search YouTube by name, then pick what to grab.</p></div>
-        <div class="dropzone slim">
-          <input id="searchInput" type="text" placeholder="Search songs, videos, artists…" />
-          <button id="searchBtn" class="btn-primary"><span class="btn-label">Search</span><span class="spinner" hidden></span></button>
+        <div class="search-toolbar">
+          <div class="dropzone slim">
+            <input id="searchInput" type="text" placeholder="Search songs, videos, artists…" aria-label="Search YouTube" />
+            <button id="searchBtn" class="btn-primary"><span class="btn-label">Search</span><span class="spinner" hidden></span></button>
+          </div>
+          <div class="search-filters">
+            <button class="filter-chip active" data-filter="all">All</button>
+            <button class="filter-chip" data-filter="video">Videos</button>
+            <button class="filter-chip" data-filter="music">Music</button>
+            <button class="filter-chip" data-filter="short">Shorts</button>
+          </div>
+        </div>
+        <div class="search-sort">
+          <label class="opt-label">Sort by:</label>
+          <select id="searchSort" class="select mini-select" aria-label="Sort results">
+            <option value="relevance">Relevance</option>
+            <option value="date">Upload date</option>
+            <option value="views">View count</option>
+            <option value="duration">Duration</option>
+          </select>
+          <span id="resultCount" class="result-count"></span>
         </div>
         <div id="searchError" class="error-msg" hidden></div>
         <div id="searchResults" class="results-grid"></div>
         <div id="searchActions" class="search-actions" hidden>
           <span id="selCount" class="sel-count">0 selected</span>
+          <button id="searchSelectAll" class="btn-soft">Select all</button>
+          <button id="searchClearSel" class="btn-soft">Clear</button>
           <button id="searchDownloadBtn" class="btn-primary">⬇ Download selected</button>
+          <button id="searchQueueBtn" class="btn-soft">📋 Add to queue</button>
+        </div>
+      </section>
+
+      <!-- ===== QUEUE VIEW ===== -->
+      <section id="view-queue" class="view">
+        <div class="view-head"><h2>Queue</h2><p>Manage your download queue. Add items and start when ready.</p></div>
+        <div class="queue-toolbar">
+          <button id="queueStartAll" class="btn-primary" disabled>▶ Start all</button>
+          <button id="queuePauseAll" class="btn-soft" disabled>⏸ Pause all</button>
+          <button id="queueClearAll" class="btn-soft danger" disabled>🗑 Clear queue</button>
+          <span id="queueStats" class="queue-stats"></span>
+        </div>
+        <div id="queueList" class="queue-list">
+          <p class="hint center">Queue is empty. Add items from Download or Search.</p>
         </div>
       </section>
 
       <!-- ===== HISTORY VIEW ===== -->
       <section id="view-history" class="view">
         <div class="view-head"><h2>History</h2><p>Everything you've grabbed. Open, zip, or re-download.</p></div>
-        <div class="history-bar"><button id="refreshHistory" class="btn-soft">↻ Refresh</button><button id="clearHistory" class="btn-soft danger">🗑 Clear all</button></div>
+        <div class="history-bar">
+          <input type="text" id="historySearch" class="text-input small" placeholder="Filter history…" aria-label="Filter history" />
+          <select id="historyFilter" class="select mini-select" aria-label="Filter by status">
+            <option value="all">All</option>
+            <option value="complete">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button id="refreshHistory" class="btn-soft">↻ Refresh</button>
+          <button id="exportHistory" class="btn-soft">📤 Export</button>
+          <button id="clearHistory" class="btn-soft danger">🗑 Clear all</button>
+        </div>
         <div id="historyList" class="history-list"></div>
+        <div id="historyPagination" class="pagination" hidden></div>
+      </section>
+
+      <!-- ===== STATS VIEW ===== -->
+      <section id="view-stats" class="view">
+        <div class="view-head"><h2>Statistics</h2><p>Your download activity at a glance.</p></div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📥</div>
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-label">Total downloads</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" id="statSuccess">0</div>
+            <div class="stat-label">Successful</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎵</div>
+            <div class="stat-value" id="statAudio">0</div>
+            <div class="stat-label">Audio files</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎬</div>
+            <div class="stat-value" id="statVideo">0</div>
+            <div class="stat-label">Video files</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🟢</div>
+            <div class="stat-value" id="statSpotify">0</div>
+            <div class="stat-label">From Spotify</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔴</div>
+            <div class="stat-value" id="statYoutube">0</div>
+            <div class="stat-label">From YouTube</div>
+          </div>
+        </div>
+        <div class="card mt">
+          <h3 class="card-title">Recent activity</h3>
+          <div id="statsChart" class="stats-chart"></div>
+        </div>
+        <div class="card mt">
+          <h3 class="card-title">Top formats</h3>
+          <div id="formatChart" class="format-chart"></div>
+        </div>
+      </section>
+
+      <!-- ===== CONVERTER VIEW ===== -->
+      <section id="view-converter" class="view">
+        <div class="view-head"><h2>Convert</h2><p>Convert downloaded files between formats.</p></div>
+        <div class="card">
+          <div class="converter-drop" id="converterDrop">
+            <p class="converter-drop-text">Drop a file here or click to select</p>
+            <input type="file" id="converterFile" hidden accept="audio/*,video/*" />
+          </div>
+          <div id="converterInfo" class="converter-info" hidden>
+            <p id="converterFileName" class="converter-filename"></p>
+            <div class="opt-row">
+              <div class="opt-group">
+                <label class="opt-label">Convert to</label>
+                <select id="convertFormat" class="select" aria-label="Target format">
+                  <option value="mp3">MP3</option>
+                  <option value="m4a">M4A (AAC)</option>
+                  <option value="flac">FLAC</option>
+                  <option value="wav">WAV</option>
+                  <option value="opus">Opus</option>
+                  <option value="ogg">OGG</option>
+                  <option value="mp4">MP4</option>
+                  <option value="webm">WebM</option>
+                  <option value="mkv">MKV</option>
+                </select>
+              </div>
+              <div class="opt-group">
+                <label class="opt-label">Quality</label>
+                <select id="convertQuality" class="select" aria-label="Conversion quality">
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low (small file)</option>
+                </select>
+              </div>
+            </div>
+            <button id="convertBtn" class="btn-primary btn-big"><span class="btn-label">🔄 Convert</span><span class="spinner" hidden></span></button>
+          </div>
+          <div id="convertProgress" class="bar mt" hidden><div id="convertBar" class="bar-fill"></div></div>
+          <div id="convertResult" hidden></div>
+        </div>
       </section>
 
       <!-- ===== SETTINGS VIEW ===== -->
@@ -192,7 +353,7 @@
         <div class="view-head"><h2>Settings</h2><p>Make PurffleGrab yours.</p></div>
         <div class="card">
           <h3 class="card-title">Download folder</h3>
-          <div class="sub-inline"><input type="text" id="outputDir" class="text-input" placeholder="Where files are saved…" /><button id="pickFolder" class="btn-soft">📁 Browse</button></div>
+          <div class="sub-inline"><input type="text" id="outputDir" class="text-input" placeholder="Where files are saved…" aria-label="Download folder path" /><button id="pickFolder" class="btn-soft">📁 Browse</button></div>
           <p class="hint" id="dirHint"></p>
 
           <h3 class="card-title mt">Defaults &amp; behaviour</h3>
@@ -200,24 +361,117 @@
             <div class="opt-group"><label class="opt-label">Default type</label><select id="defType" class="select"><option value="video">Video</option><option value="audio">Audio only</option></select></div>
             <div class="opt-group"><label class="opt-label">Default quality</label><select id="defRes" class="select"><option value="best">Best</option><option value="2160">4K</option><option value="1440">2K</option><option value="1080">1080p</option><option value="720">720p</option></select></div>
             <div class="opt-group"><label class="opt-label">Default audio format</label><select id="defFmt" class="select"><option value="mp3">MP3</option><option value="m4a">M4A</option><option value="flac">FLAC</option><option value="wav">WAV</option></select></div>
-            <div class="opt-group"><label class="opt-label">Simultaneous downloads</label><select id="defConc" class="select"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+            <div class="opt-group"><label class="opt-label">Simultaneous downloads</label><select id="defConc" class="select"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div>
           </div>
-          <div class="opt-group checks">
+          <div class="opt-group checks mt">
             <label class="check"><input type="checkbox" id="defNotify" checked /><span>Desktop notification when done</span></label>
+            <label class="check"><input type="checkbox" id="defAutoStart" /><span>Auto-start queued downloads</span></label>
+            <label class="check"><input type="checkbox" id="defShowSpeed" checked /><span>Show download speed overlay</span></label>
+            <label class="check"><input type="checkbox" id="defConfirmClose" checked /><span>Confirm before closing during download</span></label>
           </div>
+
+          <h3 class="card-title mt">Appearance</h3>
+          <div class="opt-row">
+            <div class="opt-group">
+              <label class="opt-label">Accent color</label>
+              <div class="color-swatches">
+                <button class="swatch active" data-color="#8b5cf6" style="background:#8b5cf6" title="Purple"></button>
+                <button class="swatch" data-color="#3b82f6" style="background:#3b82f6" title="Blue"></button>
+                <button class="swatch" data-color="#10b981" style="background:#10b981" title="Green"></button>
+                <button class="swatch" data-color="#f59e0b" style="background:#f59e0b" title="Amber"></button>
+                <button class="swatch" data-color="#ef4444" style="background:#ef4444" title="Red"></button>
+                <button class="swatch" data-color="#ec4899" style="background:#ec4899" title="Pink"></button>
+                <button class="swatch" data-color="#06b6d4" style="background:#06b6d4" title="Cyan"></button>
+              </div>
+            </div>
+          </div>
+
           <button id="saveSettings" class="btn-primary">💾 Save settings</button><span id="settingsSaved" class="saved-msg" hidden>Saved ✓</span>
 
           <h3 class="card-title mt">Downloader engine</h3>
           <p class="hint">Keep the YouTube engine (yt-dlp) up to date for best reliability.</p>
-          <button id="updateEngine" class="btn-soft">⬆ Update engine</button>
+          <div class="sub-inline">
+            <button id="updateEngine" class="btn-soft">⬆ Update engine</button>
+            <button id="checkEngine" class="btn-soft">🔍 Check version</button>
+          </div>
           <pre id="engineOut" class="engine-out" hidden></pre>
+
+          <h3 class="card-title mt">Data management</h3>
+          <div class="sub-inline">
+            <button id="exportSettings" class="btn-soft">📤 Export settings</button>
+            <button id="importSettings" class="btn-soft">📥 Import settings</button>
+            <button id="resetSettings" class="btn-soft danger">↺ Reset to defaults</button>
+          </div>
         </div>
         <p class="disclaimer">For personal use only. Respect copyright and the terms of service of the platforms you download from.</p>
       </section>
+
+      <!-- ===== ABOUT VIEW ===== -->
+      <section id="view-about" class="view">
+        <div class="view-head"><h2>About PurffleGrab</h2></div>
+        <div class="card about-card">
+          <div class="about-hero">
+            <div class="about-logo">P</div>
+            <h3>PurffleGrab <span class="about-ver">v2.1.0</span></h3>
+            <p class="about-tagline">The cleanest way to grab media from the web.</p>
+          </div>
+          <div class="about-features">
+            <div class="about-feat"><span>🎬</span> YouTube video &amp; playlist downloads up to 4K</div>
+            <div class="about-feat"><span>🎵</span> Spotify track, album &amp; playlist downloads</div>
+            <div class="about-feat"><span>📋</span> Queue management with batch operations</div>
+            <div class="about-feat"><span>🔄</span> Built-in format converter</div>
+            <div class="about-feat"><span>✂</span> Video trimming &amp; clipping</div>
+            <div class="about-feat"><span>📊</span> Download statistics &amp; analytics</div>
+            <div class="about-feat"><span>🔎</span> YouTube search built in</div>
+            <div class="about-feat"><span>🎨</span> Dark &amp; light themes with accent colors</div>
+            <div class="about-feat"><span>⌨</span> Keyboard shortcuts for power users</div>
+            <div class="about-feat"><span>📱</span> Responsive design — works on any screen</div>
+          </div>
+          <div class="about-links">
+            <a href="https://github.com/Chamanrajragu/purffle-grab" target="_blank" class="btn-soft">⭐ Star on GitHub</a>
+            <a href="https://github.com/Chamanrajragu/purffle-grab/issues" target="_blank" class="btn-soft">🐛 Report a bug</a>
+            <a href="https://purffle.com" target="_blank" class="btn-soft">🌐 Purffle.com</a>
+          </div>
+          <p class="about-copy">Made with ♥ by Purffle · Open source under MIT License</p>
+        </div>
+      </section>
+
     </main>
   </div>
 
+  <!-- ===== KEYBOARD SHORTCUTS MODAL ===== -->
+  <div id="shortcutsModal" class="modal" hidden>
+    <div class="modal-content">
+      <div class="modal-head"><h3>Keyboard Shortcuts</h3><button class="modal-close" data-close>✕</button></div>
+      <div class="shortcuts-list">
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>V</kbd><span>Paste &amp; auto-detect links</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>Enter</kbd><span>Analyze / Download</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>F</kbd><span>Focus search</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>1-8</kbd><span>Switch views</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>D</kbd><span>Toggle dark/light theme</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>Q</kbd><span>Open queue</span></div>
+        <div class="shortcut"><kbd>Escape</kbd><span>Close modal / Cancel</span></div>
+        <div class="shortcut"><kbd>?</kbd><span>Show this help</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ONBOARDING TOUR ===== -->
+  <div id="tourOverlay" class="tour-overlay" hidden>
+    <div id="tourCard" class="tour-card">
+      <div class="tour-step-indicator"><span id="tourStepNum">1</span> / <span id="tourStepTotal">5</span></div>
+      <h3 id="tourTitle"></h3>
+      <p id="tourDesc"></p>
+      <div class="tour-actions">
+        <button id="tourSkip" class="btn-soft">Skip tour</button>
+        <button id="tourNext" class="btn-primary">Next →</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" hidden></div>
+  <input type="file" id="fileImport" hidden accept=".txt,.csv,.json" />
+  <input type="file" id="settingsImportFile" hidden accept=".json" />
   <script src="app.js"></script>
 </body>
 </html>

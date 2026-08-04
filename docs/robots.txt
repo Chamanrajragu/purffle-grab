@@ -1,3 +1,9 @@
 User-agent: *
 Allow: /
 Sitemap: https://chamanrajragu.github.io/purffle-grab/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
