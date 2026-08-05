@@ -1,4 +1,4 @@
-// PurffleGrab front-end (v3.0) — premium edition.
+// PurffleGrab front-end (v4.1) — ultra premium edition.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -9,6 +9,8 @@ let searchSel = new Set();
 let searchResults = [];
 let downloadQueue = [];
 let scheduledDownloads = [];
+let favorites = [];
+let recentUrls = [];
 let prefs = { defaults: {}, theme: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6' };
 let downloadStartTime = null;
 
@@ -43,6 +45,7 @@ $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
   if (b.dataset.view === 'stats') loadStats();
   if (b.dataset.view === 'queue') renderQueue();
   if (b.dataset.view === 'scheduler') renderSchedule();
+  if (b.dataset.view === 'favorites') renderFavorites();
 }));
 function goto(view) {
   $$('.side-btn').forEach((x) => x.classList.toggle('active', x.dataset.view === view));
@@ -96,9 +99,15 @@ document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'q') { e.preventDefault(); goto('queue'); }
   if (e.ctrlKey && e.key === 's' && !isInput) { e.preventDefault(); goto('settings'); }
   if (e.ctrlKey && e.key === 'f' && !isInput) { e.preventDefault(); goto('search'); setTimeout(() => $('#searchInput').focus(), 100); }
+  if (e.ctrlKey && e.key === 'k') { e.preventDefault(); openCommandPalette(); }
+  if (e.ctrlKey && e.key === 'b') {
+    e.preventDefault();
+    const url = urlInput.value.trim();
+    if (url) { addFavorite(url, ''); } else { goto('favorites'); }
+  }
   if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     e.preventDefault();
-    const views = ['download','search','queue','history','stats','converter','scheduler','settings','about'];
+    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','settings','about'];
     const idx = parseInt(e.key) - 1;
     if (views[idx]) goto(views[idx]);
   }
@@ -108,21 +117,80 @@ document.addEventListener('keydown', (e) => {
 // Close modal on background click
 $$('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.hidden = true; }));
 
+// ---- command palette ----
+const CMD_ACTIONS = [
+  { icon: '⬇', label: 'Go to Download', hint: 'Ctrl+1', action: () => goto('download') },
+  { icon: '🔎', label: 'Go to Search', hint: 'Ctrl+2', action: () => { goto('search'); setTimeout(() => $('#searchInput').focus(), 100); } },
+  { icon: '📋', label: 'Go to Queue', hint: 'Ctrl+3', action: () => goto('queue') },
+  { icon: '🕘', label: 'Go to History', hint: 'Ctrl+4', action: () => goto('history') },
+  { icon: '📊', label: 'Go to Statistics', hint: 'Ctrl+5', action: () => goto('stats') },
+  { icon: '🔄', label: 'Go to Converter', hint: 'Ctrl+6', action: () => goto('converter') },
+  { icon: '⏰', label: 'Go to Scheduler', hint: 'Ctrl+7', action: () => goto('scheduler') },
+  { icon: '⭐', label: 'Go to Favorites', hint: 'Ctrl+8', action: () => goto('favorites') },
+  { icon: '⚙', label: 'Go to Settings', hint: 'Ctrl+9', action: () => goto('settings') },
+  { icon: '🌙', label: 'Toggle theme (dark/light)', hint: 'Ctrl+D', action: () => $('#themeToggle').click() },
+  { icon: '📋', label: 'Paste from clipboard', hint: 'Ctrl+V', action: () => { goto('download'); $('#pasteBtn').click(); } },
+  { icon: '⌨', label: 'Show keyboard shortcuts', hint: '?', action: () => { $('#shortcutsModal').hidden = false; } },
+  { icon: '🗑', label: 'Clear download queue', action: () => { downloadQueue = []; saveQueue(); renderQueue(); updateQueueBadge(); toast('Queue cleared'); } },
+  { icon: '📤', label: 'Export history', action: () => $('#exportHistory')?.click() },
+  { icon: '📤', label: 'Export settings', action: () => $('#exportSettings')?.click() },
+  { icon: '⬆', label: 'Update yt-dlp engine', action: () => { goto('settings'); $('#updateEngine').click(); } },
+  { icon: '↺', label: 'Reset settings to defaults', action: () => $('#resetSettings')?.click() },
+  { icon: '🔄', label: 'Refresh history', action: () => { goto('history'); loadHistory(); } },
+];
+
+let cmdIdx = 0;
+function openCommandPalette() {
+  const modal = $('#cmdPalette');
+  modal.hidden = false;
+  const input = $('#cmdInput');
+  input.value = '';
+  input.focus();
+  renderCmdResults('');
+}
+function renderCmdResults(query) {
+  const q = query.toLowerCase().trim();
+  const filtered = q ? CMD_ACTIONS.filter(a => a.label.toLowerCase().includes(q)) : CMD_ACTIONS;
+  cmdIdx = 0;
+  const el = $('#cmdResults');
+  if (!filtered.length) { el.innerHTML = '<div class="cmd-empty">No matching commands</div>'; return; }
+  el.innerHTML = filtered.map((a, i) =>
+    `<div class="cmd-item ${i === 0 ? 'active' : ''}" data-ci="${i}"><span class="cmd-ic">${a.icon}</span><span class="cmd-label">${esc(a.label)}</span>${a.hint ? `<span class="cmd-hint">${a.hint}</span>` : ''}</div>`
+  ).join('');
+  el._actions = filtered;
+  $$('.cmd-item').forEach((el, i) => {
+    el.addEventListener('click', () => { $('#cmdPalette').hidden = true; filtered[i].action(); });
+    el.addEventListener('mouseenter', () => {
+      $$('.cmd-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      cmdIdx = i;
+    });
+  });
+}
+$('#cmdInput')?.addEventListener('input', (e) => renderCmdResults(e.target.value));
+$('#cmdInput')?.addEventListener('keydown', (e) => {
+  const items = $$('.cmd-item');
+  const actions = $('#cmdResults')._actions || [];
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdIdx = Math.min(cmdIdx + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === cmdIdx)); items[cmdIdx]?.scrollIntoView({ block: 'nearest' }); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); cmdIdx = Math.max(cmdIdx - 1, 0); items.forEach((el, i) => el.classList.toggle('active', i === cmdIdx)); items[cmdIdx]?.scrollIntoView({ block: 'nearest' }); }
+  else if (e.key === 'Enter') { e.preventDefault(); $('#cmdPalette').hidden = true; if (actions[cmdIdx]) actions[cmdIdx].action(); }
+});
+
 // ---- onboarding tour ----
 const TOUR_STEPS = [
   { title: 'Welcome to PurffleGrab! 🎉', desc: 'The cleanest way to download media from Spotify and YouTube. Let us show you around!' },
   { title: 'Paste & Download ⬇', desc: 'Just paste a Spotify or YouTube link in the box and hit Analyze. You can paste multiple links at once or import from a file!' },
   { title: 'Search YouTube 🔎', desc: 'No link? Use the Search tab to find videos and music directly by name. Select results and download them.' },
   { title: 'Queue System 📋', desc: 'Add items to the queue and download them all at once. Great for batch downloading!' },
-  { title: 'Scheduler ⏰', desc: 'New! Schedule downloads for later. Set a date and time, and PurffleGrab will grab it automatically.' },
-  { title: 'You\'re all set! ✅', desc: 'Explore Stats, Converter, and Settings for more power. Hit ? anytime for keyboard shortcuts.' },
+  { title: 'Command Palette 🚀', desc: 'Press Ctrl+K anytime to open the command palette. Quickly navigate, toggle theme, or trigger actions.' },
+  { title: 'Favorites ⭐', desc: 'Save URLs you download often to Favorites. Press Ctrl+B to bookmark the current URL.' },
+  { title: 'You\'re all set! ✅', desc: 'Explore Stats, Converter, Scheduler, and Settings for more power. Hit ? anytime for keyboard shortcuts.' },
 ];
 let tourStep = 0;
 function showTour() {
-  try { if (localStorage.getItem('pg-toured-v3')) return; } catch {}
+  try { if (localStorage.getItem('pg-toured-v4')) return; } catch {}
   tourStep = 0;
   renderTourStep();
-  // Hide any modals first so tour is clearly on top
   $$('.modal').forEach(m => m.hidden = true);
   $('#tourOverlay').hidden = false;
 }
@@ -136,14 +204,12 @@ function renderTourStep() {
 }
 $('#tourNext').addEventListener('click', () => {
   tourStep++;
-  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} return; }
+  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v4', '1'); } catch {} return; }
   renderTourStep();
 });
-$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} });
-// Prevent clicks inside tour card from bubbling to overlay
+$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v4', '1'); } catch {} });
 $('#tourCard').addEventListener('click', (e) => e.stopPropagation());
-// Click overlay background to dismiss tour
-$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v3', '1'); } catch {} });
+$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v4', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
@@ -195,6 +261,15 @@ document.addEventListener('drop', (ev) => {
   }
 });
 
+// ---- recent urls ----
+function loadRecents() { try { recentUrls = JSON.parse(localStorage.getItem('pg-recents') || '[]'); } catch { recentUrls = []; } }
+function saveRecent(url) {
+  recentUrls = recentUrls.filter(u => u !== url);
+  recentUrls.unshift(url);
+  if (recentUrls.length > 50) recentUrls = recentUrls.slice(0, 50);
+  try { localStorage.setItem('pg-recents', JSON.stringify(recentUrls)); } catch {}
+}
+
 // ---- analyze ----
 async function analyze() {
   const links = urlInput.value.split('\n').map((s) => s.trim()).filter(Boolean);
@@ -205,6 +280,7 @@ async function analyze() {
   sources = []; $('#sourceCards').innerHTML = '';
   let anyVideo = false, ok = 0;
   for (const link of links) {
+    saveRecent(link);
     try {
       const res = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: link }) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error);
@@ -237,10 +313,11 @@ function renderSourceCard(idx) {
     tracksHtml = `<div class="track-tools"><button class="mini" data-act="all">Select all</button><button class="mini" data-act="none">None</button><input type="text" class="track-search" placeholder="Filter tracks…" /><span class="sel-info"></span></div>
       <ul class="track-list">${data.tracks.map((t, i) => `<li><label class="trk" data-search="${esc((t.artist + ' ' + t.title).toLowerCase())}"><input type="checkbox" data-ti="${i}" ${selected.has(i) ? 'checked' : ''}/><span class="trk-n">${i + 1}.</span><span class="trk-t">${esc(t.artist ? t.artist + ' — ' : '')}${esc(t.title)}</span><span class="trk-d">${fmtDur(t.duration)}</span></label></li>`).join('')}</ul>`;
   }
-  card.innerHTML = `<div class="sc-top"><img class="sc-thumb" src="${data.thumbnail || ''}" alt="${esc(data.title || '')}" onerror="this.style.visibility='hidden'" loading="lazy"/><div class="sc-body">${badge}<h4 class="sc-title">${esc(data.title || 'Untitled')}</h4><p class="meta-sub">${esc(sub)}</p></div><button class="sc-remove" title="Remove">✕</button></div>${tracksHtml}`;
+  card.innerHTML = `<div class="sc-top"><img class="sc-thumb" src="${data.thumbnail || ''}" alt="${esc(data.title || '')}" onerror="this.style.visibility='hidden'" loading="lazy"/><div class="sc-body">${badge}<h4 class="sc-title">${esc(data.title || 'Untitled')}</h4><p class="meta-sub">${esc(sub)}</p></div><button class="sc-fav mini" title="Add to favorites">⭐</button><button class="sc-remove" title="Remove">✕</button></div>${tracksHtml}`;
   card.querySelector('.sc-remove').addEventListener('click', () => { sources[idx] = null; card.remove(); updateDlCount(); if (!sources.some(Boolean)) $('#panel').hidden = true; });
+  card.querySelector('.sc-fav').addEventListener('click', () => { addFavorite(data.url, data.title); });
   card.querySelectorAll('input[data-ti]').forEach((cb) => cb.addEventListener('change', () => { const i = Number(cb.dataset.ti); cb.checked ? selected.add(i) : selected.delete(i); updateSelInfo(card, selected, data.count); updateDlCount(); }));
-  card.querySelectorAll('.mini').forEach((btn) => btn.addEventListener('click', () => {
+  card.querySelectorAll('.mini[data-act]').forEach((btn) => btn.addEventListener('click', () => {
     if (btn.dataset.act === 'all') data.tracks.forEach((_, i) => selected.add(i)); else selected.clear();
     card.querySelectorAll('input[data-ti]').forEach((cb) => (cb.checked = selected.has(Number(cb.dataset.ti))));
     updateSelInfo(card, selected, data.count); updateDlCount();
@@ -277,6 +354,8 @@ const PRESETS = {
   podcast: { type: 'audio', audioFormat: 'mp3', audioBitrate: '128' },
   ringtone: { type: 'audio', audioFormat: 'm4a', audioBitrate: '256' },
   audiobook: { type: 'audio', audioFormat: 'mp3', audioBitrate: '64' },
+  djmix: { type: 'audio', audioFormat: 'flac', audioBitrate: '' },
+  lecture: { type: 'audio', audioFormat: 'mp3', audioBitrate: '96' },
 };
 $$('.preset').forEach((p) => p.addEventListener('click', () => {
   const c = PRESETS[p.dataset.preset]; if (!c) return;
@@ -301,6 +380,55 @@ function gatherOptions() {
     clip: { start: $('#clipStart').value.trim(), end: $('#clipEnd').value.trim() } };
 }
 function gatherSources() { return sources.filter(Boolean).map((s) => ({ url: s.data.url, selected: s.selected ? [...s.selected] : null })); }
+
+// ---- favorites ----
+function loadFavorites() { try { favorites = JSON.parse(localStorage.getItem('pg-favorites') || '[]'); } catch { favorites = []; } }
+function saveFavorites() { try { localStorage.setItem('pg-favorites', JSON.stringify(favorites)); } catch {} }
+function addFavorite(url, label) {
+  if (!url) return;
+  if (favorites.some(f => f.url === url)) { toast('Already in favorites!'); return; }
+  favorites.push({ url, label: label || url.slice(0, 60), addedAt: Date.now() });
+  saveFavorites();
+  toast('⭐ Added to favorites!');
+}
+function renderFavorites() {
+  const list = $('#favList');
+  if (!favorites.length) {
+    list.innerHTML = '<p class="hint center">No favorites yet. Save URLs you download often!</p>';
+    return;
+  }
+  list.innerHTML = favorites.map((f, i) => `
+    <div class="queue-item" data-fi="${i}">
+      <div class="qi-info">
+        <div class="qi-title">${esc(f.label)}</div>
+        <div class="qi-meta">${esc(f.url.slice(0, 80))} · ${new Date(f.addedAt).toLocaleDateString()}</div>
+      </div>
+      <div class="qi-actions">
+        <button class="mini" data-fact="grab">⬇ Grab</button>
+        <button class="mini" data-fact="queue">📋 Queue</button>
+        <button class="mini" data-fact="copy">📋 Copy</button>
+        <button class="mini danger" data-fact="remove">✕</button>
+      </div>
+    </div>`).join('');
+
+  $$('#favList .queue-item').forEach(el => {
+    const i = Number(el.dataset.fi);
+    const f = favorites[i];
+    el.querySelector('[data-fact="grab"]')?.addEventListener('click', () => { urlInput.value = f.url; goto('download'); analyze(); });
+    el.querySelector('[data-fact="queue"]')?.addEventListener('click', () => { addToQueue([{ url: f.url, selected: null }], gatherOptions()); });
+    el.querySelector('[data-fact="copy"]')?.addEventListener('click', () => { navigator.clipboard?.writeText(f.url).then(() => toast('📋 Copied!')); });
+    el.querySelector('[data-fact="remove"]')?.addEventListener('click', () => { favorites.splice(i, 1); saveFavorites(); renderFavorites(); toast('Removed from favorites'); });
+  });
+}
+$('#favAddBtn')?.addEventListener('click', () => {
+  const url = $('#favUrl')?.value?.trim();
+  const label = $('#favLabel')?.value?.trim();
+  if (!url) { toast('Please enter a URL'); return; }
+  addFavorite(url, label);
+  $('#favUrl').value = '';
+  $('#favLabel').value = '';
+  renderFavorites();
+});
 
 // ---- queue system ----
 function addToQueue(srcList, options) {
@@ -467,9 +595,8 @@ function saveDownloadStats(job) {
       format: opts.contentType === 'audio' ? (opts.audioFormat || 'mp3') : 'mp4',
       source: job.sources?.[0]?.url?.includes('spotify') ? 'spotify' : 'youtube',
     });
-    // Track total size (estimate)
     if (!stats.totalSize) stats.totalSize = 0;
-    stats.totalSize += doneCount * 5 * 1024 * 1024; // rough 5MB estimate per file
+    stats.totalSize += doneCount * 5 * 1024 * 1024;
     if (stats.downloads.length > 1000) stats.downloads = stats.downloads.slice(-1000);
     localStorage.setItem('pg-stats', JSON.stringify(stats));
   } catch {}
@@ -487,7 +614,6 @@ function loadStats() {
     const spotify = dl.filter(d => d.source === 'spotify').reduce((a, d) => a + d.count, 0);
     const youtube = dl.filter(d => d.source === 'youtube').reduce((a, d) => a + d.count, 0);
 
-    // Animate stat values
     animateValue($('#statTotal'), 0, total, 800);
     animateValue($('#statSuccess'), 0, total - failed, 800);
     animateValue($('#statAudio'), 0, audio, 800);
@@ -496,8 +622,6 @@ function loadStats() {
     animateValue($('#statYoutube'), 0, youtube, 800);
     $('#statSize').textContent = fmtBytes(stats.totalSize || 0);
 
-    // Calculate streak
-    const today = new Date().toISOString().slice(0, 10);
     const uniqueDates = [...new Set(dl.map(d => d.date))].sort().reverse();
     let streak = 0;
     const d = new Date();
@@ -508,7 +632,6 @@ function loadStats() {
     }
     animateValue($('#statStreak'), 0, streak, 600);
 
-    // Activity chart - last 14 days
     const chart = $('#statsChart');
     const days = {};
     for (let i = 13; i >= 0; i--) {
@@ -524,7 +647,6 @@ function loadStats() {
       return `<div class="chart-bar" style="height:${h}px" data-label="${label}" data-value="${count}" title="${date}: ${count} downloads"></div>`;
     }).join('');
 
-    // Format breakdown
     const formats = {};
     dl.forEach(d => { formats[d.format] = (formats[d.format] || 0) + d.count; });
     const fmtChart = $('#formatChart');
@@ -604,12 +726,13 @@ async function loadHistory() {
   const page = filtered.slice(historyPage * HISTORY_PAGE_SIZE, (historyPage + 1) * HISTORY_PAGE_SIZE);
 
   wrap.innerHTML = page.map((h) => { const d = new Date(h.when); const cls = h.status === 'complete' ? 'done' : h.status === 'cancelled' ? 'cancelled' : 'failed';
-    return `<div class="hist" data-id="${h.id}"><div class="hist-main"><span class="st ${cls}">${h.status}</span><div><p class="hist-title">${esc(h.title)}</p><p class="meta-sub">${h.done}/${h.count} files · ${d.toLocaleString()}</p></div></div><div class="hist-actions"><button class="mini" data-act="folder">📂 Folder</button><button class="mini" data-act="zip">⬇ Zip</button><button class="mini" data-act="regrab">↺ Re-grab</button><button class="mini danger" data-act="del">🗑</button></div></div>`; }).join('');
+    return `<div class="hist" data-id="${h.id}"><div class="hist-main"><span class="st ${cls}">${h.status}</span><div><p class="hist-title">${esc(h.title)}</p><p class="meta-sub">${h.done}/${h.count} files · ${d.toLocaleString()}</p></div></div><div class="hist-actions"><button class="mini" data-act="folder">📂 Folder</button><button class="mini" data-act="zip">⬇ Zip</button><button class="mini" data-act="regrab">↺ Re-grab</button><button class="mini" data-act="fav">⭐</button><button class="mini danger" data-act="del">🗑</button></div></div>`; }).join('');
   $$('#historyList .hist').forEach((el) => { const id = el.dataset.id; const h = history.find((x) => x.id === id);
     el.querySelector('[data-act="folder"]').onclick = () => fetch(`/api/open-folder/${id}`, { method: 'POST' });
     el.querySelector('[data-act="zip"]').onclick = () => (window.location = `/api/zip/${id}`);
     el.querySelector('[data-act="del"]').onclick = async () => { await fetch(`/api/history/delete/${id}`, { method: 'POST' }); loadHistory(); };
     el.querySelector('[data-act="regrab"]').onclick = () => { if (h) startDownload(h.sources, h.options); };
+    el.querySelector('[data-act="fav"]').onclick = () => { if (h?.sources?.[0]) addFavorite(typeof h.sources[0] === 'string' ? h.sources[0] : h.sources[0].url, h.title); };
   });
 
   const pagEl = $('#historyPagination');
@@ -815,5 +938,7 @@ $$('.chip').forEach((c) => c.addEventListener('click', () => { urlInput.value = 
 loadSettings();
 loadQueue();
 loadSchedule();
+loadFavorites();
+loadRecents();
 try { if (Notification.permission === 'default') Notification.requestPermission(); } catch {}
 setTimeout(showTour, 600);
