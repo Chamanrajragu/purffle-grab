@@ -24,7 +24,8 @@
   <div class="ambient-particle"></div>
   <div class="app">
     <!-- ===== SIDEBAR ===== -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
+      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">◀</button>
       <div class="brand">
         <div class="logo"></div>
         <div class="brand-txt"><span class="brand-name">PurffleGrab</span><span class="brand-sub">Media Grabber</span></div>
@@ -37,7 +38,8 @@
         <button class="side-btn" data-view="history"><span class="ic">🕘</span><span class="nav-text"> History</span></button>
         <button class="side-btn" data-view="stats"><span class="ic">📊</span><span class="nav-text"> Stats</span></button>
         <button class="side-btn" data-view="converter"><span class="ic">🔄</span><span class="nav-text"> Convert</span></button>
-        <button class="side-btn" data-view="scheduler"><span class="ic">⏰</span><span class="nav-text"> Scheduler</span><span class="new-dot"></span></button>
+        <button class="side-btn" data-view="scheduler"><span class="ic">⏰</span><span class="nav-text"> Scheduler</span></button>
+        <button class="side-btn" data-view="favorites"><span class="ic">⭐</span><span class="nav-text"> Favorites</span></button>
         <button class="side-btn" data-view="settings"><span class="ic">⚙</span><span class="nav-text"> Settings</span></button>
         <button class="side-btn" data-view="about"><span class="ic">ℹ</span><span class="nav-text"> About</span></button>
       </nav>
@@ -45,7 +47,7 @@
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
         <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts (?)"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
-        <span class="ver">v4.0 · a Purffle tool</span>
+        <span class="ver">v5.0 · a Purffle tool</span>
       </div>
     </aside>
 
@@ -78,7 +80,7 @@
 
         <div id="sourceCards" class="source-cards"></div>
 
-        <section id="panel" class="card options-card" hidden>
+        <section id="panel" class="card card-glow options-card" hidden>
           <h3 class="card-title">Options</h3>
 
           <div class="presets">
@@ -91,6 +93,8 @@
             <button class="preset" data-preset="podcast">🎙 Podcast MP3 128</button>
             <button class="preset" data-preset="ringtone">🔔 Ringtone M4A</button>
             <button class="preset" data-preset="audiobook">📖 Audiobook MP3 64</button>
+            <button class="preset" data-preset="djmix">🎧 DJ Mix FLAC</button>
+            <button class="preset" data-preset="lecture">🎓 Lecture MP3 96</button>
           </div>
 
           <div class="options">
@@ -193,6 +197,8 @@
             <div class="prog-right"><span id="progMeta" class="prog-meta"></span><span id="progPct" class="prog-pct">0%</span></div>
           </div>
           <div class="bar"><div id="progBar" class="bar-fill"></div></div>
+          <div id="progVisualizer" class="prog-visualizer" hidden></div>
+          <div id="speedGraph" class="speed-graph" hidden></div>
           <div id="progTimeInfo" class="prog-time-info"></div>
           <ul id="itemList" class="item-list"></ul>
           <button id="cancelBtn" class="btn-soft cancel">✕ Cancel</button>
@@ -244,11 +250,12 @@
 
       <!-- ===== QUEUE VIEW ===== -->
       <section id="view-queue" class="view">
-        <div class="view-head"><h2>Queue</h2><p>Manage your download queue. Add items and start when ready.</p></div>
+        <div class="view-head"><h2>Queue</h2><p>Manage your download queue. Drag to reorder, then start when ready.</p></div>
         <div class="queue-toolbar">
           <button id="queueStartAll" class="btn-primary" disabled>▶ Start all</button>
           <button id="queuePauseAll" class="btn-soft" disabled>⏸ Pause all</button>
           <button id="queueClearAll" class="btn-soft danger" disabled>🗑 Clear queue</button>
+          <button id="queueExport" class="btn-soft">📤 Export</button>
           <span id="queueStats" class="queue-stats"></span>
         </div>
         <div id="queueList" class="queue-list">
@@ -377,6 +384,25 @@
         </div>
       </section>
 
+      <!-- ===== FAVORITES VIEW ===== -->
+      <section id="view-favorites" class="view">
+        <div class="view-head"><h2>Favorites</h2><p>Save URLs for quick re-downloading later. Star any link to keep it here.</p></div>
+        <div class="card">
+          <h3 class="card-title">Add a favorite</h3>
+          <div class="sub-inline">
+            <input type="text" id="favUrl" class="text-input" placeholder="Paste a URL to save" aria-label="Favorite URL" />
+            <input type="text" id="favLabel" class="text-input small" placeholder="Label (optional)" aria-label="Favorite label" />
+            <button id="favAddBtn" class="btn-primary">⭐ Save</button>
+          </div>
+        </div>
+        <div class="card mt">
+          <h3 class="card-title">Saved favorites</h3>
+          <div id="favList" class="queue-list">
+            <p class="hint center">No favorites yet. Save URLs you download often!</p>
+          </div>
+        </div>
+      </section>
+
       <!-- ===== SETTINGS VIEW ===== -->
       <section id="view-settings" class="view">
         <div class="view-head"><h2>Settings</h2><p>Make PurffleGrab yours.</p></div>
@@ -395,14 +421,23 @@
           <div class="opt-group checks mt">
             <label class="check"><input type="checkbox" id="defNotify" checked /><span>Desktop notification when done</span></label>
             <label class="check"><input type="checkbox" id="defAutoStart" /><span>Auto-start queued downloads</span></label>
-            <label class="check"><input type="checkbox" id="defShowSpeed" checked /><span>Show download speed overlay</span></label>
+            <label class="check"><input type="checkbox" id="defShowSpeed" checked /><span>Show download speed graph</span></label>
             <label class="check"><input type="checkbox" id="defConfirmClose" checked /><span>Confirm before closing during download</span></label>
             <label class="check"><input type="checkbox" id="defAutoUpdate" /><span>Auto-update yt-dlp on startup</span></label>
             <label class="check"><input type="checkbox" id="defMinToTray" /><span>Minimize to system tray</span></label>
+            <label class="check"><input type="checkbox" id="defPlaySound" checked /><span>Play sound on download complete</span></label>
           </div>
 
           <h3 class="card-title mt">Appearance</h3>
           <div class="opt-row">
+            <div class="opt-group">
+              <label class="opt-label">Theme</label>
+              <div class="seg" id="themeSeg">
+                <button class="seg-btn active" data-theme-mode="dark">🌙 Dark</button>
+                <button class="seg-btn" data-theme-mode="light">☀ Light</button>
+                <button class="seg-btn" data-theme-mode="system">💻 System</button>
+              </div>
+            </div>
             <div class="opt-group">
               <label class="opt-label">Accent color</label>
               <div class="color-swatches">
@@ -445,24 +480,29 @@
         <div class="card about-card">
           <div class="about-hero">
             <div class="about-logo">⬇</div>
-            <h3>PurffleGrab <span class="about-ver">v4.0.0</span></h3>
-            <p class="about-tagline">The cleanest way to grab media from the web.</p>
+            <h3>PurffleGrab <span class="about-ver">v5.0.0</span></h3>
+            <p class="about-tagline">The ultimate way to grab media from the web.</p>
           </div>
           <div class="about-features">
             <div class="about-feat"><span>🎬</span> YouTube video &amp; playlist downloads up to 4K</div>
             <div class="about-feat"><span>🎵</span> Spotify track, album &amp; playlist downloads</div>
-            <div class="about-feat"><span>📋</span> Queue management with batch operations</div>
+            <div class="about-feat"><span>📋</span> Queue management with drag reorder</div>
             <div class="about-feat"><span>🔄</span> Built-in format converter</div>
             <div class="about-feat"><span>✂</span> Video trimming &amp; clipping</div>
-            <div class="about-feat"><span>📊</span> Download statistics &amp; analytics</div>
-            <div class="about-feat"><span>⏰</span> Download scheduler</div>
+            <div class="about-feat"><span>📊</span> Download statistics &amp; activity chart</div>
+            <div class="about-feat"><span>⏰</span> Download scheduler with repeat</div>
             <div class="about-feat"><span>🔎</span> YouTube search built in</div>
-            <div class="about-feat"><span>🎨</span> Dark &amp; light themes with 9 accent colors</div>
-            <div class="about-feat"><span>⌨</span> Keyboard shortcuts for power users</div>
-            <div class="about-feat"><span>📱</span> Responsive design — works on any screen</div>
+            <div class="about-feat"><span>🎨</span> Dark / Light / System themes, 9 accent colors</div>
+            <div class="about-feat"><span>⌨</span> Keyboard shortcuts &amp; command palette</div>
+            <div class="about-feat"><span>📱</span> Collapsible sidebar, responsive design</div>
             <div class="about-feat"><span>🔒</span> No telemetry, no ads, fully private</div>
+            <div class="about-feat"><span>⭐</span> Favorites — save URLs for quick access</div>
+            <div class="about-feat"><span>🚀</span> Floating action button &amp; mini progress</div>
+            <div class="about-feat"><span>📈</span> Live speed graph &amp; music visualizer</div>
+            <div class="about-feat"><span>🔔</span> Completion sound &amp; desktop notifications</div>
           </div>
           <div class="about-links">
+            <button id="whatsNewBtn" class="btn-soft">🆕 What's New</button>
             <a href="https://github.com/Chamanrajragu/purffle-grab" target="_blank" rel="noopener" class="btn-soft">⭐ Star on GitHub</a>
             <a href="https://github.com/Chamanrajragu/purffle-grab/issues" target="_blank" rel="noopener" class="btn-soft">🐛 Report a bug</a>
             <a href="https://purffle.com" target="_blank" rel="noopener" class="btn-soft">🌐 Purffle.com</a>
@@ -474,6 +514,21 @@
     </main>
   </div>
 
+  <!-- ===== FLOATING ACTION BUTTON ===== -->
+  <button id="fab" class="fab" title="Quick paste & download">
+    📋
+    <span class="fab-tooltip">Paste & grab (Ctrl+V)</span>
+  </button>
+
+  <!-- ===== MINI PROGRESS INDICATOR ===== -->
+  <div id="miniProgress" class="mini-progress" hidden>
+    <div class="mp-title" id="mpTitle">Downloading…</div>
+    <div class="mp-info">
+      <div class="mp-bar"><div class="mp-bar-fill" id="mpBar"></div></div>
+      <span class="mp-pct" id="mpPct">0%</span>
+    </div>
+  </div>
+
   <!-- ===== KEYBOARD SHORTCUTS MODAL ===== -->
   <div id="shortcutsModal" class="modal" hidden>
     <div class="modal-content">
@@ -482,10 +537,13 @@
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>V</kbd><span>Paste &amp; auto-detect links</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>Enter</kbd><span>Analyze / Download</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>F</kbd><span>Focus search</span></div>
-        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>1-9</kbd><span>Switch views</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>1-9</kbd><span>Switch views (0 = about)</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>D</kbd><span>Toggle dark / light theme</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>Q</kbd><span>Open queue</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd><span>Open settings</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>K</kbd><span>Command palette</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>B</kbd><span>Add to favorites</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>\\</kbd><span>Toggle sidebar</span></div>
         <div class="shortcut"><kbd>Escape</kbd><span>Close modal / Cancel</span></div>
         <div class="shortcut"><kbd>?</kbd><span>Show this help</span></div>
       </div>
@@ -495,12 +553,40 @@
   <!-- ===== ONBOARDING TOUR ===== -->
   <div id="tourOverlay" class="tour-overlay" hidden>
     <div id="tourCard" class="tour-card">
-      <div class="tour-step-indicator"><span id="tourStepNum">1</span> / <span id="tourStepTotal">6</span></div>
+      <div id="tourDots" class="tour-dots"></div>
       <h3 id="tourTitle"></h3>
       <p id="tourDesc"></p>
       <div class="tour-actions">
         <button id="tourSkip" class="btn-soft">Skip tour</button>
         <button id="tourNext" class="btn-primary">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMMAND PALETTE ===== -->
+  <div id="cmdPalette" class="modal" hidden>
+    <div class="modal-content cmd-palette">
+      <input type="text" id="cmdInput" class="cmd-input" placeholder="Type a command… (navigate, theme, download)" aria-label="Command palette" autocomplete="off" />
+      <div id="cmdResults" class="cmd-results"></div>
+    </div>
+  </div>
+
+  <!-- ===== WHAT'S NEW MODAL ===== -->
+  <div id="whatsNewModal" class="modal" hidden>
+    <div class="modal-content">
+      <div class="modal-head"><h3>What's New</h3><button class="modal-close" data-close>✕</button></div>
+      <div class="changelog-ver">Version 5.0.0</div>
+      <div class="changelog-list">
+        <div class="changelog-item"><span class="changelog-icon">🎨</span><div class="changelog-text"><h4>Collapsible Sidebar</h4><p>Toggle the sidebar with the arrow button or Ctrl+\\ for a wider workspace.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📋</span><div class="changelog-text"><h4>Floating Action Button</h4><p>Quick-paste &amp; download from anywhere with the floating button.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📈</span><div class="changelog-text"><h4>Live Speed Graph</h4><p>See your download speed visualized in real-time during downloads.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎵</span><div class="changelog-text"><h4>Music Visualizer</h4><p>Animated bars during audio downloads for a premium feel.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🔔</span><div class="changelog-text"><h4>Completion Sound</h4><p>Hear a chime when your download finishes (toggle in Settings).</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">💻</span><div class="changelog-text"><h4>System Theme</h4><p>Auto-match your OS dark/light preference with the new System theme.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📤</span><div class="changelog-text"><h4>Export Queue</h4><p>Export your queue as a URL list for sharing or backup.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">✨</span><div class="changelog-text"><h4>Glowing Cards</h4><p>Animated gradient borders on the options panel for a premium look.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🖱</span><div class="changelog-text"><h4>Drag Reorder Queue</h4><p>Drag queue items to reorder your download priority.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📊</span><div class="changelog-text"><h4>Mini Progress</h4><p>Floating progress indicator when you navigate away from the download view.</p></div></div>
       </div>
     </div>
   </div>

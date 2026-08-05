@@ -1,4 +1,4 @@
-// PurffleGrab front-end (v4.1) — ultra premium edition.
+// PurffleGrab front-end (v5.0) — ultimate edition.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -11,7 +11,8 @@ let downloadQueue = [];
 let scheduledDownloads = [];
 let favorites = [];
 let recentUrls = [];
-let prefs = { defaults: {}, theme: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6' };
+let speedHistory = [];
+let prefs = { defaults: {}, theme: 'dark', themeMode: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6', playSound: true };
 let downloadStartTime = null;
 
 // ---- helpers ----
@@ -36,6 +37,27 @@ function animateValue(el, start, end, dur) {
   requestAnimationFrame(update);
 }
 
+// ---- completion sound ----
+function playCompletionSound() {
+  if (!prefs.playSound) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 chord
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.12 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.6);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.12);
+      osc.stop(ctx.currentTime + i * 0.12 + 0.6);
+    });
+  } catch {}
+}
+
 // ---- nav ----
 $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
   $$('.side-btn').forEach((x) => x.classList.toggle('active', x === b));
@@ -46,11 +68,20 @@ $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
   if (b.dataset.view === 'queue') renderQueue();
   if (b.dataset.view === 'scheduler') renderSchedule();
   if (b.dataset.view === 'favorites') renderFavorites();
+  updateMiniProgress();
 }));
 function goto(view) {
   $$('.side-btn').forEach((x) => x.classList.toggle('active', x.dataset.view === view));
   $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${view}`));
+  updateMiniProgress();
 }
+
+// ---- sidebar toggle ----
+$('#sidebarToggle')?.addEventListener('click', () => {
+  $('#sidebar').classList.toggle('collapsed');
+  try { localStorage.setItem('pg-sidebar', $('#sidebar').classList.contains('collapsed') ? 'collapsed' : 'expanded'); } catch {}
+});
+try { if (localStorage.getItem('pg-sidebar') === 'collapsed') $('#sidebar').classList.add('collapsed'); } catch {}
 
 // ---- theme ----
 function applyTheme(theme) {
@@ -59,13 +90,37 @@ function applyTheme(theme) {
   const tog = $('#themeToggle');
   if (tog) { tog.querySelector('.tt-ic').textContent = theme === 'dark' ? '🌙' : '☀️'; tog.querySelector('.tt-label').textContent = theme === 'dark' ? 'Dark' : 'Light'; }
   try { localStorage.setItem('pg-theme', theme); } catch {}
+  // Update theme segment
+  $$('#themeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.themeMode === (prefs.themeMode || theme)));
 }
+function applyThemeMode(mode) {
+  prefs.themeMode = mode;
+  try { localStorage.setItem('pg-theme-mode', mode); } catch {}
+  if (mode === 'system') {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(prefersDark ? 'dark' : 'light');
+  } else {
+    applyTheme(mode);
+  }
+  $$('#themeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.themeMode === mode));
+}
+// Theme segment buttons
+$$('#themeSeg .seg-btn').forEach(b => b.addEventListener('click', () => applyThemeMode(b.dataset.themeMode)));
+// System theme change listener
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  if (prefs.themeMode === 'system') applyTheme(e.matches ? 'dark' : 'light');
+});
+
 $('#themeToggle').addEventListener('click', () => {
   const next = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
+  applyThemeMode(next);
   fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: next }) });
 });
-try { const t = localStorage.getItem('pg-theme'); if (t) applyTheme(t); } catch {}
+try {
+  const mode = localStorage.getItem('pg-theme-mode');
+  if (mode) applyThemeMode(mode);
+  else { const t = localStorage.getItem('pg-theme'); if (t) applyTheme(t); }
+} catch {}
 
 // ---- accent color ----
 function applyAccent(color) {
@@ -105,17 +160,50 @@ document.addEventListener('keydown', (e) => {
     const url = urlInput.value.trim();
     if (url) { addFavorite(url, ''); } else { goto('favorites'); }
   }
+  if (e.ctrlKey && e.key === '\\') { e.preventDefault(); $('#sidebarToggle')?.click(); }
   if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     e.preventDefault();
-    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','settings','about'];
+    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','settings'];
     const idx = parseInt(e.key) - 1;
     if (views[idx]) goto(views[idx]);
   }
+  if (e.ctrlKey && e.key === '0') { e.preventDefault(); goto('about'); }
   if (e.key === '?' && !isInput) { e.preventDefault(); $('#shortcutsModal').hidden = false; }
 });
 
 // Close modal on background click
 $$('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.hidden = true; }));
+
+// ---- What's New modal ----
+$('#whatsNewBtn')?.addEventListener('click', () => { $('#whatsNewModal').hidden = false; });
+try {
+  if (!localStorage.getItem('pg-seen-v5')) {
+    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v5', '1'); }, 1500);
+  }
+} catch {}
+
+// ---- Floating Action Button ----
+$('#fab')?.addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) {
+      const urls = text.match(/https?:\/\/\S+/g);
+      if (urls?.length) {
+        urlInput.value = urls.join('\n');
+        urlInput.dispatchEvent(new Event('input'));
+        goto('download');
+        toast(`📋 Pasted ${urls.length} link${urls.length > 1 ? 's' : ''}`);
+        analyze();
+        return;
+      }
+    }
+    toast('No URLs found in clipboard');
+  } catch {
+    goto('download');
+    urlInput.focus();
+    toast('Paste a link to get started');
+  }
+});
 
 // ---- command palette ----
 const CMD_ACTIONS = [
@@ -128,15 +216,20 @@ const CMD_ACTIONS = [
   { icon: '⏰', label: 'Go to Scheduler', hint: 'Ctrl+7', action: () => goto('scheduler') },
   { icon: '⭐', label: 'Go to Favorites', hint: 'Ctrl+8', action: () => goto('favorites') },
   { icon: '⚙', label: 'Go to Settings', hint: 'Ctrl+9', action: () => goto('settings') },
+  { icon: 'ℹ', label: 'Go to About', hint: 'Ctrl+0', action: () => goto('about') },
   { icon: '🌙', label: 'Toggle theme (dark/light)', hint: 'Ctrl+D', action: () => $('#themeToggle').click() },
+  { icon: '💻', label: 'Set system theme', action: () => applyThemeMode('system') },
   { icon: '📋', label: 'Paste from clipboard', hint: 'Ctrl+V', action: () => { goto('download'); $('#pasteBtn').click(); } },
+  { icon: '◀', label: 'Toggle sidebar', hint: 'Ctrl+\\', action: () => $('#sidebarToggle')?.click() },
   { icon: '⌨', label: 'Show keyboard shortcuts', hint: '?', action: () => { $('#shortcutsModal').hidden = false; } },
   { icon: '🗑', label: 'Clear download queue', action: () => { downloadQueue = []; saveQueue(); renderQueue(); updateQueueBadge(); toast('Queue cleared'); } },
   { icon: '📤', label: 'Export history', action: () => $('#exportHistory')?.click() },
   { icon: '📤', label: 'Export settings', action: () => $('#exportSettings')?.click() },
+  { icon: '📤', label: 'Export queue as URL list', action: () => $('#queueExport')?.click() },
   { icon: '⬆', label: 'Update yt-dlp engine', action: () => { goto('settings'); $('#updateEngine').click(); } },
   { icon: '↺', label: 'Reset settings to defaults', action: () => $('#resetSettings')?.click() },
   { icon: '🔄', label: 'Refresh history', action: () => { goto('history'); loadHistory(); } },
+  { icon: '🆕', label: "What's new in v5.0", action: () => { $('#whatsNewModal').hidden = false; } },
 ];
 
 let cmdIdx = 0;
@@ -178,17 +271,18 @@ $('#cmdInput')?.addEventListener('keydown', (e) => {
 
 // ---- onboarding tour ----
 const TOUR_STEPS = [
-  { title: 'Welcome to PurffleGrab! 🎉', desc: 'The cleanest way to download media from Spotify and YouTube. Let us show you around!' },
-  { title: 'Paste & Download ⬇', desc: 'Just paste a Spotify or YouTube link in the box and hit Analyze. You can paste multiple links at once or import from a file!' },
-  { title: 'Search YouTube 🔎', desc: 'No link? Use the Search tab to find videos and music directly by name. Select results and download them.' },
-  { title: 'Queue System 📋', desc: 'Add items to the queue and download them all at once. Great for batch downloading!' },
-  { title: 'Command Palette 🚀', desc: 'Press Ctrl+K anytime to open the command palette. Quickly navigate, toggle theme, or trigger actions.' },
-  { title: 'Favorites ⭐', desc: 'Save URLs you download often to Favorites. Press Ctrl+B to bookmark the current URL.' },
-  { title: 'You\'re all set! ✅', desc: 'Explore Stats, Converter, Scheduler, and Settings for more power. Hit ? anytime for keyboard shortcuts.' },
+  { title: 'Welcome to PurffleGrab! 🎉', desc: 'The ultimate way to download media from Spotify and YouTube. Let us show you around!' },
+  { title: 'Paste & Download ⬇', desc: 'Just paste a Spotify or YouTube link and hit Analyze. Use the floating button to quick-paste from clipboard!' },
+  { title: 'Search YouTube 🔎', desc: 'No link? Search directly by name, select results, and download them all at once.' },
+  { title: 'Queue System 📋', desc: 'Add items to the queue, drag to reorder, and batch download. Export your queue as a URL list.' },
+  { title: 'Command Palette 🚀', desc: 'Press Ctrl+K anytime for the command palette. Navigate anywhere, toggle theme, or trigger actions.' },
+  { title: 'Favorites ⭐', desc: 'Save URLs you download often. Press Ctrl+B to bookmark the current URL.' },
+  { title: 'Live Progress 📈', desc: 'Watch the speed graph and music visualizer during downloads. A mini-progress floats when you leave the page.' },
+  { title: 'You\'re all set! ✅', desc: 'Explore Stats, Converter, Scheduler, and Settings. Press ? for shortcuts or Ctrl+\\ to collapse the sidebar.' },
 ];
 let tourStep = 0;
 function showTour() {
-  try { if (localStorage.getItem('pg-toured-v4')) return; } catch {}
+  try { if (localStorage.getItem('pg-toured-v5')) return; } catch {}
   tourStep = 0;
   renderTourStep();
   $$('.modal').forEach(m => m.hidden = true);
@@ -198,18 +292,20 @@ function renderTourStep() {
   const s = TOUR_STEPS[tourStep];
   $('#tourTitle').textContent = s.title;
   $('#tourDesc').textContent = s.desc;
-  $('#tourStepNum').textContent = tourStep + 1;
-  $('#tourStepTotal').textContent = TOUR_STEPS.length;
+  // Render dots
+  $('#tourDots').innerHTML = TOUR_STEPS.map((_, i) =>
+    `<div class="tour-dot ${i === tourStep ? 'active' : ''}"></div>`
+  ).join('');
   $('#tourNext').textContent = tourStep === TOUR_STEPS.length - 1 ? 'Get started!' : 'Next →';
 }
 $('#tourNext').addEventListener('click', () => {
   tourStep++;
-  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v4', '1'); } catch {} return; }
+  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v5', '1'); } catch {} return; }
   renderTourStep();
 });
-$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v4', '1'); } catch {} });
+$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v5', '1'); } catch {} });
 $('#tourCard').addEventListener('click', (e) => e.stopPropagation());
-$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v4', '1'); } catch {} });
+$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v5', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
@@ -238,7 +334,7 @@ $('#fileImport').addEventListener('change', (e) => {
   e.target.value = '';
 });
 
-// drag & drop links anywhere
+// drag & drop
 const dz = $('#dropzone');
 ['dragenter', 'dragover'].forEach((e) => document.addEventListener(e, (ev) => { ev.preventDefault(); dz.classList.add('drag'); }));
 ['dragleave', 'drop'].forEach((e) => document.addEventListener(e, (ev) => { ev.preventDefault(); if (e !== 'drop' && ev.relatedTarget) return; dz.classList.remove('drag'); }));
@@ -462,7 +558,7 @@ function renderQueue() {
   toolbar.stats.textContent = `${queued} queued · ${downloadQueue.length} total`;
 
   list.innerHTML = downloadQueue.map((q, i) => `
-    <div class="queue-item" data-qi="${i}">
+    <div class="queue-item" data-qi="${i}" draggable="true">
       <span class="qi-handle">⋮⋮</span>
       <div class="qi-info">
         <div class="qi-title">${esc(q.source.url)}</div>
@@ -474,6 +570,27 @@ function renderQueue() {
         <button class="mini danger" data-qact="remove">✕</button>
       </div>
     </div>`).join('');
+
+  // Drag-to-reorder
+  let dragIdx = null;
+  $$('.queue-item[draggable]').forEach((el, i) => {
+    el.addEventListener('dragstart', (e) => {
+      dragIdx = i;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', () => { el.classList.remove('dragging'); dragIdx = null; });
+    el.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+    el.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (dragIdx !== null && dragIdx !== i) {
+        const item = downloadQueue.splice(dragIdx, 1)[0];
+        downloadQueue.splice(i, 0, item);
+        saveQueue();
+        renderQueue();
+      }
+    });
+  });
 
   $$('.queue-item').forEach(el => {
     const i = Number(el.dataset.qi);
@@ -496,6 +613,15 @@ $('#queueStartAll')?.addEventListener('click', () => {
   startDownload(srcList, opts);
 });
 $('#queueClearAll')?.addEventListener('click', () => { downloadQueue = []; saveQueue(); renderQueue(); updateQueueBadge(); toast('Queue cleared'); });
+$('#queueExport')?.addEventListener('click', () => {
+  const urls = downloadQueue.map(q => q.source.url).join('\n');
+  if (!urls) { toast('Queue is empty'); return; }
+  const blob = new Blob([urls], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'purfflegrab-queue.txt'; a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 Queue exported!');
+});
 
 async function startDownload(srcList, options) {
   const opts = options || gatherOptions();
@@ -511,15 +637,65 @@ async function startDownload(srcList, options) {
   try {
     const res = await fetch('/api/download', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sources: list, options: opts }) });
     const data = await res.json(); if (!res.ok) throw new Error(data.error);
-    activeJobId = data.jobId; downloadStartTime = Date.now(); goto('download'); openProgress(); listenProgress(data.jobId);
+    activeJobId = data.jobId; downloadStartTime = Date.now(); speedHistory = []; goto('download'); openProgress(); listenProgress(data.jobId);
   } catch (err) { toast(err.message); } finally { setBtnLoading($('#downloadBtn'), false); }
 }
+
+// ---- visualizer ----
+function initVisualizer() {
+  const el = $('#progVisualizer');
+  el.hidden = false;
+  el.innerHTML = Array.from({ length: 16 }, (_, i) => {
+    const h = 8 + Math.random() * 16;
+    const dur = 0.4 + Math.random() * 0.5;
+    return `<div class="viz-bar" style="--h:${h}px;--dur:${dur}s"></div>`;
+  }).join('');
+}
+
+// ---- speed graph ----
+function updateSpeedGraph(speedStr) {
+  if (!speedStr) return;
+  const match = speedStr.match(/([\d.]+)\s*(KiB|MiB|GiB|B)/i);
+  if (!match) return;
+  let val = parseFloat(match[1]);
+  const unit = match[2].toLowerCase();
+  if (unit === 'mib') val *= 1024;
+  else if (unit === 'gib') val *= 1024 * 1024;
+  else if (unit === 'b') val /= 1024;
+  speedHistory.push(val);
+  if (speedHistory.length > 60) speedHistory.shift();
+
+  const el = $('#speedGraph');
+  el.hidden = false;
+  const max = Math.max(1, ...speedHistory);
+  el.innerHTML = speedHistory.map(v => {
+    const h = Math.max(2, (v / max) * 44);
+    return `<div class="sg-bar" style="height:${h}px"></div>`;
+  }).join('');
+}
+
+// ---- mini progress ----
+let lastMiniJob = null;
+function updateMiniProgress() {
+  const mp = $('#miniProgress');
+  const isOnDownload = $('.view.active')?.id === 'view-download';
+  if (!activeJobId || isOnDownload || !lastMiniJob) {
+    mp.hidden = true;
+    return;
+  }
+  mp.hidden = false;
+}
+$('#miniProgress')?.addEventListener('click', () => { goto('download'); });
 
 function openProgress() {
   $('#panel').hidden = true; $('#progress').hidden = false; $('#doneActions').hidden = true; $('#cancelBtn').hidden = false;
   $('#itemList').innerHTML = ''; $('#progBar').style.width = '0%'; $('#progPct').textContent = '0%'; $('#progMeta').textContent = ''; $('#progTitle').textContent = 'Preparing…';
   $('#progTimeInfo').textContent = '';
+  $('#speedGraph').hidden = true; $('#speedGraph').innerHTML = '';
+  initVisualizer();
   $('#progress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  // Hide FAB during download
+  $('#fab').hidden = true;
 }
 function listenProgress(id) {
   if (activeES) activeES.close();
@@ -541,6 +717,16 @@ function renderProgress(job) {
 
   document.title = pct < 100 ? `(${pct}%) Downloading — PurffleGrab` : 'PurffleGrab';
 
+  // Update speed graph
+  if (job.speed) updateSpeedGraph(job.speed);
+
+  // Update mini progress
+  lastMiniJob = job;
+  $('#mpTitle').textContent = job.title || 'Downloading…';
+  $('#mpBar').style.width = pct + '%';
+  $('#mpPct').textContent = pct + '%';
+  updateMiniProgress();
+
   $('#itemList').innerHTML = job.items.map((it, i) => {
     const label = it.status === 'downloading' ? `${Math.round(it.progress)}%` : (ST[it.status] || it.status);
     const acts = (it.status === 'done' && it.file) ? `<span class="item-acts"><button class="mini" data-open="${esc(it.file)}">Open</button><button class="mini" data-reveal="${esc(it.file)}">Folder</button></span>` : '';
@@ -552,7 +738,12 @@ function renderProgress(job) {
 let lastDoneJob = null;
 function finishProgress(job) {
   document.title = 'PurffleGrab';
+  activeJobId = null;
+  lastMiniJob = null;
+  updateMiniProgress();
   $('#cancelBtn').hidden = true;
+  $('#progVisualizer').hidden = true;
+  $('#fab').hidden = false;
   const done = job.items.filter((i) => i.status === 'done').length;
   const failed = job.items.filter((i) => i.status === 'failed').length;
   const elapsed = downloadStartTime ? fmtTime(Math.round((Date.now() - downloadStartTime) / 1000)) : '';
@@ -572,7 +763,12 @@ function finishProgress(job) {
     if (navigator.share) { navigator.share({ title: 'PurffleGrab', text }).catch(() => {}); }
     else { navigator.clipboard?.writeText(text).then(() => toast('📋 Copied share text!')); }
   };
-  if (job.status === 'complete' && lastDoneJob !== job.id) { lastDoneJob = job.id; notifyDone(done); saveDownloadStats(job); }
+  if (job.status === 'complete' && lastDoneJob !== job.id) {
+    lastDoneJob = job.id;
+    notifyDone(done);
+    saveDownloadStats(job);
+    playCompletionSound();
+  }
   downloadStartTime = null;
 }
 function notifyDone(n) {
@@ -799,6 +995,7 @@ $('#convertBtn')?.addEventListener('click', async () => {
     $('#convertResult').hidden = false;
     $('#convertResult').innerHTML = `<div class="done-actions"><a href="${url}" download="${esc(name)}" class="btn-primary">⬇ Download ${esc(name)}</a></div>`;
     toast('✅ Conversion complete!');
+    playCompletionSound();
   } catch (err) {
     toast(err.message);
     $('#convertResult').hidden = false;
@@ -880,17 +1077,20 @@ async function loadSettings() {
   try {
     const res = await fetch('/api/settings'); const { settings, defaultDir } = await res.json(); prefs = settings;
     applyTheme(settings.theme || document.body.dataset.theme || 'dark');
+    if (settings.themeMode) applyThemeMode(settings.themeMode);
     if (settings.accentColor) applyAccent(settings.accentColor);
+    if (settings.playSound !== undefined) prefs.playSound = settings.playSound;
     $('#outputDir').value = settings.outputDir || ''; $('#dirHint').textContent = `Default folder: ${defaultDir}`;
     const d = settings.defaults || {};
     $('#defType').value = d.contentType || 'video'; $('#defRes').value = d.resolution || '1080'; $('#defFmt').value = d.audioFormat || 'mp3';
     $('#defConc').value = String(settings.concurrency || 2); $('#defNotify').checked = settings.notify !== false;
+    $('#defPlaySound').checked = settings.playSound !== false;
   } catch {}
 }
 function applyDefaultsToForm() { const d = prefs.defaults || {}; if (d.resolution) $('#resolution').value = d.resolution; if (d.audioFormat) $('#audioFormat').value = d.audioFormat; }
 $('#pickFolder').addEventListener('click', async () => { const res = await fetch('/api/pick-folder', { method: 'POST' }); const { path } = await res.json(); if (path) $('#outputDir').value = path; });
 $('#saveSettings').addEventListener('click', async () => {
-  const body = { outputDir: $('#outputDir').value, theme: document.body.dataset.theme, accentColor: prefs.accentColor, concurrency: Number($('#defConc').value), notify: $('#defNotify').checked,
+  const body = { outputDir: $('#outputDir').value, theme: document.body.dataset.theme, themeMode: prefs.themeMode, accentColor: prefs.accentColor, concurrency: Number($('#defConc').value), notify: $('#defNotify').checked, playSound: $('#defPlaySound').checked,
     defaults: { contentType: $('#defType').value, resolution: $('#defRes').value, audioFormat: $('#defFmt').value } };
   const res = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await res.json();
