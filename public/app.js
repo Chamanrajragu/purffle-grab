@@ -1,4 +1,4 @@
-// PurffleGrab front-end (v7.0) — ultimate edition.
+// PurffleGrab front-end (v8.0) — ultimate edition.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -239,6 +239,7 @@ $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
   if (b.dataset.view === 'queue') renderQueue();
   if (b.dataset.view === 'scheduler') renderSchedule();
   if (b.dataset.view === 'favorites') renderFavorites();
+  if (b.dataset.view === 'achievements') { renderAchievements(); renderHeatmap(); }
   updateMiniProgress();
 }));
 function goto(view) {
@@ -336,7 +337,7 @@ document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'p') { e.preventDefault(); goto('player'); }
   if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     e.preventDefault();
-    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','player','settings'];
+    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','player','achievements','settings'];
     const idx = parseInt(e.key) - 1;
     if (views[idx]) goto(views[idx]);
   }
@@ -350,8 +351,8 @@ $$('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === 
 // ---- What's New modal ----
 $('#whatsNewBtn')?.addEventListener('click', () => { $('#whatsNewModal').hidden = false; });
 try {
-  if (!localStorage.getItem('pg-seen-v7')) {
-    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v7', '1'); }, 1500);
+  if (!localStorage.getItem('pg-seen-v8')) {
+    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v8', '1'); }, 1500);
   }
 } catch {}
 
@@ -460,7 +461,7 @@ const TOUR_STEPS = [
 ];
 let tourStep = 0;
 function showTour() {
-  try { if (localStorage.getItem('pg-toured-v7')) return; } catch {}
+  try { if (localStorage.getItem('pg-toured-v8')) return; } catch {}
   tourStep = 0;
   renderTourStep();
   $$('.modal').forEach(m => m.hidden = true);
@@ -477,12 +478,12 @@ function renderTourStep() {
 }
 $('#tourNext').addEventListener('click', () => {
   tourStep++;
-  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v7', '1'); } catch {} return; }
+  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v8', '1'); } catch {} return; }
   renderTourStep();
 });
-$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v7', '1'); } catch {} });
+$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v8', '1'); } catch {} });
 $('#tourCard').addEventListener('click', (e) => e.stopPropagation());
-$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v7', '1'); } catch {} });
+$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v8', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
@@ -1782,4 +1783,333 @@ const _origFinish = finishProgress;
 finishProgress = function(job) {
   _origFinish(job);
   $('#speedGauge').hidden = true;
+};
+
+// ====================================================================
+// v8.0 NEW FEATURES
+// ====================================================================
+
+// ---- equalizer ----
+let eqFilters = [];
+const EQ_FREQS = [60, 230, 910, 3600, 14000];
+const EQ_LABELS = ['Bass', 'Low', 'Mid', 'High', 'Treble'];
+
+function initEqualizer() {
+  if (!playerAudioCtx || !playerAnalyser || eqFilters.length) return;
+  // Disconnect analyser, insert EQ chain
+  try {
+    const source = playerAudioCtx.createMediaElementSource ? null : null; // already connected
+    let lastNode = playerAnalyser;
+    // We need to reconnect: source → EQ filters → analyser → destination
+    // Since source is already connected to analyser, we'll create filters between analyser and destination
+    playerAnalyser.disconnect();
+    EQ_FREQS.forEach((freq, i) => {
+      const filter = playerAudioCtx.createBiquadFilter();
+      filter.type = i === 0 ? 'lowshelf' : i === EQ_FREQS.length - 1 ? 'highshelf' : 'peaking';
+      filter.frequency.value = freq;
+      filter.gain.value = 0;
+      filter.Q.value = 1;
+      eqFilters.push(filter);
+    });
+    // Chain: analyser → filter0 → filter1 → ... → destination
+    let prev = playerAnalyser;
+    eqFilters.forEach(f => { prev.connect(f); prev = f; });
+    prev.connect(playerAudioCtx.destination);
+  } catch {}
+}
+
+function renderEqualizer() {
+  const wrap = $('#eqSliders');
+  if (!wrap) return;
+  wrap.innerHTML = EQ_FREQS.map((freq, i) => {
+    const label = EQ_LABELS[i];
+    const val = eqFilters[i]?.gain?.value || 0;
+    return `<div class="eq-band">
+      <input type="range" class="eq-slider" data-eqi="${i}" min="-12" max="12" step="1" value="${Math.round(val)}" orient="vertical" />
+      <span class="eq-label">${label}</span>
+      <span class="eq-val" id="eqVal${i}">${Math.round(val)} dB</span>
+    </div>`;
+  }).join('');
+  $$('.eq-slider').forEach(s => s.addEventListener('input', (e) => {
+    const i = Number(s.dataset.eqi);
+    const val = Number(e.target.value);
+    if (eqFilters[i]) eqFilters[i].gain.value = val;
+    $(`#eqVal${i}`).textContent = `${val} dB`;
+  }));
+}
+$('#eqToggle')?.addEventListener('click', () => {
+  const panel = $('#eqPanel');
+  if (!panel) return;
+  panel.hidden = !panel.hidden;
+  if (!panel.hidden) {
+    if (!eqFilters.length && playerAudioCtx) initEqualizer();
+    renderEqualizer();
+  }
+});
+$('#eqReset')?.addEventListener('click', () => {
+  eqFilters.forEach(f => { f.gain.value = 0; });
+  renderEqualizer();
+  toast('🎛 Equalizer reset');
+});
+// EQ presets
+$$('[data-eqpreset]').forEach(btn => btn.addEventListener('click', () => {
+  const presets = {
+    flat: [0, 0, 0, 0, 0],
+    bass: [6, 4, 0, -1, -2],
+    treble: [-2, -1, 0, 4, 6],
+    vocal: [-2, 0, 4, 3, -1],
+    rock: [4, 2, -1, 3, 5],
+  };
+  const vals = presets[btn.dataset.eqpreset] || presets.flat;
+  vals.forEach((v, i) => { if (eqFilters[i]) eqFilters[i].gain.value = v; });
+  renderEqualizer();
+  toast(`🎛 EQ: ${btn.dataset.eqpreset}`);
+}));
+
+// ---- sleep timer ----
+let sleepTimerId = null;
+let sleepTimeRemaining = 0;
+$('#sleepTimerBtn')?.addEventListener('click', () => {
+  const modal = $('#sleepTimerModal');
+  if (modal) modal.hidden = false;
+});
+$$('[data-sleep]').forEach(btn => btn.addEventListener('click', () => {
+  const mins = Number(btn.dataset.sleep);
+  if (sleepTimerId) clearInterval(sleepTimerId);
+  if (mins === 0) {
+    sleepTimerId = null;
+    sleepTimeRemaining = 0;
+    $('#sleepStatus').textContent = '';
+    $('#sleepTimerModal').hidden = true;
+    toast('😴 Sleep timer cancelled');
+    return;
+  }
+  sleepTimeRemaining = mins * 60;
+  sleepTimerId = setInterval(() => {
+    sleepTimeRemaining--;
+    const m = Math.floor(sleepTimeRemaining / 60);
+    const s = sleepTimeRemaining % 60;
+    const status = $('#sleepStatus');
+    if (status) status.textContent = `Sleep in ${m}:${String(s).padStart(2, '0')}`;
+    if (sleepTimeRemaining <= 0) {
+      clearInterval(sleepTimerId);
+      sleepTimerId = null;
+      if (playerAudio) { playerAudio.pause(); $('#playerPlay').textContent = '▶'; $('#playerArtwork').classList.remove('playing'); }
+      toast('😴 Sleep timer — playback stopped');
+      addNotification('😴', 'Sleep timer stopped playback');
+      if (status) status.textContent = '';
+    }
+  }, 1000);
+  $('#sleepTimerModal').hidden = true;
+  toast(`😴 Sleep timer: ${mins} minutes`);
+}));
+
+// ---- achievement system ----
+const ACHIEVEMENTS = [
+  { id: 'first', icon: '🎉', title: 'First Download', desc: 'Download your first file', check: s => s >= 1 },
+  { id: 'ten', icon: '🔟', title: 'Getting Started', desc: 'Download 10 files', check: s => s >= 10 },
+  { id: 'fifty', icon: '🏆', title: 'Power User', desc: 'Download 50 files', check: s => s >= 50 },
+  { id: 'hundred', icon: '💯', title: 'Centurion', desc: 'Download 100 files', check: s => s >= 100 },
+  { id: 'fivehundred', icon: '🌟', title: 'Legend', desc: 'Download 500 files', check: s => s >= 500 },
+  { id: 'streak3', icon: '🔥', title: 'On Fire', desc: '3-day download streak', check: (s, st) => st >= 3 },
+  { id: 'streak7', icon: '⚡', title: 'Unstoppable', desc: '7-day download streak', check: (s, st) => st >= 7 },
+  { id: 'streak30', icon: '👑', title: 'King of Downloads', desc: '30-day download streak', check: (s, st) => st >= 30 },
+];
+
+function checkAchievements() {
+  try {
+    const stats = JSON.parse(localStorage.getItem('pg-stats') || '{}');
+    const dl = stats.downloads || [];
+    const total = dl.reduce((a, d) => a + d.count, 0);
+    const unlocked = JSON.parse(localStorage.getItem('pg-achievements') || '[]');
+    const uniqueDates = [...new Set(dl.map(d => d.date))].sort().reverse();
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 365; i++) {
+      const key = d.toISOString().slice(0, 10);
+      if (uniqueDates.includes(key)) { streak++; d.setDate(d.getDate() - 1); }
+      else break;
+    }
+    for (const a of ACHIEVEMENTS) {
+      if (unlocked.includes(a.id)) continue;
+      if (a.check(total, streak)) {
+        unlocked.push(a.id);
+        toast(`🏅 Achievement unlocked: ${a.title}!`);
+        addNotification('🏅', `Achievement: ${a.title} — ${a.desc}`);
+        fireConfetti();
+      }
+    }
+    localStorage.setItem('pg-achievements', JSON.stringify(unlocked));
+  } catch {}
+}
+
+function renderAchievements() {
+  const wrap = $('#achievementsList');
+  if (!wrap) return;
+  const unlocked = JSON.parse(localStorage.getItem('pg-achievements') || '[]');
+  wrap.innerHTML = ACHIEVEMENTS.map(a => {
+    const done = unlocked.includes(a.id);
+    return `<div class="achievement ${done ? 'unlocked' : 'locked'}">
+      <span class="ach-icon">${a.icon}</span>
+      <div class="ach-info"><div class="ach-title">${a.title}</div><div class="ach-desc">${a.desc}</div></div>
+      ${done ? '<span class="ach-check">✓</span>' : '<span class="ach-lock">🔒</span>'}
+    </div>`;
+  }).join('');
+}
+
+// Hook into download complete to check achievements
+const _origFinish2 = finishProgress;
+finishProgress = function(job) {
+  _origFinish2(job);
+  if (job.status === 'complete') setTimeout(checkAchievements, 500);
+};
+
+// ---- heatmap calendar ----
+function renderHeatmap() {
+  const wrap = $('#heatmapGrid');
+  if (!wrap) return;
+  try {
+    const stats = JSON.parse(localStorage.getItem('pg-stats') || '{}');
+    const dl = stats.downloads || [];
+    const counts = {};
+    dl.forEach(d => { counts[d.date] = (counts[d.date] || 0) + d.count; });
+    const cells = [];
+    const today = new Date();
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const count = counts[key] || 0;
+      const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : count <= 10 ? 3 : 4;
+      cells.push(`<div class="hm-cell hm-${level}" title="${key}: ${count} downloads" data-date="${key}"></div>`);
+    }
+    wrap.innerHTML = cells.join('');
+  } catch {}
+}
+
+// ---- focus mode ----
+let focusMode = false;
+$('#focusModeBtn')?.addEventListener('click', () => {
+  focusMode = !focusMode;
+  document.body.classList.toggle('focus-mode', focusMode);
+  toast(focusMode ? '🧘 Focus mode on — distractions hidden' : '🧘 Focus mode off');
+});
+
+// ---- export as M3U playlist ----
+$('#exportM3U')?.addEventListener('click', async () => {
+  try {
+    const res = await fetch('/api/history');
+    const { history } = await res.json();
+    const completed = history.filter(h => h.status === 'complete');
+    if (!completed.length) { toast('No completed downloads to export'); return; }
+    let m3u = '#EXTM3U\n';
+    completed.forEach(h => {
+      m3u += `#EXTINF:-1,${h.title || 'Unknown'}\n`;
+      m3u += `${h.sources?.[0]?.url || h.url || 'unknown'}\n`;
+    });
+    const blob = new Blob([m3u], { type: 'audio/x-mpegurl' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `purfflegrab-playlist-${new Date().toISOString().slice(0,10)}.m3u`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('📤 M3U playlist exported!');
+    addNotification('📤', 'Playlist exported as M3U');
+  } catch { toast('Export failed'); }
+});
+
+// ---- batch rename ----
+$('#batchRenameBtn')?.addEventListener('click', () => {
+  const modal = $('#batchRenameModal');
+  if (modal) modal.hidden = false;
+});
+$('#batchRenameApply')?.addEventListener('click', () => {
+  const pattern = $('#renamePattern')?.value?.trim();
+  if (!pattern) { toast('Enter a rename pattern'); return; }
+  toast(`📝 Rename pattern saved: ${pattern}`);
+  try { localStorage.setItem('pg-rename-pattern', pattern); } catch {}
+  $('#batchRenameModal').hidden = true;
+});
+
+// ---- drag reorder player playlist ----
+(function initPlaylistDrag() {
+  const list = $('#playerPlaylist');
+  if (!list) return;
+  let dragIdx = null;
+  list.addEventListener('dragstart', (e) => {
+    const item = e.target.closest('.pl-item');
+    if (!item) return;
+    dragIdx = Number(item.dataset.pli);
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  list.addEventListener('dragend', (e) => {
+    const item = e.target.closest('.pl-item');
+    if (item) item.classList.remove('dragging');
+    dragIdx = null;
+  });
+  list.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+  list.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const item = e.target.closest('.pl-item');
+    if (!item || dragIdx === null) return;
+    const dropIdx = Number(item.dataset.pli);
+    if (dragIdx !== dropIdx) {
+      const moved = playerPlaylist.splice(dragIdx, 1)[0];
+      playerPlaylist.splice(dropIdx, 0, moved);
+      if (playerIdx === dragIdx) playerIdx = dropIdx;
+      else if (dragIdx < playerIdx && dropIdx >= playerIdx) playerIdx--;
+      else if (dragIdx > playerIdx && dropIdx <= playerIdx) playerIdx++;
+      renderPlayerPlaylist();
+    }
+  });
+})();
+
+// ---- mini player (picture-in-picture style) ----
+$('#miniPlayerToggle')?.addEventListener('click', () => {
+  const mp = $('#pipPlayer');
+  if (!mp) return;
+  mp.hidden = !mp.hidden;
+  if (!mp.hidden) updateMiniPlayer();
+});
+
+function updateMiniPlayer() {
+  const mp = $('#pipPlayer');
+  if (!mp || mp.hidden || !playerAudio) return;
+  const track = playerPlaylist[playerIdx];
+  $('#pipTitle').textContent = track?.name || 'No track';
+  $('#pipTime').textContent = fmtDur(playerAudio.currentTime) + ' / ' + fmtDur(playerAudio.duration || 0);
+  requestAnimationFrame(updateMiniPlayer);
+}
+$('#pipPlayBtn')?.addEventListener('click', () => $('#playerPlay')?.click());
+$('#pipNextBtn')?.addEventListener('click', () => $('#playerNext')?.click());
+$('#pipClose')?.addEventListener('click', () => { $('#pipPlayer').hidden = true; });
+
+// Make PiP draggable
+(function initPipDrag() {
+  const pip = $('#pipPlayer');
+  if (!pip) return;
+  let dragging = false, ox, oy;
+  pip.addEventListener('mousedown', (e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    dragging = true;
+    ox = e.clientX - pip.offsetLeft;
+    oy = e.clientY - pip.offsetTop;
+    pip.style.transition = 'none';
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    pip.style.left = (e.clientX - ox) + 'px';
+    pip.style.top = (e.clientY - oy) + 'px';
+    pip.style.right = 'auto';
+    pip.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', () => { dragging = false; if (pip) pip.style.transition = ''; });
+})();
+
+// Patch renderPlayerPlaylist to add draggable
+const _origRenderPlaylist = renderPlayerPlaylist;
+renderPlayerPlaylist = function() {
+  _origRenderPlaylist();
+  $$('.pl-item').forEach(el => { el.draggable = true; });
 };

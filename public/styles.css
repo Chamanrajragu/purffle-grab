@@ -1,4 +1,4 @@
-/* ===== PurffleGrab v7.0 — Ultimate Edition ===== */
+/* ===== PurffleGrab v8.0 — Ultimate Edition ===== */
 
 /* ===== Theme tokens ===== */
 :root {
@@ -1518,6 +1518,161 @@ kbd {
   transition: all 0.2s ease;
 }
 .qb-btn:hover { color: var(--text); background: var(--card-2); transform: scale(1.15); }
+
+/* ===== Equalizer Panel ===== */
+.player-extra-bar {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  align-items: center;
+}
+.sleep-status {
+  color: var(--brand-3); font-size: 12px; font-weight: 700;
+  margin-left: auto; font-variant-numeric: tabular-nums;
+}
+.eq-panel {
+  margin-top: 16px; padding: 18px;
+  background: var(--input); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  animation: fadeSlideDown 0.3s ease;
+}
+.eq-presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.eq-sliders {
+  display: flex; gap: 16px; justify-content: center;
+  padding: 10px 0;
+}
+.eq-band {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.eq-slider {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  width: 6px; height: 100px;
+  background: var(--border); border-radius: 999px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.eq-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+.eq-val { font-size: 10px; color: var(--brand); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ===== Sleep Timer Options ===== */
+.sleep-options {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+
+/* ===== PiP Mini Player ===== */
+.pip-player {
+  position: fixed; bottom: 80px; right: 24px;
+  width: 260px;
+  background: var(--side-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 45;
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(20px);
+  cursor: move;
+  transition: box-shadow 0.2s;
+}
+.pip-player:hover { box-shadow: var(--shadow-lg), var(--glow); }
+.pip-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.pip-title {
+  font-size: 13px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 200px;
+}
+.pip-close {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 14px;
+  transition: color 0.2s;
+}
+.pip-close:hover { color: var(--red); }
+.pip-time { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pip-controls {
+  display: flex; gap: 8px; margin-top: 8px;
+}
+.pip-btn {
+  flex: 1;
+  background: var(--card-2); border: 1px solid var(--border);
+  color: var(--text); border-radius: var(--radius-xs);
+  padding: 8px; font-size: 14px;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.pip-btn:hover { border-color: var(--brand); transform: translateY(-1px); }
+
+/* ===== Focus Mode ===== */
+.focus-btn {
+  position: fixed; top: 16px; right: 16px;
+  width: 40px; height: 40px;
+  background: var(--card-2); border: 1px solid var(--border);
+  border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; font-size: 18px;
+  z-index: 25; color: var(--muted);
+  transition: all 0.2s ease;
+}
+.focus-btn:hover { color: var(--text); border-color: var(--brand); transform: scale(1.1); }
+body.focus-mode .sidebar,
+body.focus-mode .quick-bar,
+body.focus-mode .fab,
+body.focus-mode #notifBtn,
+body.focus-mode .ambient-particle,
+body.focus-mode #particlesCanvas,
+body.focus-mode .mesh-gradient { opacity: 0.08; pointer-events: none; transition: opacity 0.5s ease; }
+body.focus-mode .content { max-width: 700px; margin: 0 auto; }
+
+/* ===== Achievements ===== */
+.achievements-list { display: grid; gap: 10px; }
+.achievement {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px;
+  background: var(--card-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+.achievement:hover { transform: translateX(3px); border-color: var(--border-hover); }
+.achievement.locked { opacity: 0.45; }
+.achievement.unlocked { border-color: var(--brand); }
+.achievement.unlocked::before {
+  content: '';
+  position: absolute; inset: 0;
+}
+.ach-icon { font-size: 28px; flex: none; width: 36px; text-align: center; }
+.ach-info { flex: 1; }
+.ach-title { font-size: 14px; font-weight: 700; }
+.ach-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.ach-check { color: var(--green); font-size: 18px; font-weight: 900; }
+.ach-lock { font-size: 16px; opacity: 0.5; }
+
+/* ===== Heatmap ===== */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 3px;
+  padding: 10px 0;
+}
+.hm-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  transition: transform 0.15s;
+  cursor: default;
+}
+.hm-cell:hover { transform: scale(1.4); }
+.hm-0 { background: var(--input); }
+.hm-1 { background: rgba(139,92,246,0.2); }
+.hm-2 { background: rgba(139,92,246,0.4); }
+.hm-3 { background: rgba(139,92,246,0.65); }
+.hm-4 { background: var(--brand); }
+
+/* ===== Dragging playlist items ===== */
+.pl-item.dragging { opacity: 0.4; transform: scale(0.96); }
+.pl-item[draggable="true"] { cursor: grab; }
+.pl-item[draggable="true"]:active { cursor: grabbing; }
 
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {

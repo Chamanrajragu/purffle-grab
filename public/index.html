@@ -56,6 +56,7 @@
         <button class="side-btn" data-view="scheduler"><span class="ic">⏰</span><span class="nav-text"> Scheduler</span></button>
         <button class="side-btn" data-view="favorites"><span class="ic">⭐</span><span class="nav-text"> Favorites</span></button>
         <button class="side-btn" data-view="player"><span class="ic">🎧</span><span class="nav-text"> Player</span></button>
+        <button class="side-btn" data-view="achievements"><span class="ic">🏅</span><span class="nav-text"> Achievements</span></button>
         <button class="side-btn" data-view="settings"><span class="ic">⚙</span><span class="nav-text"> Settings</span></button>
         <button class="side-btn" data-view="about"><span class="ic">ℹ</span><span class="nav-text"> About</span></button>
       </nav>
@@ -63,7 +64,7 @@
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
         <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts (?)"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
-        <span class="ver">v7.0 · a Purffle tool</span>
+        <span class="ver">v8.0 · a Purffle tool</span>
       </div>
     </aside>
 
@@ -487,6 +488,25 @@
               </div>
             </div>
           </div>
+          <!-- Equalizer -->
+          <div class="player-extra-bar">
+            <button id="eqToggle" class="mini">🎛 Equalizer</button>
+            <button id="sleepTimerBtn" class="mini">😴 Sleep Timer</button>
+            <button id="miniPlayerToggle" class="mini">🖼 Mini Player</button>
+            <button id="exportM3U" class="mini">📤 Export M3U</button>
+            <span id="sleepStatus" class="sleep-status"></span>
+          </div>
+          <div id="eqPanel" class="eq-panel" hidden>
+            <div class="eq-presets">
+              <button data-eqpreset="flat" class="mini">Flat</button>
+              <button data-eqpreset="bass" class="mini">Bass</button>
+              <button data-eqpreset="treble" class="mini">Treble</button>
+              <button data-eqpreset="vocal" class="mini">Vocal</button>
+              <button data-eqpreset="rock" class="mini">Rock</button>
+              <button id="eqReset" class="mini danger">Reset</button>
+            </div>
+            <div id="eqSliders" class="eq-sliders"></div>
+          </div>
           <div class="player-playlist-head">
             <h4>Playlist</h4>
             <button id="playerLoadFile" class="mini">📁 Load file</button>
@@ -496,6 +516,19 @@
           <div id="playerPlaylist" class="player-playlist">
             <p class="hint center">No files loaded. Click "Load file" to add audio files.</p>
           </div>
+        </div>
+      </section>
+
+      <!-- ===== ACHIEVEMENTS VIEW ===== -->
+      <section id="view-achievements" class="view">
+        <div class="view-head"><h2>Achievements</h2><p>Track your milestones and unlock badges as you download.</p></div>
+        <div class="card">
+          <h3 class="card-title">🏅 Your Badges</h3>
+          <div id="achievementsList" class="achievements-list"></div>
+        </div>
+        <div class="card mt">
+          <h3 class="card-title">📅 Activity Heatmap (90 days)</h3>
+          <div id="heatmapGrid" class="heatmap-grid"></div>
         </div>
       </section>
 
@@ -525,6 +558,7 @@
             <label class="check"><input type="checkbox" id="defConfetti" checked /><span>Show confetti on download complete</span></label>
             <label class="check"><input type="checkbox" id="defParticles" checked /><span>Interactive background particles</span></label>
             <label class="check"><input type="checkbox" id="defSpeedGauge" checked /><span>Show speed gauge during download</span></label>
+            <label class="check"><input type="checkbox" id="defFocusMode" /><span>Focus mode (hide distractions while downloading)</span></label>
           </div>
 
           <h3 class="card-title mt">Appearance</h3>
@@ -579,7 +613,7 @@
         <div class="card about-card">
           <div class="about-hero">
             <div class="about-logo">⬇</div>
-            <h3>PurffleGrab <span class="about-ver">v7.0.0</span></h3>
+            <h3>PurffleGrab <span class="about-ver">v8.0.0</span></h3>
             <p class="about-tagline">The ultimate way to grab media from the web.</p>
           </div>
           <div class="about-features">
@@ -607,6 +641,14 @@
             <div class="about-feat"><span>🎯</span> Speed gauge &amp; donut stats chart</div>
             <div class="about-feat"><span>✨</span> Interactive background particles</div>
             <div class="about-feat"><span>🪟</span> Windows, Mac &amp; Linux support</div>
+            <div class="about-feat"><span>🎛</span> 5-band equalizer with presets</div>
+            <div class="about-feat"><span>😴</span> Sleep timer for auto-stop playback</div>
+            <div class="about-feat"><span>🏅</span> Achievement &amp; badge system</div>
+            <div class="about-feat"><span>📅</span> GitHub-style activity heatmap</div>
+            <div class="about-feat"><span>🖼</span> Draggable mini player (PiP)</div>
+            <div class="about-feat"><span>🧘</span> Focus mode — hide distractions</div>
+            <div class="about-feat"><span>📤</span> Export playlist as M3U</div>
+            <div class="about-feat"><span>📝</span> Batch rename with patterns</div>
           </div>
           <div class="about-links">
             <button id="whatsNewBtn" class="btn-soft">🆕 What's New</button>
@@ -696,19 +738,68 @@
   <div id="whatsNewModal" class="modal" hidden>
     <div class="modal-content">
       <div class="modal-head"><h3>What's New</h3><button class="modal-close" data-close>✕</button></div>
-      <div class="changelog-ver">Version 7.0.0</div>
+      <div class="changelog-ver">Version 8.0.0</div>
       <div class="changelog-list">
-        <div class="changelog-item"><span class="changelog-icon">🎧</span><div class="changelog-text"><h4>Built-in Audio Player</h4><p>Play downloaded audio right in the app with waveform visualization, playlist, shuffle &amp; repeat.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🎯</span><div class="changelog-text"><h4>Speed Gauge</h4><p>Beautiful animated speedometer shows real-time download speed with gradient arc.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🍩</span><div class="changelog-text"><h4>Donut Stats Chart</h4><p>SVG donut chart for format breakdown in statistics view.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">✨</span><div class="changelog-text"><h4>Interactive Particles</h4><p>Mouse-reactive floating particles create a living background.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">⌨</span><div class="changelog-text"><h4>Typewriter Hero</h4><p>Animated typewriter effect on the download page heading.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🔗</span><div class="changelog-text"><h4>URL Preview Cards</h4><p>Pasted URLs show visual preview cards with source icons.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🪟</span><div class="changelog-text"><h4>Cross-Platform</h4><p>Now available on Windows, macOS and Linux via CI/CD builds.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🌊</span><div class="changelog-text"><h4>Enhanced Waveform</h4><p>Real-time animated waveform canvas in the audio player.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎛</span><div class="changelog-text"><h4>5-Band Equalizer</h4><p>Tune your audio with Bass, Low, Mid, High &amp; Treble bands. Includes presets: Flat, Bass, Treble, Vocal, Rock.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">😴</span><div class="changelog-text"><h4>Sleep Timer</h4><p>Set a timer to automatically stop playback — perfect for listening before bed.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🏅</span><div class="changelog-text"><h4>Achievement System</h4><p>Earn badges for milestones: first download, streaks, power user goals. Track progress in the new Achievements view.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📅</span><div class="changelog-text"><h4>Activity Heatmap</h4><p>GitHub-style heatmap shows your download activity over the past 90 days.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🖼</span><div class="changelog-text"><h4>Mini Player (PiP)</h4><p>Draggable floating mini player — keep listening while browsing other views.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🧘</span><div class="changelog-text"><h4>Focus Mode</h4><p>Hide UI distractions during downloads for a clean, distraction-free experience.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📤</span><div class="changelog-text"><h4>M3U Export</h4><p>Export your download history as an M3U playlist file.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📝</span><div class="changelog-text"><h4>Batch Rename</h4><p>Rename downloaded files using pattern templates with artist, title, album variables.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🔀</span><div class="changelog-text"><h4>Drag Reorder Playlist</h4><p>Drag &amp; drop to reorder tracks in the audio player playlist.</p></div></div>
       </div>
     </div>
   </div>
+
+  <!-- ===== SLEEP TIMER MODAL ===== -->
+  <div id="sleepTimerModal" class="modal" hidden>
+    <div class="modal-content" style="max-width:380px;text-align:center">
+      <div class="modal-head"><h3>😴 Sleep Timer</h3><button class="modal-close" data-close>✕</button></div>
+      <p style="color:var(--muted);margin-bottom:18px">Stop playback after:</p>
+      <div class="sleep-options">
+        <button data-sleep="5" class="btn-soft">5 min</button>
+        <button data-sleep="10" class="btn-soft">10 min</button>
+        <button data-sleep="15" class="btn-soft">15 min</button>
+        <button data-sleep="30" class="btn-soft">30 min</button>
+        <button data-sleep="45" class="btn-soft">45 min</button>
+        <button data-sleep="60" class="btn-soft">1 hour</button>
+        <button data-sleep="0" class="btn-soft danger">Cancel timer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BATCH RENAME MODAL ===== -->
+  <div id="batchRenameModal" class="modal" hidden>
+    <div class="modal-content" style="max-width:460px">
+      <div class="modal-head"><h3>📝 Batch Rename</h3><button class="modal-close" data-close>✕</button></div>
+      <div class="opt-group">
+        <label class="opt-label">Rename pattern</label>
+        <input type="text" id="renamePattern" class="text-input" placeholder="%(artist)s - %(title)s" />
+        <p class="hint">Variables: %(title)s, %(artist)s, %(album)s, %(track)s, %(date)s, %(ext)s</p>
+      </div>
+      <button id="batchRenameApply" class="btn-primary" style="margin-top:16px;width:100%">✓ Apply Pattern</button>
+    </div>
+  </div>
+
+  <!-- ===== PiP Mini Player ===== -->
+  <div id="pipPlayer" class="pip-player" hidden>
+    <div class="pip-header">
+      <span id="pipTitle" class="pip-title">No track</span>
+      <button id="pipClose" class="pip-close">✕</button>
+    </div>
+    <span id="pipTime" class="pip-time">0:00 / 0:00</span>
+    <div class="pip-controls">
+      <button id="pipPlayBtn" class="pip-btn">▶</button>
+      <button id="pipNextBtn" class="pip-btn">⏭</button>
+    </div>
+  </div>
+
+  <!-- ===== Focus Mode Button ===== -->
+  <button id="focusModeBtn" class="focus-btn" title="Toggle focus mode">🧘</button>
+
+  <!-- ===== Batch Rename Button ===== -->
 
   <!-- ===== CONTEXT MENU ===== -->
   <div id="ctxMenu" class="ctx-menu" hidden></div>
@@ -721,6 +812,7 @@
     <button class="qb-btn" data-qb="player" title="Player">🎧</button>
     <button class="qb-btn" data-qb="theme" title="Toggle theme">🌙</button>
     <button class="qb-btn" data-qb="cmd" title="Command palette">⌘</button>
+    <button class="qb-btn" data-qb="achievements" title="Achievements">🏅</button>
   </div>
 
   <div id="toast" class="toast" hidden></div>

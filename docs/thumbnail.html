@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PurffleGrab thumbnail — final</title>
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;overflow:hidden;background:#0b0a12;}
+  body{width:1280px;height:720px;}
+
+  /* ONE type family for the entire frame */
+  .stage{
+    position:relative;width:1280px;height:720px;overflow:hidden;
+    background:#0b0a12;
+    font-family:'Segoe UI Variable Display','Segoe UI',Inter,system-ui,sans-serif;
+    color:#fff;-webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- brand glow field: violet upper-left, pink lower-right, no third hue ---- */
+  .glow{position:absolute;inset:0;z-index:0;}
+  .glow::before{
+    content:"";position:absolute;
+    left:-260px;top:-340px;width:1180px;height:1020px;
+    background:radial-gradient(ellipse at 50% 50%, rgba(139,92,246,.40), rgba(139,92,246,0) 62%);
+  }
+  .glow::after{
+    content:"";position:absolute;
+    right:-300px;bottom:-400px;width:1140px;height:1100px;
+    background:radial-gradient(ellipse at 50% 50%, rgba(236,72,153,.26), rgba(236,72,153,0) 60%);
+  }
+  .vignette{
+    position:absolute;inset:0;z-index:1;
+    background:radial-gradient(ellipse at 34% 40%, rgba(0,0,0,0) 30%, rgba(0,0,0,.54) 100%);
+  }
+  /* inner edge so the frame does not dissolve into a dark-mode feed */
+  .edge{position:absolute;inset:0;z-index:9;border:2px solid #2a2233;pointer-events:none;}
+
+  /* ---- top row ---- */
+  .wordmark{
+    position:absolute;left:64px;top:48px;z-index:5;
+    font-size:51px;font-weight:800;letter-spacing:-1.2px;line-height:1;color:#fff;
+    text-shadow:0 6px 24px rgba(0,0,0,.6);
+  }
+  .pill{
+    position:absolute;right:64px;top:47px;z-index:5;
+    display:inline-flex;align-items:center;gap:13px;
+    padding:14px 30px 15px 24px;border-radius:999px;
+    background:linear-gradient(90deg,#8b5cf6,#ec4899);
+    box-shadow:0 12px 34px rgba(236,72,153,.42), inset 0 2px 0 rgba(255,255,255,.22);
+    font-size:30px;font-weight:800;letter-spacing:2.2px;line-height:1;
+    text-transform:uppercase;color:#fff;white-space:nowrap;
+  }
+  .pill svg{width:28px;height:28px;fill:#fff;flex:none;}
+
+  /* ---- hero app icon: the wordless anchor, top-right third ---- */
+  .iconwrap{position:absolute;left:1044px;top:224px;width:168px;height:168px;z-index:4;}
+  .iconwrap::before{
+    content:"";position:absolute;inset:-88px;border-radius:50%;
+    background:radial-gradient(circle at 44% 38%, rgba(172,116,255,.62), rgba(236,72,153,.28) 46%, transparent 72%);
+    filter:blur(30px);
+  }
+  .icon{
+    position:relative;width:168px;height:168px;border-radius:44px;
+    background:linear-gradient(140deg,#a370fc 0%,#8b5cf6 32%,#ec4899 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:
+      inset 0 0 0 1.5px rgba(255,255,255,.18),
+      0 26px 60px rgba(236,72,153,.42),
+      0 12px 30px rgba(139,92,246,.44);
+  }
+  .icon svg{width:98px;height:98px;fill:#fff;display:block;
+            filter:drop-shadow(0 4px 10px rgba(72,16,86,.34));}
+
+  /* ---- headline: one spine at x=64, one sentence, three tiers ---- */
+  .type{position:absolute;left:64px;top:140px;z-index:5;}
+  .l1{
+    font-size:222px;font-weight:800;letter-spacing:-9px;line-height:.84;
+    color:#fff;margin-left:-10px;                 /* optical: kill F side bearing */
+    text-shadow:0 18px 64px rgba(0,0,0,.6);
+  }
+  .l2{
+    margin-top:24px;
+    font-size:92px;font-weight:800;letter-spacing:-.5px;line-height:1;
+    background:linear-gradient(90deg,#a78bfa 0%,#d489f4 46%,#f472b6 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    width:max-content;padding-right:10px;white-space:nowrap;
+  }
+  .l3{
+    margin-top:22px;                              /* +leading, no line fusing */
+    font-size:88px;font-weight:800;letter-spacing:1.5px;line-height:1;
+    color:#fff;text-shadow:0 14px 52px rgba(0,0,0,.55);
+  }
+
+  /* ---- format pills on the same x=64 spine ---- */
+  .formats{
+    position:absolute;left:64px;bottom:46px;z-index:5;
+    display:flex;align-items:stretch;gap:16px;
+  }
+  .fp{
+    display:flex;align-items:center;justify-content:center;
+    height:74px;padding:0 28px;border-radius:22px;
+    font-size:46px;font-weight:800;letter-spacing:1.2px;line-height:1;
+    color:#fff;white-space:nowrap;
+    background:#322740;border:2px solid rgba(196,181,253,.50);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.14), 0 14px 30px rgba(0,0,0,.45);
+  }
+  .fp.hero{
+    background:linear-gradient(100deg,#8b5cf6 0%,#ec4899 100%);
+    border:0;padding:0 32px;
+    box-shadow:0 18px 40px rgba(236,72,153,.44), inset 0 2px 0 rgba(255,255,255,.28);
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="glow"></div>
+    <div class="vignette"></div>
+
+    <div class="wordmark">PurffleGrab</div>
+
+    <div class="pill">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="20.9" y="6" width="6.2" height="19.5" rx="3.1"/>
+        <path d="M11.6 22.9h24.8c1.5 0 2.3 1.8 1.2 2.9L25.7 37.6a2.4 2.4 0 0 1-3.4 0L10.4 25.8c-1.1-1.1-.3-2.9 1.2-2.9z"/>
+        <rect x="10.6" y="39.6" width="26.8" height="6" rx="3"/>
+      </svg>
+      Open source
+    </div>
+
+    <div class="iconwrap">
+      <div class="icon">
+        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="20.9" y="6" width="6.2" height="19.5" rx="3.1"/>
+          <path d="M11.6 22.9h24.8c1.5 0 2.3 1.8 1.2 2.9L25.7 37.6a2.4 2.4 0 0 1-3.4 0L10.4 25.8c-1.1-1.1-.3-2.9 1.2-2.9z"/>
+          <rect x="10.6" y="39.6" width="26.8" height="6" rx="3"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="type">
+      <div class="l1">FREE</div>
+      <div class="l2">SPOTIFY&nbsp;+&nbsp;YOUTUBE</div>
+      <div class="l3">DOWNLOADER</div>
+    </div>
+
+    <div class="formats">
+      <div class="fp">MP3</div>
+      <div class="fp">MP4</div>
+      <div class="fp">FLAC</div>
+      <div class="fp hero">UP TO 4K</div>
+    </div>
+
+    <div class="edge"></div>
+  </div>
+</body>
+</html>
