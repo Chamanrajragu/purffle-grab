@@ -12,9 +12,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // value Electron sets just before launching — ESM imports are hoisted and would
 // otherwise read this before main.js runs.
 const binDir = () => process.env.PURFFLE_BIN || path.resolve(__dirname, '..', 'bin');
-export const YTDLP = () => path.join(binDir(), 'yt-dlp.exe');
-export const FFMPEG = () => path.join(binDir(), 'ffmpeg.exe');
-export const FFPROBE = () => path.join(binDir(), 'ffprobe.exe');
+const ext = process.platform === 'win32' ? '.exe' : '';
+export const YTDLP = () => path.join(binDir(), 'yt-dlp' + ext);
+export const FFMPEG = () => path.join(binDir(), 'ffmpeg' + ext);
+export const FFPROBE = () => path.join(binDir(), 'ffprobe' + ext);
 
 /**
  * Run a binary, streaming stdout lines to onLine. Resolves with full stdout.

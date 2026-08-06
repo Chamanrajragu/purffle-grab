@@ -9,6 +9,8 @@
     "start": "electron .",
     "server": "node server/standalone.js",
     "dist": "electron-builder --win nsis",
+    "dist:mac": "electron-builder --mac dmg",
+    "dist:linux": "electron-builder --linux AppImage deb",
     "pack": "electron-builder --dir"
   },
   "dependencies": {
@@ -38,6 +40,19 @@
     "win": {
       "target": [{ "target": "nsis", "arch": ["x64"] }],
       "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "icon": "build/icon.png",
+      "category": "public.app-category.music"
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.png",
+      "category": "AudioVideo"
     },
     "nsis": {
       "oneClick": false,
