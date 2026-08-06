@@ -1,4 +1,4 @@
-/* ===== PurffleGrab v8.0 — Ultimate Edition ===== */
+/* ===== PurffleGrab v9.0 — Ultimate Edition ===== */
 
 /* ===== Theme tokens ===== */
 :root {
@@ -1673,6 +1673,183 @@ body.focus-mode .content { max-width: 700px; margin: 0 auto; }
 .pl-item.dragging { opacity: 0.4; transform: scale(0.96); }
 .pl-item[draggable="true"] { cursor: grab; }
 .pl-item[draggable="true"]:active { cursor: grabbing; }
+
+/* ===== Scroll Progress Indicator ===== */
+.scroll-progress {
+  position: fixed; top: 0; left: 0;
+  height: 3px; width: 0%;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--brand-3));
+  z-index: 999;
+  transition: width 0.15s ease;
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 10px rgba(139,92,246,0.4);
+}
+
+/* ===== Floating Music Notes ===== */
+.music-notes {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 5;
+  overflow: hidden;
+}
+.floating-note {
+  position: absolute;
+  bottom: -30px;
+  color: var(--brand);
+  opacity: 0.6;
+  animation: noteFloat linear forwards;
+  pointer-events: none;
+}
+@keyframes noteFloat {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+  100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+/* ===== Lyrics Panel ===== */
+.lyrics-panel {
+  margin: 16px 0;
+  padding: 18px;
+  background: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  max-height: 300px; overflow-y: auto;
+  animation: fadeSlideDown 0.3s ease;
+}
+.lyrics-content { text-align: left; }
+.lyrics-title { font-weight: 800; font-size: 16px; }
+.lyrics-artist { color: var(--muted); font-size: 13px; }
+.lyrics-placeholder { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+/* ===== Crossfade Row ===== */
+.crossfade-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.crossfade-val {
+  font-size: 12px; font-weight: 700; color: var(--brand);
+  min-width: 24px;
+}
+
+/* ===== Piano Keyboard ===== */
+.piano-panel {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.piano-panel.active { display: block; }
+.piano-keys {
+  display: flex; justify-content: center; gap: 2px;
+  position: relative; height: 100px;
+}
+.piano-key {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding-bottom: 8px;
+  font-size: 10px; font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  border-radius: 0 0 6px 6px;
+  user-select: none;
+  line-height: 1.2;
+}
+.piano-key.white {
+  width: 36px; height: 100px;
+  background: linear-gradient(to bottom, #f8f8f8, #fff);
+  border: 1px solid #ccc;
+  color: #666;
+  z-index: 1;
+}
+.piano-key.black {
+  width: 24px; height: 65px;
+  background: linear-gradient(to bottom, #333, #111);
+  border: 1px solid #000;
+  color: #888;
+  margin: 0 -12px;
+  z-index: 2;
+  border-radius: 0 0 4px 4px;
+}
+.piano-key.white:hover { background: #e8e0ff; }
+.piano-key.black:hover { background: #444; }
+.piano-key.pressed.white { background: var(--brand) !important; color: #fff; transform: translateY(2px); }
+.piano-key.pressed.black { background: var(--brand-2) !important; color: #fff; transform: translateY(2px); }
+
+/* ===== Ambient Bar ===== */
+.ambient-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.ambient-bar .mini.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+/* ===== Mood Theme Buttons ===== */
+.mood-swatches {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.mood-btn {
+  background: var(--card-2); border: 1px solid var(--border);
+  color: var(--text); border-radius: var(--radius-sm);
+  padding: 10px 16px; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.2s ease;
+}
+.mood-btn:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.mood-btn.active {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; border-color: transparent;
+  box-shadow: var(--glow-brand);
+}
+
+/* ===== QR Canvas ===== */
+.qr-canvas {
+  display: block;
+  margin: 0 auto;
+  background: #fff;
+  image-rendering: pixelated;
+}
+
+/* ===== Download Comparison ===== */
+.download-comparison { margin-top: 16px; animation: fadeSlideDown 0.4s ease; }
+.comparison-card {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+}
+.comp-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 16px 24px;
+  background: var(--card-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-width: 120px;
+  transition: transform 0.2s;
+}
+.comp-stat:hover { transform: translateY(-2px); }
+.comp-icon { font-size: 24px; }
+.comp-val { font-size: 20px; font-weight: 800; color: var(--brand); }
+.comp-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+
+/* ===== Speed History Chart ===== */
+.speed-history-chart {
+  height: 150px;
+  display: flex; align-items: flex-end; gap: 4px;
+  padding: 10px 0;
+}
+.sh-bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--brand-3), var(--brand));
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: filter 0.2s, height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sh-bar:hover { filter: brightness(1.3); }
+.sh-label {
+  position: absolute; bottom: -18px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px; color: var(--muted); white-space: nowrap;
+}
 
 /* ===== Reduced motion ===== */
 @media (prefers-reduced-motion: reduce) {

@@ -18,6 +18,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 </head>
 <body data-theme="dark">
+  <!-- Scroll progress indicator -->
+  <div id="scrollProgress" class="scroll-progress"></div>
+
+  <!-- Floating music notes -->
+  <div id="musicNotes" class="music-notes" hidden></div>
+
   <!-- Animated mesh gradient background -->
   <div class="mesh-gradient">
     <div class="mesh-blob"></div>
@@ -64,7 +70,7 @@
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
         <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts (?)"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
-        <span class="ver">v8.0 · a Purffle tool</span>
+        <span class="ver">v9.0 · a Purffle tool</span>
       </div>
     </aside>
 
@@ -247,9 +253,12 @@
             <button id="folderBtn" class="btn-soft">📂 Open folder</button>
             <button id="convertDoneBtn" class="btn-soft">🔄 Convert</button>
             <button id="shareDoneBtn" class="btn-soft">📤 Share</button>
+            <button id="qrGenBtn" class="btn-soft">📱 QR Code</button>
             <button id="playDoneBtn" class="btn-soft">🎧 Play</button>
             <button id="againBtn" class="btn-soft">↺ Grab another</button>
           </div>
+          <!-- Download comparison -->
+          <div id="downloadComparison" class="download-comparison" hidden></div>
         </section>
       </section>
 
@@ -358,6 +367,10 @@
             <h3 class="card-title">Top formats</h3>
             <div id="formatChart" class="format-chart"></div>
           </div>
+        </div>
+        <div class="card mt">
+          <h3 class="card-title">Download Speed History</h3>
+          <div id="speedHistoryChart" class="speed-history-chart"></div>
         </div>
       </section>
 
@@ -488,11 +501,22 @@
               </div>
             </div>
           </div>
-          <!-- Equalizer -->
+          <!-- Lyrics panel -->
+          <div id="lyricsPanel" class="lyrics-panel" hidden>
+            <div id="lyricsBody" class="lyrics-body">
+              <p class="hint center">Click a track to see lyrics</p>
+            </div>
+          </div>
+
+          <!-- Equalizer & extras -->
           <div class="player-extra-bar">
             <button id="eqToggle" class="mini">🎛 Equalizer</button>
             <button id="sleepTimerBtn" class="mini">😴 Sleep Timer</button>
+            <button id="lyricsToggle" class="mini">📝 Lyrics</button>
+            <button id="vizModeBtn" class="mini">🌈 Visualizer</button>
             <button id="miniPlayerToggle" class="mini">🖼 Mini Player</button>
+            <button id="tagEditorBtn" class="mini">🏷 Tags</button>
+            <button id="pianoToggle" class="mini">🎹 Piano</button>
             <button id="exportM3U" class="mini">📤 Export M3U</button>
             <span id="sleepStatus" class="sleep-status"></span>
           </div>
@@ -506,6 +530,40 @@
               <button id="eqReset" class="mini danger">Reset</button>
             </div>
             <div id="eqSliders" class="eq-sliders"></div>
+          </div>
+          <!-- Crossfade -->
+          <div class="crossfade-row">
+            <span class="opt-label" style="margin:0">Crossfade:</span>
+            <input type="range" id="crossfadeSlider" class="player-vol" min="0" max="10" value="3" />
+            <span id="crossfadeVal" class="crossfade-val">3s</span>
+          </div>
+          <!-- Piano keyboard -->
+          <div id="pianoPanel" class="piano-panel">
+            <div class="piano-keys">
+              <div class="piano-key white" data-note="a">A<br>C4</div>
+              <div class="piano-key black" data-note="w">W</div>
+              <div class="piano-key white" data-note="s">S<br>D4</div>
+              <div class="piano-key black" data-note="e">E</div>
+              <div class="piano-key white" data-note="d">D<br>E4</div>
+              <div class="piano-key white" data-note="f">F<br>F4</div>
+              <div class="piano-key black" data-note="t">T</div>
+              <div class="piano-key white" data-note="g">G<br>G4</div>
+              <div class="piano-key black" data-note="y">Y</div>
+              <div class="piano-key white" data-note="h">H<br>A4</div>
+              <div class="piano-key black" data-note="u">U</div>
+              <div class="piano-key white" data-note="j">J<br>B4</div>
+              <div class="piano-key white" data-note="k">K<br>C5</div>
+              <div class="piano-key white" data-note="l">L<br>D5</div>
+            </div>
+          </div>
+          <!-- Ambient sounds -->
+          <div class="ambient-bar">
+            <span class="opt-label" style="margin:0">Ambient:</span>
+            <button data-ambient="rain" class="mini">🌧 Rain</button>
+            <button data-ambient="fire" class="mini">🔥 Fire</button>
+            <button data-ambient="birds" class="mini">🐦 Birds</button>
+            <button data-ambient="waves" class="mini">🌊 Waves</button>
+            <button data-ambient="wind" class="mini">💨 Wind</button>
           </div>
           <div class="player-playlist-head">
             <h4>Playlist</h4>
@@ -587,6 +645,16 @@
             </div>
           </div>
 
+          <h3 class="card-title mt">Mood themes</h3>
+          <div class="mood-swatches">
+            <button data-mood="sunset" class="mood-btn">🌅 Sunset</button>
+            <button data-mood="ocean" class="mood-btn">🌊 Ocean</button>
+            <button data-mood="forest" class="mood-btn">🌲 Forest</button>
+            <button data-mood="neon" class="mood-btn">💜 Neon</button>
+            <button data-mood="midnight" class="mood-btn">🌌 Midnight</button>
+            <button data-mood="cherry" class="mood-btn">🍒 Cherry</button>
+          </div>
+
           <button id="saveSettings" class="btn-primary">💾 Save settings</button><span id="settingsSaved" class="saved-msg" hidden>Saved ✓</span>
 
           <h3 class="card-title mt">Downloader engine</h3>
@@ -613,7 +681,7 @@
         <div class="card about-card">
           <div class="about-hero">
             <div class="about-logo">⬇</div>
-            <h3>PurffleGrab <span class="about-ver">v8.0.0</span></h3>
+            <h3>PurffleGrab <span class="about-ver">v9.0.0</span></h3>
             <p class="about-tagline">The ultimate way to grab media from the web.</p>
           </div>
           <div class="about-features">
@@ -649,6 +717,17 @@
             <div class="about-feat"><span>🧘</span> Focus mode — hide distractions</div>
             <div class="about-feat"><span>📤</span> Export playlist as M3U</div>
             <div class="about-feat"><span>📝</span> Batch rename with patterns</div>
+            <div class="about-feat"><span>🌈</span> 3 visualizer modes (bars, wave, circular)</div>
+            <div class="about-feat"><span>📝</span> Lyrics viewer for playing tracks</div>
+            <div class="about-feat"><span>🏷</span> Tag editor for track metadata</div>
+            <div class="about-feat"><span>🎹</span> Keyboard piano instrument</div>
+            <div class="about-feat"><span>🌧</span> Ambient sound mixer (rain, fire, birds...)</div>
+            <div class="about-feat"><span>🎨</span> 6 mood-based color themes</div>
+            <div class="about-feat"><span>📱</span> QR code generator for sharing links</div>
+            <div class="about-feat"><span>🔀</span> Crossfade between tracks</div>
+            <div class="about-feat"><span>📊</span> Download speed history chart</div>
+            <div class="about-feat"><span>🎵</span> Floating music notes animation</div>
+            <div class="about-feat"><span>📏</span> Scroll progress indicator</div>
           </div>
           <div class="about-links">
             <button id="whatsNewBtn" class="btn-soft">🆕 What's New</button>
@@ -738,17 +817,19 @@
   <div id="whatsNewModal" class="modal" hidden>
     <div class="modal-content">
       <div class="modal-head"><h3>What's New</h3><button class="modal-close" data-close>✕</button></div>
-      <div class="changelog-ver">Version 8.0.0</div>
+      <div class="changelog-ver">Version 9.0.0</div>
       <div class="changelog-list">
-        <div class="changelog-item"><span class="changelog-icon">🎛</span><div class="changelog-text"><h4>5-Band Equalizer</h4><p>Tune your audio with Bass, Low, Mid, High &amp; Treble bands. Includes presets: Flat, Bass, Treble, Vocal, Rock.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">😴</span><div class="changelog-text"><h4>Sleep Timer</h4><p>Set a timer to automatically stop playback — perfect for listening before bed.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🏅</span><div class="changelog-text"><h4>Achievement System</h4><p>Earn badges for milestones: first download, streaks, power user goals. Track progress in the new Achievements view.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📅</span><div class="changelog-text"><h4>Activity Heatmap</h4><p>GitHub-style heatmap shows your download activity over the past 90 days.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🖼</span><div class="changelog-text"><h4>Mini Player (PiP)</h4><p>Draggable floating mini player — keep listening while browsing other views.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🧘</span><div class="changelog-text"><h4>Focus Mode</h4><p>Hide UI distractions during downloads for a clean, distraction-free experience.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📤</span><div class="changelog-text"><h4>M3U Export</h4><p>Export your download history as an M3U playlist file.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📝</span><div class="changelog-text"><h4>Batch Rename</h4><p>Rename downloaded files using pattern templates with artist, title, album variables.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🔀</span><div class="changelog-text"><h4>Drag Reorder Playlist</h4><p>Drag &amp; drop to reorder tracks in the audio player playlist.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🌈</span><div class="changelog-text"><h4>3 Visualizer Modes</h4><p>Switch between bars, waveform &amp; circular visualizer in the audio player.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📝</span><div class="changelog-text"><h4>Lyrics Viewer</h4><p>View and paste lyrics for the currently playing track.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎹</span><div class="changelog-text"><h4>Keyboard Piano</h4><p>Play musical notes using your keyboard (A-L keys). Built-in synthesizer!</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🌧</span><div class="changelog-text"><h4>Ambient Sound Mixer</h4><p>Layer rain, fire, birds, waves or wind ambience over your music.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎨</span><div class="changelog-text"><h4>Mood Themes</h4><p>6 gorgeous mood-based color themes: Sunset, Ocean, Forest, Neon, Midnight &amp; Cherry.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🏷</span><div class="changelog-text"><h4>Tag Editor</h4><p>Edit track title, artist &amp; album metadata right in the player.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📱</span><div class="changelog-text"><h4>QR Code Generator</h4><p>Generate QR codes for any URL — share download links easily.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🔀</span><div class="changelog-text"><h4>Crossfade</h4><p>Smooth transitions between tracks with adjustable crossfade duration.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📊</span><div class="changelog-text"><h4>Speed History</h4><p>Persistent download speed tracking with visual chart in stats.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎵</span><div class="changelog-text"><h4>Floating Music Notes</h4><p>Animated musical notes float across the screen during playback.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📏</span><div class="changelog-text"><h4>Scroll Progress</h4><p>Gradient bar at top shows your scroll position in the page.</p></div></div>
       </div>
     </div>
   </div>
@@ -793,6 +874,27 @@
     <div class="pip-controls">
       <button id="pipPlayBtn" class="pip-btn">▶</button>
       <button id="pipNextBtn" class="pip-btn">⏭</button>
+    </div>
+  </div>
+
+  <!-- ===== TAG EDITOR MODAL ===== -->
+  <div id="tagEditorModal" class="modal" hidden>
+    <div class="modal-content" style="max-width:420px">
+      <div class="modal-head"><h3>🏷 Edit Tags</h3><button class="modal-close" data-close>✕</button></div>
+      <div class="opt-group"><label class="opt-label">Title</label><input type="text" id="tagTitle" class="text-input" placeholder="Track title" /></div>
+      <div class="opt-group mt"><label class="opt-label">Artist</label><input type="text" id="tagArtist" class="text-input" placeholder="Artist name" /></div>
+      <div class="opt-group mt"><label class="opt-label">Album</label><input type="text" id="tagAlbum" class="text-input" placeholder="Album name" /></div>
+      <button id="tagSaveBtn" class="btn-primary" style="margin-top:16px;width:100%">💾 Save Tags</button>
+    </div>
+  </div>
+
+  <!-- ===== QR CODE MODAL ===== -->
+  <div id="qrModal" class="modal" hidden>
+    <div class="modal-content" style="max-width:380px;text-align:center">
+      <div class="modal-head"><h3>📱 QR Code</h3><button class="modal-close" data-close>✕</button></div>
+      <div class="opt-group"><input type="text" id="qrInput" class="text-input" placeholder="Paste a URL to generate QR" /></div>
+      <button id="qrGenerateBtn" class="btn-primary" style="margin-top:12px">Generate QR</button>
+      <canvas id="qrCanvas" class="qr-canvas" style="margin-top:16px;border-radius:12px"></canvas>
     </div>
   </div>
 
