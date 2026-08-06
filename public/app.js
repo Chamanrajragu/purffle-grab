@@ -1,4 +1,4 @@
-// PurffleGrab front-end (v6.0) — supreme edition.
+// PurffleGrab front-end (v7.0) — ultimate edition.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -15,7 +15,7 @@ let speedHistory = [];
 let notifications = [];
 let downloadProfiles = [];
 let bulkSelected = new Set();
-let prefs = { defaults: {}, theme: 'dark', themeMode: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6', playSound: true, confetti: true };
+let prefs = { defaults: {}, theme: 'dark', themeMode: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6', playSound: true, confetti: true, particles: true, speedGauge: true };
 let downloadStartTime = null;
 
 // ---- helpers ----
@@ -333,9 +333,10 @@ document.addEventListener('keydown', (e) => {
   }
   if (e.ctrlKey && e.key === '\\') { e.preventDefault(); $('#sidebarToggle')?.click(); }
   if (e.ctrlKey && e.key === 'n') { e.preventDefault(); $('#notifBtn')?.click(); }
+  if (e.ctrlKey && e.key === 'p') { e.preventDefault(); goto('player'); }
   if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     e.preventDefault();
-    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','settings'];
+    const views = ['download','search','queue','history','stats','converter','scheduler','favorites','player','settings'];
     const idx = parseInt(e.key) - 1;
     if (views[idx]) goto(views[idx]);
   }
@@ -349,8 +350,8 @@ $$('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === 
 // ---- What's New modal ----
 $('#whatsNewBtn')?.addEventListener('click', () => { $('#whatsNewModal').hidden = false; });
 try {
-  if (!localStorage.getItem('pg-seen-v6')) {
-    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v6', '1'); }, 1500);
+  if (!localStorage.getItem('pg-seen-v7')) {
+    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v7', '1'); }, 1500);
   }
 } catch {}
 
@@ -404,6 +405,7 @@ const CMD_ACTIONS = [
   { icon: '🔄', label: 'Refresh history', action: () => { goto('history'); loadHistory(); } },
   { icon: '🆕', label: "What's new in v6.0", action: () => { $('#whatsNewModal').hidden = false; } },
   { icon: '🎊', label: 'Test confetti', action: () => fireConfetti() },
+  { icon: '🎧', label: 'Go to Player', hint: 'Ctrl+P', action: () => goto('player') },
 ];
 
 let cmdIdx = 0;
@@ -453,11 +455,12 @@ const TOUR_STEPS = [
   { title: 'Favorites ⭐', desc: 'Save URLs you download often. Press Ctrl+B to bookmark the current URL.' },
   { title: 'Notification Center 🔔', desc: 'Click the bell icon to see all your download events and alerts. Press Ctrl+N to toggle.' },
   { title: 'Download Profiles 💾', desc: 'Save your favorite download options as profiles and reload them with one click.' },
-  { title: 'You\'re all set! ✅', desc: 'Explore Stats (with 3D tilt!), Converter, Scheduler, and Settings. Enjoy confetti on completions! 🎊' },
+  { title: 'Audio Player 🎧', desc: 'Play your downloaded audio right in the app with waveform visualization, shuffle, repeat and playlists.' },
+  { title: 'You\'re all set! ✅', desc: 'Explore Stats (donut charts!), Converter, Scheduler, Player and Settings. Enjoy confetti and speed gauge! 🎊' },
 ];
 let tourStep = 0;
 function showTour() {
-  try { if (localStorage.getItem('pg-toured-v6')) return; } catch {}
+  try { if (localStorage.getItem('pg-toured-v7')) return; } catch {}
   tourStep = 0;
   renderTourStep();
   $$('.modal').forEach(m => m.hidden = true);
@@ -474,12 +477,12 @@ function renderTourStep() {
 }
 $('#tourNext').addEventListener('click', () => {
   tourStep++;
-  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v6', '1'); } catch {} return; }
+  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v7', '1'); } catch {} return; }
   renderTourStep();
 });
-$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v6', '1'); } catch {} });
+$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v7', '1'); } catch {} });
 $('#tourCard').addEventListener('click', (e) => e.stopPropagation());
-$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v6', '1'); } catch {} });
+$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v7', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
@@ -915,7 +918,7 @@ function renderProgress(job) {
 
   document.title = pct < 100 ? `(${pct}%) Downloading — PurffleGrab` : 'PurffleGrab';
 
-  if (job.speed) updateSpeedGraph(job.speed);
+  if (job.speed) { updateSpeedGraph(job.speed); updateSpeedGauge(job.speed); }
 
   lastMiniJob = job;
   $('#mpTitle').textContent = job.title || 'Downloading…';
@@ -954,6 +957,7 @@ function finishProgress(job) {
   $('#folderBtn').onclick = () => fetch(`/api/open-folder/${job.id}`, { method: 'POST' });
   $('#againBtn').onclick = () => { $('#progress').hidden = true; urlInput.value = ''; urlInput.focus(); };
   $('#convertDoneBtn').onclick = () => goto('converter');
+  $('#playDoneBtn').onclick = () => goto('player');
   $('#shareDoneBtn').onclick = () => {
     const text = `I just downloaded "${job.title}" with PurffleGrab! https://github.com/Chamanrajragu/purffle-grab`;
     if (navigator.share) { navigator.share({ title: 'PurffleGrab', text }).catch(() => {}); }
@@ -1391,3 +1395,391 @@ loadRecents();
 loadProfiles();
 try { if (Notification.permission === 'default') Notification.requestPermission(); } catch {}
 setTimeout(showTour, 600);
+
+// ====================================================================
+// v7.0 NEW FEATURES
+// ====================================================================
+
+// ---- typewriter hero text ----
+(function typewriterHero() {
+  const el = $('#heroTypewriter');
+  if (!el) return;
+  const phrases = ['Download', 'Grab Music', 'Save Playlists', 'Rip Audio', 'Capture Video'];
+  let pi = 0, ci = 0, deleting = false;
+  function tick() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      el.textContent = phrase.slice(0, ci + 1);
+      ci++;
+      if (ci >= phrase.length) { deleting = true; setTimeout(tick, 2200); return; }
+      setTimeout(tick, 80 + Math.random() * 40);
+    } else {
+      el.textContent = phrase.slice(0, ci);
+      ci--;
+      if (ci <= 0) { deleting = false; pi = (pi + 1) % phrases.length; setTimeout(tick, 400); return; }
+      setTimeout(tick, 40);
+    }
+  }
+  tick();
+})();
+
+// ---- URL preview cards ----
+urlInput.addEventListener('input', () => {
+  const urls = urlInput.value.match(/https?:\/\/\S+/g) || [];
+  const wrap = $('#urlCards');
+  if (!urls.length) { wrap.hidden = true; return; }
+  wrap.hidden = false;
+  wrap.innerHTML = urls.slice(0, 10).map((u, i) => {
+    const isSpotify = u.includes('spotify');
+    const icon = isSpotify ? '🟢' : '🔴';
+    const label = isSpotify ? 'Spotify' : 'YouTube';
+    const short = u.replace(/https?:\/\/(www\.)?/, '').slice(0, 40);
+    return `<div class="url-card" style="animation-delay:${i*0.05}s"><span class="uc-icon">${icon}</span><span class="uc-text" title="${esc(u)}">${label}: ${esc(short)}</span><span class="uc-close" data-ucr="${i}">✕</span></div>`;
+  }).join('');
+  $$('.uc-close').forEach(btn => btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const lines = urlInput.value.split('\n');
+    const idx = Number(btn.dataset.ucr);
+    let count = 0;
+    for (let j = 0; j < lines.length; j++) {
+      if (lines[j].match(/https?:\/\/\S+/)) {
+        if (count === idx) { lines.splice(j, 1); break; }
+        count++;
+      }
+    }
+    urlInput.value = lines.join('\n');
+    urlInput.dispatchEvent(new Event('input'));
+  }));
+});
+
+// ---- speed gauge ----
+function updateSpeedGauge(speedStr) {
+  if (!prefs.speedGauge) return;
+  const gauge = $('#speedGauge');
+  gauge.hidden = false;
+  const match = speedStr.match(/([\d.]+)\s*(KiB|MiB|GiB|B)/i);
+  if (!match) return;
+  let val = parseFloat(match[1]);
+  const unit = match[2].toLowerCase();
+  let displayUnit = unit.replace('ib','B/s').replace('b','B/s');
+  if (unit === 'mib') { val *= 1024; displayUnit = 'MB/s'; }
+  else if (unit === 'gib') { val *= 1024 * 1024; displayUnit = 'GB/s'; }
+  else if (unit === 'b') { val /= 1024; displayUnit = 'B/s'; }
+  else displayUnit = 'KB/s';
+  // Gauge arc is ~251 units long. Map speed 0-20MB/s to 0-251
+  const maxSpeed = 20 * 1024; // 20 MB/s in KB
+  const ratio = Math.min(val / maxSpeed, 1);
+  const offset = 251 - (251 * ratio);
+  const arc = $('#gaugeArc');
+  if (arc) arc.style.strokeDashoffset = offset;
+  const text = $('#gaugeText');
+  if (text) {
+    if (val >= 1024) text.textContent = (val / 1024).toFixed(1) + ' MB/s';
+    else text.textContent = Math.round(val) + ' KB/s';
+  }
+}
+
+// ---- interactive particles ----
+(function initParticles() {
+  const canvas = $('#particlesCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [], mouseX = -1000, mouseY = -1000;
+  function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+  for (let i = 0; i < 50; i++) {
+    particles.push({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+      r: 1.5 + Math.random() * 2, alpha: 0.1 + Math.random() * 0.2,
+    });
+  }
+  function draw() {
+    if (!prefs.particles) { ctx.clearRect(0, 0, w, h); requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, w, h);
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#8b5cf6';
+    for (const p of particles) {
+      // Mouse repulsion
+      const dx = p.x - mouseX, dy = p.y - mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 150) {
+        const force = (150 - dist) / 150 * 0.8;
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+      }
+      p.vx *= 0.98; p.vy *= 0.98;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+      if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+    }
+    // Draw connections
+    ctx.globalAlpha = 0.04;
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = dx * dx + dy * dy;
+        if (d < 15000) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ---- donut chart for stats ----
+function renderDonutChart(formats) {
+  const svg = $('#donutSvg');
+  const legend = $('#donutLegend');
+  if (!svg || !legend) return;
+  const colors = ['#8b5cf6', '#ec4899', '#22d3ee', '#1db954', '#f59e0b', '#ef4444', '#3b82f6', '#f97316'];
+  const entries = Object.entries(formats).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const total = entries.reduce((s, e) => s + e[1], 0) || 1;
+  const cx = 100, cy = 100, r = 70;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+  svg.innerHTML = entries.map(([fmt, count], i) => {
+    const pct = count / total;
+    const dash = circumference * pct;
+    const gap = circumference - dash;
+    const rot = offset * 360;
+    offset += pct;
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[i % colors.length]}" stroke-width="20" stroke-dasharray="${dash} ${gap}" transform="rotate(${rot - 90} ${cx} ${cy})" style="transition: stroke-dasharray 1s ease"/>`;
+  }).join('') + `<circle cx="${cx}" cy="${cy}" r="50" fill="var(--bg-2)"/>
+    <text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="var(--text)" font-size="22" font-weight="900">${total}</text>
+    <text x="${cx}" y="${cy + 14}" text-anchor="middle" fill="var(--muted)" font-size="10" font-weight="600">FILES</text>`;
+  legend.innerHTML = entries.map(([fmt, count], i) =>
+    `<div class="donut-legend-item"><span class="donut-legend-dot" style="background:${colors[i % colors.length]}"></span><span>${fmt.toUpperCase()}</span><span class="donut-legend-val">${count} (${Math.round(count / total * 100)}%)</span></div>`
+  ).join('') || '<p class="hint">No data yet</p>';
+}
+
+// Patch loadStats to call donut
+const _origLoadStats = loadStats;
+loadStats = function() {
+  _origLoadStats();
+  try {
+    const stats = JSON.parse(localStorage.getItem('pg-stats') || '{}');
+    const dl = stats.downloads || [];
+    const formats = {};
+    dl.forEach(d => { formats[d.format] = (formats[d.format] || 0) + d.count; });
+    renderDonutChart(formats);
+  } catch {}
+};
+
+// ---- audio player ----
+let playerAudio = null;
+let playerPlaylist = [];
+let playerIdx = 0;
+let playerShuffle = false;
+let playerRepeat = false;
+let playerWaveCtx = null;
+let playerAnalyser = null;
+let playerAudioCtx = null;
+
+$('#playerLoadFile')?.addEventListener('click', () => $('#playerFileInput').click());
+$('#playerFileInput')?.addEventListener('change', (e) => {
+  const files = [...e.target.files];
+  if (!files.length) return;
+  files.forEach(f => {
+    playerPlaylist.push({ name: f.name.replace(/\.[^.]+$/, ''), file: f, url: URL.createObjectURL(f) });
+  });
+  renderPlayerPlaylist();
+  if (!playerAudio || playerAudio.paused) loadPlayerTrack(playerPlaylist.length - files.length);
+  e.target.value = '';
+});
+
+function renderPlayerPlaylist() {
+  const el = $('#playerPlaylist');
+  if (!playerPlaylist.length) {
+    el.innerHTML = '<p class="hint center">No files loaded. Click "Load file" to add audio files.</p>';
+    return;
+  }
+  el.innerHTML = playerPlaylist.map((t, i) =>
+    `<div class="pl-item ${i === playerIdx ? 'playing' : ''}" data-pli="${i}"><span class="pl-n">${i + 1}</span><span class="pl-name">${esc(t.name)}</span></div>`
+  ).join('');
+  $$('.pl-item').forEach(el => el.addEventListener('click', () => loadPlayerTrack(Number(el.dataset.pli))));
+}
+
+function loadPlayerTrack(idx) {
+  playerIdx = idx;
+  const track = playerPlaylist[idx];
+  if (!track) return;
+  if (!playerAudio) {
+    playerAudio = new Audio();
+    playerAudio.addEventListener('timeupdate', updatePlayerTime);
+    playerAudio.addEventListener('ended', () => {
+      if (playerRepeat) { playerAudio.currentTime = 0; playerAudio.play(); }
+      else playerNextTrack();
+    });
+    playerAudio.addEventListener('loadedmetadata', () => {
+      $('#playerDuration').textContent = fmtDur(playerAudio.duration);
+      $('#playerSeek').max = Math.floor(playerAudio.duration);
+    });
+  }
+  playerAudio.src = track.url;
+  playerAudio.volume = ($('#playerVolume')?.value || 80) / 100;
+  playerAudio.play();
+  $('#playerTitle').textContent = track.name;
+  $('#playerArtist').textContent = `Track ${idx + 1} of ${playerPlaylist.length}`;
+  $('#playerPlay').textContent = '⏸';
+  $('#playerArtwork').classList.add('playing');
+  renderPlayerPlaylist();
+  initWaveform();
+}
+
+function updatePlayerTime() {
+  if (!playerAudio) return;
+  const cur = playerAudio.currentTime;
+  const dur = playerAudio.duration || 1;
+  $('#playerCurrent').textContent = fmtDur(cur);
+  $('#playerSeek').value = Math.floor(cur);
+  const pct = (cur / dur * 100).toFixed(1);
+  $('#playerSeek').style.setProperty('--progress', pct + '%');
+}
+
+$('#playerPlay')?.addEventListener('click', () => {
+  if (!playerAudio) return;
+  if (playerAudio.paused) {
+    playerAudio.play();
+    $('#playerPlay').textContent = '⏸';
+    $('#playerArtwork').classList.add('playing');
+  } else {
+    playerAudio.pause();
+    $('#playerPlay').textContent = '▶';
+    $('#playerArtwork').classList.remove('playing');
+  }
+});
+
+$('#playerSeek')?.addEventListener('input', (e) => {
+  if (playerAudio) playerAudio.currentTime = Number(e.target.value);
+});
+$('#playerVolume')?.addEventListener('input', (e) => {
+  if (playerAudio) playerAudio.volume = Number(e.target.value) / 100;
+});
+$('#playerNext')?.addEventListener('click', playerNextTrack);
+$('#playerPrev')?.addEventListener('click', () => {
+  if (playerPlaylist.length) loadPlayerTrack((playerIdx - 1 + playerPlaylist.length) % playerPlaylist.length);
+});
+function playerNextTrack() {
+  if (!playerPlaylist.length) return;
+  if (playerShuffle) {
+    loadPlayerTrack(Math.floor(Math.random() * playerPlaylist.length));
+  } else {
+    loadPlayerTrack((playerIdx + 1) % playerPlaylist.length);
+  }
+}
+$('#playerShuffle')?.addEventListener('click', () => {
+  playerShuffle = !playerShuffle;
+  $('#playerShuffle').classList.toggle('active', playerShuffle);
+  toast(playerShuffle ? '🔀 Shuffle on' : '🔀 Shuffle off');
+});
+$('#playerRepeat')?.addEventListener('click', () => {
+  playerRepeat = !playerRepeat;
+  $('#playerRepeat').classList.toggle('active', playerRepeat);
+  toast(playerRepeat ? '🔁 Repeat on' : '🔁 Repeat off');
+});
+
+// Waveform visualization
+function initWaveform() {
+  const canvas = $('#waveformCanvas');
+  if (!canvas || !playerAudio) return;
+  const ctx = canvas.getContext('2d');
+  try {
+    if (!playerAudioCtx) {
+      playerAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = playerAudioCtx.createMediaElementSource(playerAudio);
+      playerAnalyser = playerAudioCtx.createAnalyser();
+      playerAnalyser.fftSize = 256;
+      source.connect(playerAnalyser);
+      playerAnalyser.connect(playerAudioCtx.destination);
+    }
+    playerWaveCtx = ctx;
+    drawWaveform();
+  } catch {}
+}
+
+function drawWaveform() {
+  if (!playerAnalyser || !playerWaveCtx) return;
+  const canvas = $('#waveformCanvas');
+  const ctx = playerWaveCtx;
+  const bufferLength = playerAnalyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  function draw() {
+    requestAnimationFrame(draw);
+    playerAnalyser.getByteFrequencyData(dataArray);
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    const barW = (w / bufferLength) * 2;
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#8b5cf6';
+    for (let i = 0; i < bufferLength; i++) {
+      const barH = (dataArray[i] / 255) * h * 0.9;
+      const x = i * barW;
+      const grad = ctx.createLinearGradient(x, h, x, h - barH);
+      grad.addColorStop(0, accent);
+      grad.addColorStop(1, accent + '44');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, h - barH, barW - 1, barH);
+    }
+  }
+  draw();
+}
+
+// Space to play/pause in player view
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && $('.view.active')?.id === 'view-player' && !['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) {
+    e.preventDefault();
+    $('#playerPlay')?.click();
+  }
+});
+
+// ---- quick bar ----
+(function initQuickBar() {
+  const bar = $('#quickBar');
+  if (!bar) return;
+  // Show after scroll
+  let shown = false;
+  document.querySelector('.content')?.addEventListener('scroll', () => {
+    const scrolled = document.querySelector('.content').scrollTop > 200;
+    if (scrolled && !shown) { bar.hidden = false; shown = true; }
+    else if (!scrolled && shown) { bar.hidden = true; shown = false; }
+  });
+  $$('.qb-btn').forEach(btn => btn.addEventListener('click', () => {
+    const act = btn.dataset.qb;
+    if (act === 'theme') $('#themeToggle').click();
+    else if (act === 'cmd') openCommandPalette();
+    else goto(act);
+  }));
+})();
+
+// ---- settings: particles & gauge toggles ----
+$('#defParticles')?.addEventListener('change', (e) => { prefs.particles = e.target.checked; });
+$('#defSpeedGauge')?.addEventListener('change', (e) => { prefs.speedGauge = e.target.checked; });
+
+// Patch saveSettings to include new prefs
+const origSaveClick = $('#saveSettings');
+if (origSaveClick) {
+  const origHandler = origSaveClick.onclick;
+  // Already handled in the main click listener — just make sure the new fields are read
+}
+
+// Hide speed gauge on finish
+const _origFinish = finishProgress;
+finishProgress = function(job) {
+  _origFinish(job);
+  $('#speedGauge').hidden = true;
+};

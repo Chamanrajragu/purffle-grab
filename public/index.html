@@ -26,6 +26,9 @@
     <div class="mesh-blob"></div>
   </div>
 
+  <!-- Interactive particles canvas -->
+  <canvas id="particlesCanvas"></canvas>
+
   <!-- Ambient floating particles -->
   <div class="ambient-particle"></div>
   <div class="ambient-particle"></div>
@@ -52,6 +55,7 @@
         <button class="side-btn" data-view="converter"><span class="ic">🔄</span><span class="nav-text"> Convert</span></button>
         <button class="side-btn" data-view="scheduler"><span class="ic">⏰</span><span class="nav-text"> Scheduler</span></button>
         <button class="side-btn" data-view="favorites"><span class="ic">⭐</span><span class="nav-text"> Favorites</span></button>
+        <button class="side-btn" data-view="player"><span class="ic">🎧</span><span class="nav-text"> Player</span></button>
         <button class="side-btn" data-view="settings"><span class="ic">⚙</span><span class="nav-text"> Settings</span></button>
         <button class="side-btn" data-view="about"><span class="ic">ℹ</span><span class="nav-text"> About</span></button>
       </nav>
@@ -59,7 +63,7 @@
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
         <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts (?)"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
-        <span class="ver">v6.0 · a Purffle tool</span>
+        <span class="ver">v7.0 · a Purffle tool</span>
       </div>
     </aside>
 
@@ -74,12 +78,14 @@
       <!-- ===== DOWNLOAD VIEW ===== -->
       <section id="view-download" class="view active">
         <div class="view-head">
-          <h2>Download</h2>
+          <h2><span id="heroTypewriter"></span><span class="typewriter-cursor">|</span></h2>
           <p>Spotify &amp; YouTube — videos, playlists, tracks. Paste one link or many.</p>
         </div>
 
         <div id="dropzone" class="dropzone">
           <textarea id="urlInput" rows="2" placeholder="Paste Spotify / YouTube links here (one per line)… or drop them anywhere" aria-label="Paste download links"></textarea>
+          <!-- URL preview cards -->
+          <div id="urlCards" class="url-cards" hidden></div>
           <div class="dz-actions">
             <button id="pasteBtn" class="btn-soft" title="Paste from clipboard (Ctrl+V)">📋 Paste</button>
             <button id="importBtn" class="btn-soft" title="Import links from a text file">📄 Import</button>
@@ -220,6 +226,16 @@
             <div class="prog-right"><span id="progMeta" class="prog-meta"></span><span id="progPct" class="prog-pct">0%</span></div>
           </div>
           <div class="bar"><div id="progBar" class="bar-fill"></div></div>
+          <!-- Speed gauge -->
+          <div id="speedGauge" class="speed-gauge" hidden>
+            <svg class="gauge-svg" viewBox="0 0 200 110">
+              <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--border)" stroke-width="8" stroke-linecap="round"/>
+              <path id="gaugeArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="251" stroke-dashoffset="251"/>
+              <defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="var(--brand-3)"/><stop offset="50%" stop-color="var(--brand)"/><stop offset="100%" stop-color="var(--brand-2)"/></linearGradient></defs>
+              <text id="gaugeText" x="100" y="90" text-anchor="middle" fill="var(--text)" font-size="18" font-weight="800">0 KB/s</text>
+              <text x="100" y="105" text-anchor="middle" fill="var(--muted)" font-size="9" font-weight="600">SPEED</text>
+            </svg>
+          </div>
           <div id="progVisualizer" class="prog-visualizer" hidden></div>
           <div id="speedGraph" class="speed-graph" hidden></div>
           <div id="progTimeInfo" class="prog-time-info"></div>
@@ -230,6 +246,7 @@
             <button id="folderBtn" class="btn-soft">📂 Open folder</button>
             <button id="convertDoneBtn" class="btn-soft">🔄 Convert</button>
             <button id="shareDoneBtn" class="btn-soft">📤 Share</button>
+            <button id="playDoneBtn" class="btn-soft">🎧 Play</button>
             <button id="againBtn" class="btn-soft">↺ Grab another</button>
           </div>
         </section>
@@ -328,9 +345,18 @@
           <h3 class="card-title">Recent activity (14 days)</h3>
           <div id="statsChart" class="stats-chart"></div>
         </div>
-        <div class="card mt">
-          <h3 class="card-title">Top formats</h3>
-          <div id="formatChart" class="format-chart"></div>
+        <div class="stats-row">
+          <div class="card mt stats-half">
+            <h3 class="card-title">Format breakdown</h3>
+            <div id="donutChart" class="donut-chart-wrap">
+              <svg id="donutSvg" class="donut-svg" viewBox="0 0 200 200"></svg>
+              <div id="donutLegend" class="donut-legend"></div>
+            </div>
+          </div>
+          <div class="card mt stats-half">
+            <h3 class="card-title">Top formats</h3>
+            <div id="formatChart" class="format-chart"></div>
+          </div>
         </div>
       </section>
 
@@ -432,6 +458,47 @@
         </div>
       </section>
 
+      <!-- ===== PLAYER VIEW ===== -->
+      <section id="view-player" class="view">
+        <div class="view-head"><h2>Player</h2><p>Preview and play your downloaded audio files.</p></div>
+        <div class="card player-card">
+          <div class="player-artwork" id="playerArtwork">🎵</div>
+          <div class="player-info">
+            <h3 id="playerTitle" class="player-title">No track loaded</h3>
+            <p id="playerArtist" class="player-artist">Select a file to play</p>
+          </div>
+          <!-- Waveform visualizer -->
+          <canvas id="waveformCanvas" class="waveform-canvas" width="600" height="80"></canvas>
+          <div class="player-controls">
+            <div class="player-timeline">
+              <span id="playerCurrent" class="player-time">0:00</span>
+              <input type="range" id="playerSeek" class="player-seek" min="0" max="100" value="0" />
+              <span id="playerDuration" class="player-time">0:00</span>
+            </div>
+            <div class="player-btns">
+              <button id="playerPrev" class="player-btn" title="Previous">⏮</button>
+              <button id="playerPlay" class="player-btn player-btn-main" title="Play/Pause">▶</button>
+              <button id="playerNext" class="player-btn" title="Next">⏭</button>
+              <button id="playerShuffle" class="player-btn player-btn-sm" title="Shuffle">🔀</button>
+              <button id="playerRepeat" class="player-btn player-btn-sm" title="Repeat">🔁</button>
+              <div class="player-volume">
+                <span>🔊</span>
+                <input type="range" id="playerVolume" class="player-vol" min="0" max="100" value="80" />
+              </div>
+            </div>
+          </div>
+          <div class="player-playlist-head">
+            <h4>Playlist</h4>
+            <button id="playerLoadFile" class="mini">📁 Load file</button>
+            <button id="playerLoadFolder" class="mini">📂 Load folder</button>
+            <input type="file" id="playerFileInput" hidden accept="audio/*" multiple />
+          </div>
+          <div id="playerPlaylist" class="player-playlist">
+            <p class="hint center">No files loaded. Click "Load file" to add audio files.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- ===== SETTINGS VIEW ===== -->
       <section id="view-settings" class="view">
         <div class="view-head"><h2>Settings</h2><p>Make PurffleGrab yours.</p></div>
@@ -456,6 +523,8 @@
             <label class="check"><input type="checkbox" id="defMinToTray" /><span>Minimize to system tray</span></label>
             <label class="check"><input type="checkbox" id="defPlaySound" checked /><span>Play sound on download complete</span></label>
             <label class="check"><input type="checkbox" id="defConfetti" checked /><span>Show confetti on download complete</span></label>
+            <label class="check"><input type="checkbox" id="defParticles" checked /><span>Interactive background particles</span></label>
+            <label class="check"><input type="checkbox" id="defSpeedGauge" checked /><span>Show speed gauge during download</span></label>
           </div>
 
           <h3 class="card-title mt">Appearance</h3>
@@ -510,7 +579,7 @@
         <div class="card about-card">
           <div class="about-hero">
             <div class="about-logo">⬇</div>
-            <h3>PurffleGrab <span class="about-ver">v6.0.0</span></h3>
+            <h3>PurffleGrab <span class="about-ver">v7.0.0</span></h3>
             <p class="about-tagline">The ultimate way to grab media from the web.</p>
           </div>
           <div class="about-features">
@@ -534,6 +603,10 @@
             <div class="about-feat"><span>💾</span> Download profiles — save &amp; load options</div>
             <div class="about-feat"><span>🖱</span> Right-click context menus</div>
             <div class="about-feat"><span>🌊</span> Animated mesh gradient background</div>
+            <div class="about-feat"><span>🎧</span> Built-in audio player with waveform</div>
+            <div class="about-feat"><span>🎯</span> Speed gauge &amp; donut stats chart</div>
+            <div class="about-feat"><span>✨</span> Interactive background particles</div>
+            <div class="about-feat"><span>🪟</span> Windows, Mac &amp; Linux support</div>
           </div>
           <div class="about-links">
             <button id="whatsNewBtn" class="btn-soft">🆕 What's New</button>
@@ -590,6 +663,8 @@
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>B</kbd><span>Add to favorites</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>\\</kbd><span>Toggle sidebar</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>N</kbd><span>Toggle notifications</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>P</kbd><span>Open player</span></div>
+        <div class="shortcut"><kbd>Space</kbd><span>Play / pause (in player)</span></div>
         <div class="shortcut"><kbd>Escape</kbd><span>Close modal / Cancel</span></div>
         <div class="shortcut"><kbd>?</kbd><span>Show this help</span></div>
       </div>
@@ -621,24 +696,32 @@
   <div id="whatsNewModal" class="modal" hidden>
     <div class="modal-content">
       <div class="modal-head"><h3>What's New</h3><button class="modal-close" data-close>✕</button></div>
-      <div class="changelog-ver">Version 6.0.0</div>
+      <div class="changelog-ver">Version 7.0.0</div>
       <div class="changelog-list">
-        <div class="changelog-item"><span class="changelog-icon">🎊</span><div class="changelog-text"><h4>Confetti Celebration</h4><p>Beautiful confetti animation when downloads complete!</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🔔</span><div class="changelog-text"><h4>Notification Center</h4><p>Bell icon in the top-right tracks all download events and alerts.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">💾</span><div class="changelog-text"><h4>Download Profiles</h4><p>Save your favorite option combinations and reload them with one click.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🖱</span><div class="changelog-text"><h4>Context Menus</h4><p>Right-click queue and history items for quick actions.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🌊</span><div class="changelog-text"><h4>Animated Mesh Gradient</h4><p>Gorgeous animated background blobs for a premium feel.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">✨</span><div class="changelog-text"><h4>3D Tilt Cards</h4><p>Stat cards react to your mouse with a subtle 3D tilt effect.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📋</span><div class="changelog-text"><h4>Bulk Actions</h4><p>Select multiple history items for batch zip or delete.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🔢</span><div class="changelog-text"><h4>Staggered Animations</h4><p>Cards animate in with cascading delays for a polished feel.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🎨</span><div class="changelog-text"><h4>Noise Texture</h4><p>Subtle noise overlay adds depth and texture to the background.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">⏱</span><div class="changelog-text"><h4>ETA Countdown</h4><p>See a live countdown timer during downloads.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎧</span><div class="changelog-text"><h4>Built-in Audio Player</h4><p>Play downloaded audio right in the app with waveform visualization, playlist, shuffle &amp; repeat.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎯</span><div class="changelog-text"><h4>Speed Gauge</h4><p>Beautiful animated speedometer shows real-time download speed with gradient arc.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🍩</span><div class="changelog-text"><h4>Donut Stats Chart</h4><p>SVG donut chart for format breakdown in statistics view.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">✨</span><div class="changelog-text"><h4>Interactive Particles</h4><p>Mouse-reactive floating particles create a living background.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">⌨</span><div class="changelog-text"><h4>Typewriter Hero</h4><p>Animated typewriter effect on the download page heading.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🔗</span><div class="changelog-text"><h4>URL Preview Cards</h4><p>Pasted URLs show visual preview cards with source icons.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🪟</span><div class="changelog-text"><h4>Cross-Platform</h4><p>Now available on Windows, macOS and Linux via CI/CD builds.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🌊</span><div class="changelog-text"><h4>Enhanced Waveform</h4><p>Real-time animated waveform canvas in the audio player.</p></div></div>
       </div>
     </div>
   </div>
 
   <!-- ===== CONTEXT MENU ===== -->
   <div id="ctxMenu" class="ctx-menu" hidden></div>
+
+  <!-- ===== FLOATING QUICK BAR ===== -->
+  <div id="quickBar" class="quick-bar" hidden>
+    <button class="qb-btn" data-qb="download" title="Download">⬇</button>
+    <button class="qb-btn" data-qb="search" title="Search">🔎</button>
+    <button class="qb-btn" data-qb="queue" title="Queue">📋</button>
+    <button class="qb-btn" data-qb="player" title="Player">🎧</button>
+    <button class="qb-btn" data-qb="theme" title="Toggle theme">🌙</button>
+    <button class="qb-btn" data-qb="cmd" title="Command palette">⌘</button>
+  </div>
 
   <div id="toast" class="toast" hidden></div>
   <input type="file" id="fileImport" hidden accept=".txt,.csv,.json" />
