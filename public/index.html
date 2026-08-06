@@ -18,10 +18,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 </head>
 <body data-theme="dark">
+  <!-- Animated mesh gradient background -->
+  <div class="mesh-gradient">
+    <div class="mesh-blob"></div>
+    <div class="mesh-blob"></div>
+    <div class="mesh-blob"></div>
+    <div class="mesh-blob"></div>
+  </div>
+
   <!-- Ambient floating particles -->
   <div class="ambient-particle"></div>
   <div class="ambient-particle"></div>
   <div class="ambient-particle"></div>
+
+  <!-- Confetti canvas -->
+  <canvas id="confettiCanvas" hidden></canvas>
+
   <div class="app">
     <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
@@ -47,12 +59,17 @@
       <div class="side-foot">
         <button id="themeToggle" class="theme-toggle"><span class="tt-ic">🌙</span><span class="tt-label">Dark</span></button>
         <button id="kbShortcuts" class="theme-toggle" title="Keyboard shortcuts (?)"><span class="tt-ic">⌨</span><span class="tt-label">Shortcuts</span></button>
-        <span class="ver">v5.0 · a Purffle tool</span>
+        <span class="ver">v6.0 · a Purffle tool</span>
       </div>
     </aside>
 
     <!-- ===== CONTENT ===== -->
     <main class="content">
+
+      <!-- ===== Notification bell ===== -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:-20px;position:relative;z-index:20;">
+        <button id="notifBtn" class="btn-icon" title="Notifications">🔔<span class="notif-dot" id="notifDot" hidden></span></button>
+      </div>
 
       <!-- ===== DOWNLOAD VIEW ===== -->
       <section id="view-download" class="view active">
@@ -82,6 +99,12 @@
 
         <section id="panel" class="card card-glow options-card" hidden>
           <h3 class="card-title">Options</h3>
+
+          <!-- Download profiles -->
+          <div class="profiles-bar" id="profilesBar">
+            <span class="profile-label">Profiles:</span>
+            <button id="profileSaveBtn" class="mini">💾 Save profile</button>
+          </div>
 
           <div class="presets">
             <span class="preset-label">Quick presets:</span>
@@ -250,7 +273,7 @@
 
       <!-- ===== QUEUE VIEW ===== -->
       <section id="view-queue" class="view">
-        <div class="view-head"><h2>Queue</h2><p>Manage your download queue. Drag to reorder, then start when ready.</p></div>
+        <div class="view-head"><h2>Queue</h2><p>Manage your download queue. Drag to reorder, right-click for options.</p></div>
         <div class="queue-toolbar">
           <button id="queueStartAll" class="btn-primary" disabled>▶ Start all</button>
           <button id="queuePauseAll" class="btn-soft" disabled>⏸ Pause all</button>
@@ -265,7 +288,7 @@
 
       <!-- ===== HISTORY VIEW ===== -->
       <section id="view-history" class="view">
-        <div class="view-head"><h2>History</h2><p>Everything you've grabbed. Open, zip, or re-download.</p></div>
+        <div class="view-head"><h2>History</h2><p>Everything you've grabbed. Right-click items for more options.</p></div>
         <div class="history-bar">
           <input type="text" id="historySearch" class="text-input small" placeholder="Filter history…" aria-label="Filter history" />
           <select id="historyFilter" class="select mini-select" aria-label="Filter by status">
@@ -278,6 +301,12 @@
           <button id="exportHistory" class="btn-soft">📤 Export</button>
           <button id="clearHistory" class="btn-soft danger">🗑 Clear all</button>
         </div>
+        <div id="bulkToolbar" class="bulk-toolbar" hidden>
+          <input type="checkbox" id="bulkSelectAll" class="hist-check" />
+          <span class="bulk-count" id="bulkCount">0 selected</span>
+          <button id="bulkZip" class="btn-soft">⬇ Zip selected</button>
+          <button id="bulkDelete" class="btn-soft danger">🗑 Delete selected</button>
+        </div>
         <div id="historyList" class="history-list"></div>
         <div id="historyPagination" class="pagination" hidden></div>
       </section>
@@ -286,14 +315,14 @@
       <section id="view-stats" class="view">
         <div class="view-head"><h2>Statistics</h2><p>Your download activity at a glance.</p></div>
         <div class="stats-grid">
-          <div class="stat-card"><div class="stat-icon">📥</div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total downloads</div></div>
-          <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-value" id="statSuccess">0</div><div class="stat-label">Successful</div></div>
-          <div class="stat-card"><div class="stat-icon">🎵</div><div class="stat-value" id="statAudio">0</div><div class="stat-label">Audio files</div></div>
-          <div class="stat-card"><div class="stat-icon">🎬</div><div class="stat-value" id="statVideo">0</div><div class="stat-label">Video files</div></div>
-          <div class="stat-card"><div class="stat-icon">🟢</div><div class="stat-value" id="statSpotify">0</div><div class="stat-label">From Spotify</div></div>
-          <div class="stat-card"><div class="stat-icon">🔴</div><div class="stat-value" id="statYoutube">0</div><div class="stat-label">From YouTube</div></div>
-          <div class="stat-card"><div class="stat-icon">💾</div><div class="stat-value" id="statSize">0</div><div class="stat-label">Total size</div></div>
-          <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-value" id="statStreak">0</div><div class="stat-label">Day streak</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">📥</div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total downloads</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">✅</div><div class="stat-value" id="statSuccess">0</div><div class="stat-label">Successful</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">🎵</div><div class="stat-value" id="statAudio">0</div><div class="stat-label">Audio files</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">🎬</div><div class="stat-value" id="statVideo">0</div><div class="stat-label">Video files</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">🟢</div><div class="stat-value" id="statSpotify">0</div><div class="stat-label">From Spotify</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">🔴</div><div class="stat-value" id="statYoutube">0</div><div class="stat-label">From YouTube</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">💾</div><div class="stat-value" id="statSize">0</div><div class="stat-label">Total size</div></div>
+          <div class="stat-card" data-tilt><div class="stat-icon">⚡</div><div class="stat-value" id="statStreak">0</div><div class="stat-label">Day streak</div></div>
         </div>
         <div class="card mt">
           <h3 class="card-title">Recent activity (14 days)</h3>
@@ -379,7 +408,7 @@
         <div class="card mt">
           <h3 class="card-title">Scheduled downloads</h3>
           <div id="scheduleList" class="queue-list">
-            <p class="hint center">No scheduled downloads yet.</p>
+            <p class="hint center">No scheduled downloads yet. Schedule one above!</p>
           </div>
         </div>
       </section>
@@ -426,6 +455,7 @@
             <label class="check"><input type="checkbox" id="defAutoUpdate" /><span>Auto-update yt-dlp on startup</span></label>
             <label class="check"><input type="checkbox" id="defMinToTray" /><span>Minimize to system tray</span></label>
             <label class="check"><input type="checkbox" id="defPlaySound" checked /><span>Play sound on download complete</span></label>
+            <label class="check"><input type="checkbox" id="defConfetti" checked /><span>Show confetti on download complete</span></label>
           </div>
 
           <h3 class="card-title mt">Appearance</h3>
@@ -480,7 +510,7 @@
         <div class="card about-card">
           <div class="about-hero">
             <div class="about-logo">⬇</div>
-            <h3>PurffleGrab <span class="about-ver">v5.0.0</span></h3>
+            <h3>PurffleGrab <span class="about-ver">v6.0.0</span></h3>
             <p class="about-tagline">The ultimate way to grab media from the web.</p>
           </div>
           <div class="about-features">
@@ -489,7 +519,7 @@
             <div class="about-feat"><span>📋</span> Queue management with drag reorder</div>
             <div class="about-feat"><span>🔄</span> Built-in format converter</div>
             <div class="about-feat"><span>✂</span> Video trimming &amp; clipping</div>
-            <div class="about-feat"><span>📊</span> Download statistics &amp; activity chart</div>
+            <div class="about-feat"><span>📊</span> Download statistics with 3D tilt cards</div>
             <div class="about-feat"><span>⏰</span> Download scheduler with repeat</div>
             <div class="about-feat"><span>🔎</span> YouTube search built in</div>
             <div class="about-feat"><span>🎨</span> Dark / Light / System themes, 9 accent colors</div>
@@ -499,7 +529,11 @@
             <div class="about-feat"><span>⭐</span> Favorites — save URLs for quick access</div>
             <div class="about-feat"><span>🚀</span> Floating action button &amp; mini progress</div>
             <div class="about-feat"><span>📈</span> Live speed graph &amp; music visualizer</div>
-            <div class="about-feat"><span>🔔</span> Completion sound &amp; desktop notifications</div>
+            <div class="about-feat"><span>🔔</span> Notification center &amp; completion sound</div>
+            <div class="about-feat"><span>🎊</span> Confetti celebration on complete</div>
+            <div class="about-feat"><span>💾</span> Download profiles — save &amp; load options</div>
+            <div class="about-feat"><span>🖱</span> Right-click context menus</div>
+            <div class="about-feat"><span>🌊</span> Animated mesh gradient background</div>
           </div>
           <div class="about-links">
             <button id="whatsNewBtn" class="btn-soft">🆕 What's New</button>
@@ -529,6 +563,17 @@
     </div>
   </div>
 
+  <!-- ===== NOTIFICATION PANEL ===== -->
+  <div id="notifPanel" class="notif-panel" hidden>
+    <div class="notif-head">
+      <h4>Notifications</h4>
+      <button class="mini" id="notifClear">Clear all</button>
+    </div>
+    <div class="notif-body" id="notifBody">
+      <div class="notif-empty">No notifications yet</div>
+    </div>
+  </div>
+
   <!-- ===== KEYBOARD SHORTCUTS MODAL ===== -->
   <div id="shortcutsModal" class="modal" hidden>
     <div class="modal-content">
@@ -544,6 +589,7 @@
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>K</kbd><span>Command palette</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>B</kbd><span>Add to favorites</span></div>
         <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>\\</kbd><span>Toggle sidebar</span></div>
+        <div class="shortcut"><kbd>Ctrl</kbd>+<kbd>N</kbd><span>Toggle notifications</span></div>
         <div class="shortcut"><kbd>Escape</kbd><span>Close modal / Cancel</span></div>
         <div class="shortcut"><kbd>?</kbd><span>Show this help</span></div>
       </div>
@@ -575,21 +621,24 @@
   <div id="whatsNewModal" class="modal" hidden>
     <div class="modal-content">
       <div class="modal-head"><h3>What's New</h3><button class="modal-close" data-close>✕</button></div>
-      <div class="changelog-ver">Version 5.0.0</div>
+      <div class="changelog-ver">Version 6.0.0</div>
       <div class="changelog-list">
-        <div class="changelog-item"><span class="changelog-icon">🎨</span><div class="changelog-text"><h4>Collapsible Sidebar</h4><p>Toggle the sidebar with the arrow button or Ctrl+\\ for a wider workspace.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📋</span><div class="changelog-text"><h4>Floating Action Button</h4><p>Quick-paste &amp; download from anywhere with the floating button.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📈</span><div class="changelog-text"><h4>Live Speed Graph</h4><p>See your download speed visualized in real-time during downloads.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🎵</span><div class="changelog-text"><h4>Music Visualizer</h4><p>Animated bars during audio downloads for a premium feel.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🔔</span><div class="changelog-text"><h4>Completion Sound</h4><p>Hear a chime when your download finishes (toggle in Settings).</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">💻</span><div class="changelog-text"><h4>System Theme</h4><p>Auto-match your OS dark/light preference with the new System theme.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📤</span><div class="changelog-text"><h4>Export Queue</h4><p>Export your queue as a URL list for sharing or backup.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">✨</span><div class="changelog-text"><h4>Glowing Cards</h4><p>Animated gradient borders on the options panel for a premium look.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">🖱</span><div class="changelog-text"><h4>Drag Reorder Queue</h4><p>Drag queue items to reorder your download priority.</p></div></div>
-        <div class="changelog-item"><span class="changelog-icon">📊</span><div class="changelog-text"><h4>Mini Progress</h4><p>Floating progress indicator when you navigate away from the download view.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎊</span><div class="changelog-text"><h4>Confetti Celebration</h4><p>Beautiful confetti animation when downloads complete!</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🔔</span><div class="changelog-text"><h4>Notification Center</h4><p>Bell icon in the top-right tracks all download events and alerts.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">💾</span><div class="changelog-text"><h4>Download Profiles</h4><p>Save your favorite option combinations and reload them with one click.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🖱</span><div class="changelog-text"><h4>Context Menus</h4><p>Right-click queue and history items for quick actions.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🌊</span><div class="changelog-text"><h4>Animated Mesh Gradient</h4><p>Gorgeous animated background blobs for a premium feel.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">✨</span><div class="changelog-text"><h4>3D Tilt Cards</h4><p>Stat cards react to your mouse with a subtle 3D tilt effect.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">📋</span><div class="changelog-text"><h4>Bulk Actions</h4><p>Select multiple history items for batch zip or delete.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🔢</span><div class="changelog-text"><h4>Staggered Animations</h4><p>Cards animate in with cascading delays for a polished feel.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">🎨</span><div class="changelog-text"><h4>Noise Texture</h4><p>Subtle noise overlay adds depth and texture to the background.</p></div></div>
+        <div class="changelog-item"><span class="changelog-icon">⏱</span><div class="changelog-text"><h4>ETA Countdown</h4><p>See a live countdown timer during downloads.</p></div></div>
       </div>
     </div>
   </div>
+
+  <!-- ===== CONTEXT MENU ===== -->
+  <div id="ctxMenu" class="ctx-menu" hidden></div>
 
   <div id="toast" class="toast" hidden></div>
   <input type="file" id="fileImport" hidden accept=".txt,.csv,.json" />

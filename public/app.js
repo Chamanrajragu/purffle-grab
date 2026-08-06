@@ -1,4 +1,4 @@
-// PurffleGrab front-end (v5.0) — ultimate edition.
+// PurffleGrab front-end (v6.0) — supreme edition.
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -12,7 +12,10 @@ let scheduledDownloads = [];
 let favorites = [];
 let recentUrls = [];
 let speedHistory = [];
-let prefs = { defaults: {}, theme: 'dark', themeMode: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6', playSound: true };
+let notifications = [];
+let downloadProfiles = [];
+let bulkSelected = new Set();
+let prefs = { defaults: {}, theme: 'dark', themeMode: 'dark', notify: true, concurrency: 2, accentColor: '#8b5cf6', playSound: true, confetti: true };
 let downloadStartTime = null;
 
 // ---- helpers ----
@@ -36,6 +39,13 @@ function animateValue(el, start, end, dur) {
   }
   requestAnimationFrame(update);
 }
+function timeAgo(ts) {
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
 
 // ---- completion sound ----
 function playCompletionSound() {
@@ -58,13 +68,174 @@ function playCompletionSound() {
   } catch {}
 }
 
+// ---- confetti ----
+function fireConfetti() {
+  if (!prefs.confetti) return;
+  const canvas = $('#confettiCanvas');
+  canvas.hidden = false;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const colors = ['#8b5cf6', '#ec4899', '#22d3ee', '#1db954', '#f59e0b', '#ef4444', '#3b82f6'];
+  const pieces = [];
+  for (let i = 0; i < 120; i++) {
+    pieces.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      w: 6 + Math.random() * 6,
+      h: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 6,
+      vy: 2 + Math.random() * 4,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10,
+      opacity: 1,
+    });
+  }
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    for (const p of pieces) {
+      p.x += p.vx;
+      p.vy += 0.08;
+      p.y += p.vy;
+      p.rotation += p.rotSpeed;
+      if (frame > 60) p.opacity -= 0.015;
+      if (p.opacity <= 0) continue;
+      alive = true;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    frame++;
+    if (alive && frame < 200) requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.hidden = true; }
+  }
+  requestAnimationFrame(draw);
+}
+
+// ---- notification center ----
+function addNotification(icon, title) {
+  notifications.unshift({ icon, title, time: Date.now() });
+  if (notifications.length > 50) notifications = notifications.slice(0, 50);
+  try { localStorage.setItem('pg-notifs', JSON.stringify(notifications)); } catch {}
+  renderNotifications();
+  $('#notifDot').hidden = false;
+}
+function renderNotifications() {
+  const body = $('#notifBody');
+  if (!notifications.length) { body.innerHTML = '<div class="notif-empty">No notifications yet</div>'; return; }
+  body.innerHTML = notifications.slice(0, 20).map((n, i) =>
+    `<div class="notif-item" style="animation-delay:${i * 0.04}s"><span class="ni-icon">${n.icon}</span><div class="ni-text"><div class="ni-title">${esc(n.title)}</div><div class="ni-time">${timeAgo(n.time)}</div></div></div>`
+  ).join('');
+}
+$('#notifBtn')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const panel = $('#notifPanel');
+  panel.hidden = !panel.hidden;
+  if (!panel.hidden) { $('#notifDot').hidden = true; renderNotifications(); }
+});
+$('#notifClear')?.addEventListener('click', () => {
+  notifications = [];
+  try { localStorage.setItem('pg-notifs', '[]'); } catch {}
+  renderNotifications();
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#notifPanel') && !e.target.closest('#notifBtn')) $('#notifPanel').hidden = true;
+});
+try { notifications = JSON.parse(localStorage.getItem('pg-notifs') || '[]'); } catch {}
+
+// ---- context menu ----
+function showContextMenu(x, y, items) {
+  const menu = $('#ctxMenu');
+  menu.innerHTML = items.map(item => {
+    if (item === '---') return '<div class="ctx-sep"></div>';
+    return `<button class="ctx-item ${item.danger ? 'danger' : ''}" data-ci="${item.id}">${item.icon || ''} ${esc(item.label)}</button>`;
+  }).join('');
+  menu.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+  menu.style.top = Math.min(y, window.innerHeight - items.length * 40) + 'px';
+  menu.hidden = false;
+  const handler = (e) => {
+    const btn = e.target.closest('[data-ci]');
+    if (btn) {
+      const item = items.find(i => i.id === btn.dataset.ci);
+      if (item?.action) item.action();
+    }
+    menu.hidden = true;
+    document.removeEventListener('click', handler);
+  };
+  setTimeout(() => document.addEventListener('click', handler), 10);
+}
+
+// ---- 3D tilt on stat cards ----
+function initTiltCards() {
+  $$('[data-tilt]').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) scale(1.03)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+
+// ---- download profiles ----
+function loadProfiles() { try { downloadProfiles = JSON.parse(localStorage.getItem('pg-profiles') || '[]'); } catch { downloadProfiles = []; } }
+function saveProfiles() { try { localStorage.setItem('pg-profiles', JSON.stringify(downloadProfiles)); } catch {} }
+function renderProfiles() {
+  const bar = $('#profilesBar');
+  const chips = downloadProfiles.map((p, i) =>
+    `<button class="profile-chip" data-pi="${i}" title="Load: ${esc(p.name)}">${esc(p.name)} <span style="opacity:0.5;margin-left:4px" data-pdel="${i}">✕</span></button>`
+  ).join('');
+  bar.innerHTML = `<span class="profile-label">Profiles:</span>${chips}<button id="profileSaveBtn" class="mini">💾 Save profile</button>`;
+  $$('.profile-chip').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.dataset.pdel !== undefined) {
+        downloadProfiles.splice(Number(e.target.dataset.pdel), 1);
+        saveProfiles(); renderProfiles(); toast('Profile deleted');
+        return;
+      }
+      const p = downloadProfiles[Number(el.dataset.pi)];
+      if (!p) return;
+      applyProfileOptions(p.options);
+      $$('.profile-chip').forEach(c => c.classList.toggle('active', c === el));
+      toast(`Loaded profile: ${p.name}`);
+    });
+  });
+  $('#profileSaveBtn')?.addEventListener('click', () => {
+    const name = prompt('Profile name:');
+    if (!name) return;
+    downloadProfiles.push({ name, options: gatherOptions() });
+    saveProfiles(); renderProfiles();
+    toast(`💾 Profile "${name}" saved!`);
+    addNotification('💾', `Profile "${name}" saved`);
+  });
+}
+function applyProfileOptions(opts) {
+  if (!opts) return;
+  setContentType(opts.contentType || 'video');
+  if (opts.resolution) $('#resolution').value = opts.resolution;
+  if (opts.audioFormat) $('#audioFormat').value = opts.audioFormat;
+  if (opts.audioBitrate !== undefined) $('#audioBitrate').value = opts.audioBitrate;
+  if (opts.embedThumbnail !== undefined) $('#embedThumb').checked = opts.embedThumbnail;
+  if (opts.embedMetadata !== undefined) $('#embedMeta').checked = opts.embedMetadata;
+}
+
 // ---- nav ----
 $$('.side-btn').forEach((b) => b.addEventListener('click', () => {
   $$('.side-btn').forEach((x) => x.classList.toggle('active', x === b));
   $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${b.dataset.view}`));
   if (b.dataset.view === 'history') loadHistory();
   if (b.dataset.view === 'settings') loadSettings();
-  if (b.dataset.view === 'stats') loadStats();
+  if (b.dataset.view === 'stats') { loadStats(); initTiltCards(); }
   if (b.dataset.view === 'queue') renderQueue();
   if (b.dataset.view === 'scheduler') renderSchedule();
   if (b.dataset.view === 'favorites') renderFavorites();
@@ -74,6 +245,7 @@ function goto(view) {
   $$('.side-btn').forEach((x) => x.classList.toggle('active', x.dataset.view === view));
   $$('.view').forEach((v) => v.classList.toggle('active', v.id === `view-${view}`));
   updateMiniProgress();
+  if (view === 'stats') setTimeout(initTiltCards, 100);
 }
 
 // ---- sidebar toggle ----
@@ -90,7 +262,6 @@ function applyTheme(theme) {
   const tog = $('#themeToggle');
   if (tog) { tog.querySelector('.tt-ic').textContent = theme === 'dark' ? '🌙' : '☀️'; tog.querySelector('.tt-label').textContent = theme === 'dark' ? 'Dark' : 'Light'; }
   try { localStorage.setItem('pg-theme', theme); } catch {}
-  // Update theme segment
   $$('#themeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.themeMode === (prefs.themeMode || theme)));
 }
 function applyThemeMode(mode) {
@@ -104,9 +275,7 @@ function applyThemeMode(mode) {
   }
   $$('#themeSeg .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.themeMode === mode));
 }
-// Theme segment buttons
 $$('#themeSeg .seg-btn').forEach(b => b.addEventListener('click', () => applyThemeMode(b.dataset.themeMode)));
-// System theme change listener
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
   if (prefs.themeMode === 'system') applyTheme(e.matches ? 'dark' : 'light');
 });
@@ -139,6 +308,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     $$('.modal').forEach(m => m.hidden = true);
     $('#tourOverlay').hidden = true;
+    $('#notifPanel').hidden = true;
+    $('#ctxMenu').hidden = true;
     return;
   }
   const tag = e.target.tagName;
@@ -161,6 +332,7 @@ document.addEventListener('keydown', (e) => {
     if (url) { addFavorite(url, ''); } else { goto('favorites'); }
   }
   if (e.ctrlKey && e.key === '\\') { e.preventDefault(); $('#sidebarToggle')?.click(); }
+  if (e.ctrlKey && e.key === 'n') { e.preventDefault(); $('#notifBtn')?.click(); }
   if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
     e.preventDefault();
     const views = ['download','search','queue','history','stats','converter','scheduler','favorites','settings'];
@@ -177,8 +349,8 @@ $$('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === 
 // ---- What's New modal ----
 $('#whatsNewBtn')?.addEventListener('click', () => { $('#whatsNewModal').hidden = false; });
 try {
-  if (!localStorage.getItem('pg-seen-v5')) {
-    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v5', '1'); }, 1500);
+  if (!localStorage.getItem('pg-seen-v6')) {
+    setTimeout(() => { $('#whatsNewModal').hidden = false; localStorage.setItem('pg-seen-v6', '1'); }, 1500);
   }
 } catch {}
 
@@ -222,6 +394,7 @@ const CMD_ACTIONS = [
   { icon: '📋', label: 'Paste from clipboard', hint: 'Ctrl+V', action: () => { goto('download'); $('#pasteBtn').click(); } },
   { icon: '◀', label: 'Toggle sidebar', hint: 'Ctrl+\\', action: () => $('#sidebarToggle')?.click() },
   { icon: '⌨', label: 'Show keyboard shortcuts', hint: '?', action: () => { $('#shortcutsModal').hidden = false; } },
+  { icon: '🔔', label: 'Toggle notifications', hint: 'Ctrl+N', action: () => $('#notifBtn')?.click() },
   { icon: '🗑', label: 'Clear download queue', action: () => { downloadQueue = []; saveQueue(); renderQueue(); updateQueueBadge(); toast('Queue cleared'); } },
   { icon: '📤', label: 'Export history', action: () => $('#exportHistory')?.click() },
   { icon: '📤', label: 'Export settings', action: () => $('#exportSettings')?.click() },
@@ -229,7 +402,8 @@ const CMD_ACTIONS = [
   { icon: '⬆', label: 'Update yt-dlp engine', action: () => { goto('settings'); $('#updateEngine').click(); } },
   { icon: '↺', label: 'Reset settings to defaults', action: () => $('#resetSettings')?.click() },
   { icon: '🔄', label: 'Refresh history', action: () => { goto('history'); loadHistory(); } },
-  { icon: '🆕', label: "What's new in v5.0", action: () => { $('#whatsNewModal').hidden = false; } },
+  { icon: '🆕', label: "What's new in v6.0", action: () => { $('#whatsNewModal').hidden = false; } },
+  { icon: '🎊', label: 'Test confetti', action: () => fireConfetti() },
 ];
 
 let cmdIdx = 0;
@@ -274,15 +448,16 @@ const TOUR_STEPS = [
   { title: 'Welcome to PurffleGrab! 🎉', desc: 'The ultimate way to download media from Spotify and YouTube. Let us show you around!' },
   { title: 'Paste & Download ⬇', desc: 'Just paste a Spotify or YouTube link and hit Analyze. Use the floating button to quick-paste from clipboard!' },
   { title: 'Search YouTube 🔎', desc: 'No link? Search directly by name, select results, and download them all at once.' },
-  { title: 'Queue System 📋', desc: 'Add items to the queue, drag to reorder, and batch download. Export your queue as a URL list.' },
+  { title: 'Queue System 📋', desc: 'Add items to the queue, drag to reorder, and batch download. Right-click for more options.' },
   { title: 'Command Palette 🚀', desc: 'Press Ctrl+K anytime for the command palette. Navigate anywhere, toggle theme, or trigger actions.' },
   { title: 'Favorites ⭐', desc: 'Save URLs you download often. Press Ctrl+B to bookmark the current URL.' },
-  { title: 'Live Progress 📈', desc: 'Watch the speed graph and music visualizer during downloads. A mini-progress floats when you leave the page.' },
-  { title: 'You\'re all set! ✅', desc: 'Explore Stats, Converter, Scheduler, and Settings. Press ? for shortcuts or Ctrl+\\ to collapse the sidebar.' },
+  { title: 'Notification Center 🔔', desc: 'Click the bell icon to see all your download events and alerts. Press Ctrl+N to toggle.' },
+  { title: 'Download Profiles 💾', desc: 'Save your favorite download options as profiles and reload them with one click.' },
+  { title: 'You\'re all set! ✅', desc: 'Explore Stats (with 3D tilt!), Converter, Scheduler, and Settings. Enjoy confetti on completions! 🎊' },
 ];
 let tourStep = 0;
 function showTour() {
-  try { if (localStorage.getItem('pg-toured-v5')) return; } catch {}
+  try { if (localStorage.getItem('pg-toured-v6')) return; } catch {}
   tourStep = 0;
   renderTourStep();
   $$('.modal').forEach(m => m.hidden = true);
@@ -292,7 +467,6 @@ function renderTourStep() {
   const s = TOUR_STEPS[tourStep];
   $('#tourTitle').textContent = s.title;
   $('#tourDesc').textContent = s.desc;
-  // Render dots
   $('#tourDots').innerHTML = TOUR_STEPS.map((_, i) =>
     `<div class="tour-dot ${i === tourStep ? 'active' : ''}"></div>`
   ).join('');
@@ -300,12 +474,12 @@ function renderTourStep() {
 }
 $('#tourNext').addEventListener('click', () => {
   tourStep++;
-  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v5', '1'); } catch {} return; }
+  if (tourStep >= TOUR_STEPS.length) { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v6', '1'); } catch {} return; }
   renderTourStep();
 });
-$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v5', '1'); } catch {} });
+$('#tourSkip').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v6', '1'); } catch {} });
 $('#tourCard').addEventListener('click', (e) => e.stopPropagation());
-$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v5', '1'); } catch {} });
+$('#tourOverlay').addEventListener('click', () => { $('#tourOverlay').hidden = true; try { localStorage.setItem('pg-toured-v6', '1'); } catch {} });
 
 // ---- download: input helpers ----
 const urlInput = $('#urlInput');
@@ -384,6 +558,7 @@ async function analyze() {
       sources.push({ data, selected: data.count > 1 ? new Set(data.tracks.map((_, i) => i)) : null });
       renderSourceCard(idx);
       if (data.capabilities?.video) anyVideo = true; ok++;
+      addNotification('🔍', `Analyzed: ${data.title || link.slice(0, 40)}`);
     } catch (err) {
       const div = document.createElement('div'); div.className = 'source-card err';
       div.innerHTML = `<div class="sc-body"><b>Couldn't read</b><br><span class="meta-sub">${esc(link)}</span><br><span class="error-inline">${esc(err.message || 'failed')}</span></div>`;
@@ -394,7 +569,7 @@ async function analyze() {
   if (!ok) return;
   $('#typeGroup').hidden = !anyVideo;
   setContentType(anyVideo ? (prefs.defaults?.contentType || 'video') : 'audio');
-  applyDefaultsToForm(); updateDlCount();
+  applyDefaultsToForm(); updateDlCount(); renderProfiles();
   $('#panel').hidden = false;
   $('#panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -486,6 +661,7 @@ function addFavorite(url, label) {
   favorites.push({ url, label: label || url.slice(0, 60), addedAt: Date.now() });
   saveFavorites();
   toast('⭐ Added to favorites!');
+  addNotification('⭐', `Favorited: ${label || url.slice(0, 40)}`);
 }
 function renderFavorites() {
   const list = $('#favList');
@@ -534,6 +710,7 @@ function addToQueue(srcList, options) {
   renderQueue();
   updateQueueBadge();
   toast(`📋 Added ${items.length} item${items.length > 1 ? 's' : ''} to queue`);
+  addNotification('📋', `${items.length} item${items.length > 1 ? 's' : ''} added to queue`);
 }
 function saveQueue() { try { localStorage.setItem('pg-queue', JSON.stringify(downloadQueue)); } catch {} }
 function loadQueue() { try { downloadQueue = JSON.parse(localStorage.getItem('pg-queue') || '[]'); } catch { downloadQueue = []; } updateQueueBadge(); }
@@ -590,6 +767,18 @@ function renderQueue() {
         renderQueue();
       }
     });
+    // Right-click context menu
+    el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const q = downloadQueue[i];
+      showContextMenu(e.clientX, e.clientY, [
+        ...(q.status === 'queued' ? [{ id: 'start', icon: '▶', label: 'Start now', action: () => { q.status = 'downloading'; saveQueue(); renderQueue(); updateQueueBadge(); startDownload([q.source], q.options); } }] : []),
+        { id: 'copy', icon: '📋', label: 'Copy URL', action: () => navigator.clipboard?.writeText(q.source.url).then(() => toast('📋 Copied!')) },
+        { id: 'fav', icon: '⭐', label: 'Add to favorites', action: () => addFavorite(q.source.url, '') },
+        '---',
+        { id: 'remove', icon: '✕', label: 'Remove', danger: true, action: () => { downloadQueue.splice(i, 1); saveQueue(); renderQueue(); updateQueueBadge(); } },
+      ]);
+    });
   });
 
   $$('.queue-item').forEach(el => {
@@ -638,6 +827,7 @@ async function startDownload(srcList, options) {
     const res = await fetch('/api/download', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sources: list, options: opts }) });
     const data = await res.json(); if (!res.ok) throw new Error(data.error);
     activeJobId = data.jobId; downloadStartTime = Date.now(); speedHistory = []; goto('download'); openProgress(); listenProgress(data.jobId);
+    addNotification('⬇', 'Download started');
   } catch (err) { toast(err.message); } finally { setBtnLoading($('#downloadBtn'), false); }
 }
 
@@ -694,7 +884,6 @@ function openProgress() {
   $('#speedGraph').hidden = true; $('#speedGraph').innerHTML = '';
   initVisualizer();
   $('#progress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  // Hide FAB during download
   $('#fab').hidden = true;
 }
 function listenProgress(id) {
@@ -712,15 +901,22 @@ function renderProgress(job) {
 
   if (downloadStartTime) {
     const elapsed = Math.round((Date.now() - downloadStartTime) / 1000);
-    $('#progTimeInfo').textContent = `Elapsed: ${fmtTime(elapsed)}`;
+    let timeStr = `Elapsed: ${fmtTime(elapsed)}`;
+    // ETA countdown
+    if (job.eta && pct > 0 && pct < 100) {
+      const etaMatch = job.eta.match(/(\d+):(\d+)/);
+      if (etaMatch) {
+        const etaSec = parseInt(etaMatch[1]) * 60 + parseInt(etaMatch[2]);
+        timeStr += ` · <span class="eta-countdown">⏱ ${fmtTime(etaSec)} remaining</span>`;
+      }
+    }
+    $('#progTimeInfo').innerHTML = timeStr;
   }
 
   document.title = pct < 100 ? `(${pct}%) Downloading — PurffleGrab` : 'PurffleGrab';
 
-  // Update speed graph
   if (job.speed) updateSpeedGraph(job.speed);
 
-  // Update mini progress
   lastMiniJob = job;
   $('#mpTitle').textContent = job.title || 'Downloading…';
   $('#mpBar').style.width = pct + '%';
@@ -768,6 +964,11 @@ function finishProgress(job) {
     notifyDone(done);
     saveDownloadStats(job);
     playCompletionSound();
+    fireConfetti();
+    addNotification('✅', `Downloaded: ${job.title || 'Unknown'} (${done} file${done > 1 ? 's' : ''})`);
+  }
+  if (job.status === 'error' || job.status === 'cancelled') {
+    addNotification(job.status === 'error' ? '❌' : '⚠️', `${job.status === 'error' ? 'Failed' : 'Cancelled'}: ${job.title || 'Unknown'}`);
   }
   downloadStartTime = null;
 }
@@ -909,7 +1110,7 @@ let historyPage = 0;
 const HISTORY_PAGE_SIZE = 20;
 async function loadHistory() {
   const res = await fetch('/api/history'); const { history } = await res.json(); const wrap = $('#historyList');
-  if (!history.length) { wrap.innerHTML = '<p class="hint center">No downloads yet. Start grabbing!</p>'; $('#historyPagination').hidden = true; return; }
+  if (!history.length) { wrap.innerHTML = '<p class="hint center">No downloads yet. Start grabbing!</p>'; $('#historyPagination').hidden = true; $('#bulkToolbar').hidden = true; return; }
 
   const filterStatus = $('#historyFilter')?.value || 'all';
   const filterText = ($('#historySearch')?.value || '').toLowerCase().trim();
@@ -917,18 +1118,40 @@ async function loadHistory() {
   if (filterStatus !== 'all') filtered = filtered.filter(h => h.status === filterStatus);
   if (filterText) filtered = filtered.filter(h => (h.title || '').toLowerCase().includes(filterText));
 
+  // Show bulk toolbar
+  $('#bulkToolbar').hidden = false;
+  bulkSelected = new Set();
+  updateBulkCount();
+
   const totalPages = Math.ceil(filtered.length / HISTORY_PAGE_SIZE);
   historyPage = Math.min(historyPage, totalPages - 1);
   const page = filtered.slice(historyPage * HISTORY_PAGE_SIZE, (historyPage + 1) * HISTORY_PAGE_SIZE);
 
   wrap.innerHTML = page.map((h) => { const d = new Date(h.when); const cls = h.status === 'complete' ? 'done' : h.status === 'cancelled' ? 'cancelled' : 'failed';
-    return `<div class="hist" data-id="${h.id}"><div class="hist-main"><span class="st ${cls}">${h.status}</span><div><p class="hist-title">${esc(h.title)}</p><p class="meta-sub">${h.done}/${h.count} files · ${d.toLocaleString()}</p></div></div><div class="hist-actions"><button class="mini" data-act="folder">📂 Folder</button><button class="mini" data-act="zip">⬇ Zip</button><button class="mini" data-act="regrab">↺ Re-grab</button><button class="mini" data-act="fav">⭐</button><button class="mini danger" data-act="del">🗑</button></div></div>`; }).join('');
+    return `<div class="hist" data-id="${h.id}"><input type="checkbox" class="hist-check" data-hc="${h.id}" /><div class="hist-main"><span class="st ${cls}">${h.status}</span><div><p class="hist-title">${esc(h.title)}</p><p class="meta-sub">${h.done}/${h.count} files · ${d.toLocaleString()}</p></div></div><div class="hist-actions"><button class="mini" data-act="folder">📂 Folder</button><button class="mini" data-act="zip">⬇ Zip</button><button class="mini" data-act="regrab">↺ Re-grab</button><button class="mini" data-act="fav">⭐</button><button class="mini danger" data-act="del">🗑</button></div></div>`; }).join('');
   $$('#historyList .hist').forEach((el) => { const id = el.dataset.id; const h = history.find((x) => x.id === id);
     el.querySelector('[data-act="folder"]').onclick = () => fetch(`/api/open-folder/${id}`, { method: 'POST' });
     el.querySelector('[data-act="zip"]').onclick = () => (window.location = `/api/zip/${id}`);
     el.querySelector('[data-act="del"]').onclick = async () => { await fetch(`/api/history/delete/${id}`, { method: 'POST' }); loadHistory(); };
     el.querySelector('[data-act="regrab"]').onclick = () => { if (h) startDownload(h.sources, h.options); };
     el.querySelector('[data-act="fav"]').onclick = () => { if (h?.sources?.[0]) addFavorite(typeof h.sources[0] === 'string' ? h.sources[0] : h.sources[0].url, h.title); };
+    // Bulk select checkbox
+    el.querySelector('[data-hc]').addEventListener('change', (e) => {
+      if (e.target.checked) bulkSelected.add(id); else bulkSelected.delete(id);
+      updateBulkCount();
+    });
+    // Right-click context menu
+    el.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY, [
+        { id: 'folder', icon: '📂', label: 'Open folder', action: () => fetch(`/api/open-folder/${id}`, { method: 'POST' }) },
+        { id: 'zip', icon: '⬇', label: 'Download as zip', action: () => window.location = `/api/zip/${id}` },
+        { id: 'regrab', icon: '↺', label: 'Re-download', action: () => { if (h) startDownload(h.sources, h.options); } },
+        { id: 'fav', icon: '⭐', label: 'Add to favorites', action: () => { if (h?.sources?.[0]) addFavorite(typeof h.sources[0] === 'string' ? h.sources[0] : h.sources[0].url, h.title); } },
+        '---',
+        { id: 'del', icon: '🗑', label: 'Delete', danger: true, action: async () => { await fetch(`/api/history/delete/${id}`, { method: 'POST' }); loadHistory(); } },
+      ]);
+    });
   });
 
   const pagEl = $('#historyPagination');
@@ -938,6 +1161,27 @@ async function loadHistory() {
     $$('.page-btn').forEach(b => b.addEventListener('click', () => { historyPage = Number(b.dataset.page); loadHistory(); }));
   } else { pagEl.hidden = true; }
 }
+function updateBulkCount() {
+  $('#bulkCount').textContent = `${bulkSelected.size} selected`;
+  $('#bulkZip').disabled = bulkSelected.size === 0;
+  $('#bulkDelete').disabled = bulkSelected.size === 0;
+}
+$('#bulkSelectAll')?.addEventListener('change', (e) => {
+  $$('.hist-check[data-hc]').forEach(cb => { cb.checked = e.target.checked; if (e.target.checked) bulkSelected.add(cb.dataset.hc); else bulkSelected.delete(cb.dataset.hc); });
+  updateBulkCount();
+});
+$('#bulkDelete')?.addEventListener('click', async () => {
+  if (!bulkSelected.size) return;
+  for (const id of bulkSelected) { await fetch(`/api/history/delete/${id}`, { method: 'POST' }); }
+  bulkSelected.clear();
+  toast('🗑 Deleted selected items');
+  loadHistory();
+});
+$('#bulkZip')?.addEventListener('click', () => {
+  // Download first selected as zip
+  for (const id of bulkSelected) { window.location = `/api/zip/${id}`; break; }
+});
+
 $('#refreshHistory').addEventListener('click', loadHistory);
 $('#clearHistory').addEventListener('click', async () => { await fetch('/api/history/clear', { method: 'POST' }); loadHistory(); });
 $('#historyFilter')?.addEventListener('change', () => { historyPage = 0; loadHistory(); });
@@ -996,6 +1240,7 @@ $('#convertBtn')?.addEventListener('click', async () => {
     $('#convertResult').innerHTML = `<div class="done-actions"><a href="${url}" download="${esc(name)}" class="btn-primary">⬇ Download ${esc(name)}</a></div>`;
     toast('✅ Conversion complete!');
     playCompletionSound();
+    addNotification('🔄', `Converted: ${name}`);
   } catch (err) {
     toast(err.message);
     $('#convertResult').hidden = false;
@@ -1054,9 +1299,9 @@ $('#scheduleAddBtn')?.addEventListener('click', () => {
   renderSchedule();
   $('#scheduleUrl').value = '';
   toast('⏰ Download scheduled!');
+  addNotification('⏰', `Scheduled: ${url.slice(0, 40)}`);
 });
 
-// Check for scheduled downloads every minute
 setInterval(() => {
   const now = new Date();
   scheduledDownloads.forEach(s => {
@@ -1068,6 +1313,7 @@ setInterval(() => {
       urlInput.value = s.url;
       analyze();
       toast(`⏰ Scheduled download started: ${s.url.slice(0, 40)}…`);
+      addNotification('⏰', `Scheduled download started`);
     }
   });
 }, 60000);
@@ -1080,17 +1326,19 @@ async function loadSettings() {
     if (settings.themeMode) applyThemeMode(settings.themeMode);
     if (settings.accentColor) applyAccent(settings.accentColor);
     if (settings.playSound !== undefined) prefs.playSound = settings.playSound;
+    if (settings.confetti !== undefined) prefs.confetti = settings.confetti;
     $('#outputDir').value = settings.outputDir || ''; $('#dirHint').textContent = `Default folder: ${defaultDir}`;
     const d = settings.defaults || {};
     $('#defType').value = d.contentType || 'video'; $('#defRes').value = d.resolution || '1080'; $('#defFmt').value = d.audioFormat || 'mp3';
     $('#defConc').value = String(settings.concurrency || 2); $('#defNotify').checked = settings.notify !== false;
     $('#defPlaySound').checked = settings.playSound !== false;
+    $('#defConfetti').checked = settings.confetti !== false;
   } catch {}
 }
 function applyDefaultsToForm() { const d = prefs.defaults || {}; if (d.resolution) $('#resolution').value = d.resolution; if (d.audioFormat) $('#audioFormat').value = d.audioFormat; }
 $('#pickFolder').addEventListener('click', async () => { const res = await fetch('/api/pick-folder', { method: 'POST' }); const { path } = await res.json(); if (path) $('#outputDir').value = path; });
 $('#saveSettings').addEventListener('click', async () => {
-  const body = { outputDir: $('#outputDir').value, theme: document.body.dataset.theme, themeMode: prefs.themeMode, accentColor: prefs.accentColor, concurrency: Number($('#defConc').value), notify: $('#defNotify').checked, playSound: $('#defPlaySound').checked,
+  const body = { outputDir: $('#outputDir').value, theme: document.body.dataset.theme, themeMode: prefs.themeMode, accentColor: prefs.accentColor, concurrency: Number($('#defConc').value), notify: $('#defNotify').checked, playSound: $('#defPlaySound').checked, confetti: $('#defConfetti').checked,
     defaults: { contentType: $('#defType').value, resolution: $('#defRes').value, audioFormat: $('#defFmt').value } };
   const res = await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await res.json();
@@ -1140,5 +1388,6 @@ loadQueue();
 loadSchedule();
 loadFavorites();
 loadRecents();
+loadProfiles();
 try { if (Notification.permission === 'default') Notification.requestPermission(); } catch {}
 setTimeout(showTour, 600);
