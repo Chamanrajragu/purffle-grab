@@ -11,57 +11,64 @@ jobs:
   # ── Build on all 3 platforms ──────────────────────────────────
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: windows-latest
             platform: win
             script: dist
-            ytdlp_url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe
-            ytdlp_name: yt-dlp.exe
-            ffmpeg_url: https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
-            ffmpeg_archive: zip
           - os: macos-latest
             platform: mac
             script: dist:mac
-            ytdlp_url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
-            ytdlp_name: yt-dlp
-            ffmpeg_url: https://evermeet.cx/ffmpeg/getrelease/zip
-            ffmpeg_archive: zip
           - os: ubuntu-latest
             platform: linux
             script: dist:linux
-            ytdlp_url: https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux
-            ytdlp_name: yt-dlp
-            ffmpeg_url: https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
-            ffmpeg_archive: tar
 
     runs-on: ${{ matrix.os }}
+    env:
+      ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      # Download platform-specific yt-dlp
-      - name: Download yt-dlp
+      # ── Download platform-specific yt-dlp ──
+      - name: Download yt-dlp (Windows)
+        if: matrix.platform == 'win'
+        shell: bash
         run: |
           mkdir -p bin
-          curl -L -o "bin/${{ matrix.ytdlp_name }}" "${{ matrix.ytdlp_url }}"
-          chmod +x "bin/${{ matrix.ytdlp_name }}" || true
-        shell: bash
+          curl -L -o bin/yt-dlp.exe https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe
 
-      # Download platform-specific ffmpeg
+      - name: Download yt-dlp (macOS)
+        if: matrix.platform == 'mac'
+        shell: bash
+        run: |
+          mkdir -p bin
+          curl -L -o bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos
+          chmod +x bin/yt-dlp
+
+      - name: Download yt-dlp (Linux)
+        if: matrix.platform == 'linux'
+        shell: bash
+        run: |
+          mkdir -p bin
+          curl -L -o bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux
+          chmod +x bin/yt-dlp
+
+      # ── Download platform-specific ffmpeg ──
       - name: Download ffmpeg (Windows)
         if: matrix.platform == 'win'
         shell: bash
         run: |
-          curl -L -o ffmpeg.zip "${{ matrix.ffmpeg_url }}"
+          curl -L -o ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip
           unzip -o ffmpeg.zip -d ffmpeg-tmp
           cp ffmpeg-tmp/*/bin/ffmpeg.exe bin/ffmpeg.exe
           cp ffmpeg-tmp/*/bin/ffprobe.exe bin/ffprobe.exe
@@ -71,18 +78,16 @@ jobs:
         if: matrix.platform == 'mac'
         shell: bash
         run: |
-          curl -L -o ffmpeg.zip "https://evermeet.cx/ffmpeg/getrelease/zip"
-          unzip -o ffmpeg.zip -d bin
-          curl -L -o ffprobe.zip "https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"
-          unzip -o ffprobe.zip -d bin
+          brew install ffmpeg
+          cp "$(which ffmpeg)" bin/ffmpeg
+          cp "$(which ffprobe)" bin/ffprobe
           chmod +x bin/ffmpeg bin/ffprobe
-          rm -f ffmpeg.zip ffprobe.zip
 
       - name: Download ffmpeg (Linux)
         if: matrix.platform == 'linux'
         shell: bash
         run: |
-          curl -L -o ffmpeg.tar.xz "${{ matrix.ffmpeg_url }}"
+          curl -L -o ffmpeg.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
           tar -xf ffmpeg.tar.xz
           cp ffmpeg-master-latest-linux64-gpl/bin/ffmpeg bin/ffmpeg
           cp ffmpeg-master-latest-linux64-gpl/bin/ffprobe bin/ffprobe
@@ -93,9 +98,9 @@ jobs:
         run: ls -la bin/
         shell: bash
 
-      # Build the installer / app package
+      # Build — disable electron-builder's built-in publish (we use softprops)
       - name: Build
-        run: npm run ${{ matrix.script }}
+        run: npm run ${{ matrix.script }} -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -131,10 +136,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/release-win/*.exe
-            dist/release-mac/*.dmg
-            dist/release-linux/*.AppImage
-            dist/release-linux/*.deb
+            dist/**/*.exe
+            dist/**/*.dmg
+            dist/**/*.AppImage
+            dist/**/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
