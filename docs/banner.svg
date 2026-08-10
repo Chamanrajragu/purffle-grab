@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#120f1f"/><stop offset="1" stop-color="#0b0a12"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#22d3ee"/><stop offset="0.5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="logo" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="26" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="320" rx="20" fill="url(#bg)"/>
+  <circle cx="1040" cy="60" r="150" fill="#8b5cf6" opacity="0.16" filter="url(#glow)"/>
+  <circle cx="1140" cy="260" r="130" fill="#ec4899" opacity="0.14" filter="url(#glow)"/>
+  <circle cx="60" cy="280" r="120" fill="#22d3ee" opacity="0.10" filter="url(#glow)"/>
+
+  <!-- logo tile -->
+  <rect x="72" y="96" width="104" height="104" rx="26" fill="url(#logo)"/>
+  <text x="124" y="170" font-family="Segoe UI, Arial, sans-serif" font-size="68" font-weight="800" fill="#fff" text-anchor="middle">P</text>
+
+  <!-- title -->
+  <text x="208" y="150" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="800" fill="#f3f0fb">PurffleGrab</text>
+  <text x="210" y="196" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="600" fill="#a298c0">Free Spotify &amp; YouTube downloader for Windows — videos, playlists &amp; music in one click</text>
+
+  <!-- feature pills -->
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">
+    <rect x="210" y="232" width="132" height="42" rx="21" fill="#171426" stroke="#2a2440"/>
+    <text x="276" y="259" fill="url(#brand)" text-anchor="middle">4K Video</text>
+    <rect x="354" y="232" width="150" height="42" rx="21" fill="#171426" stroke="#2a2440"/>
+    <text x="429" y="259" fill="url(#brand)" text-anchor="middle">MP3 / FLAC</text>
+    <rect x="516" y="232" width="148" height="42" rx="21" fill="#171426" stroke="#2a2440"/>
+    <text x="590" y="259" fill="url(#brand)" text-anchor="middle">Playlists</text>
+    <rect x="676" y="232" width="178" height="42" rx="21" fill="#171426" stroke="#2a2440"/>
+    <text x="765" y="259" fill="url(#brand)" text-anchor="middle">No ads · Free</text>
+  </g>
+</svg>

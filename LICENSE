@@ -1,0 +1,63 @@
+PurffleGrab — End User Licence Agreement
+
+Copyright (c) 2026 Purffle (Pykara Technologies). All rights reserved.
+
+PLEASE NOTE: This licence applies to PurffleGrab version 10.0.0 and later, which
+are distributed in binary form. Earlier versions (up to and including 9.0.0) were
+released under the MIT Licence, and that grant remains in force for those
+versions and for any copies obtained under it.
+
+1. LICENCE GRANT
+   Purffle grants you a personal, non-exclusive, non-transferable, royalty-free
+   licence to install and use PurffleGrab on any number of devices you own or
+   control, for personal, non-commercial purposes.
+
+2. RESTRICTIONS
+   Except where a bundled third-party component grants you broader rights (see
+   section 4), and except to the extent that applicable law expressly permits it
+   notwithstanding this restriction, you may not:
+     a. sell, rent, sublicense or redistribute PurffleGrab as your own product;
+     b. reverse engineer, decompile or disassemble the PurffleGrab application;
+     c. remove or alter any copyright, trademark or attribution notice.
+
+   You may share the unmodified official installer with others free of charge.
+
+3. INTENDED USE
+   PurffleGrab is provided for personal use — for example, your own uploads,
+   Creative Commons and public-domain material, and offline access to media you
+   are licensed to keep. Downloading copyrighted content may breach the terms of
+   service of the platform concerned and copyright law in your country. You are
+   responsible for how you use this software.
+
+4. THIRD-PARTY COMPONENTS
+   PurffleGrab bundles third-party software, including FFmpeg (GPL v3) and yt-dlp
+   (Unlicense). Those components are licensed to you under their own terms, which
+   take precedence over this agreement in respect of those components. Nothing in
+   this agreement limits any right you have under those licences, including your
+   right to obtain, modify and redistribute their source code. See
+   THIRD-PARTY-NOTICES.md, which includes a written offer for the corresponding
+   source of the FFmpeg build distributed with this application.
+
+5. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+6. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+   DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+   OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+   OR OTHER DEALINGS IN THE SOFTWARE.
+
+7. NOTHING COLLECTED
+   PurffleGrab contains no telemetry, analytics or trackers, and transmits no
+   personal data. It communicates only with the media services whose links you
+   provide.
+
+Contact: purfflestore@gmail.com
+
+---
+
+This agreement was drafted for a freeware binary distribution and has not been
+reviewed by a lawyer. If PurffleGrab is ever sold, licensed commercially, or
+distributed at scale, have a solicitor review it first.

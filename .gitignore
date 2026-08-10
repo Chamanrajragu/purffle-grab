@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Bundled binaries — fetched via scripts/setup.ps1 (too large for git; ffmpeg > 100MB)
+bin/*.exe
+
+# Build output & tooling
+release/
+dist/
+out/
+nsis-tool/
+*.7z
+
+# Runtime data
+data/
+downloads/
+.cap-data/
+.cap-dl/
+
+# Video workspace — rendered frames, takes and intermediates (~1.4GB).
+# The finished mp4 in the repo root is the only part worth keeping.
+.demo/
+.scene-out/
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db

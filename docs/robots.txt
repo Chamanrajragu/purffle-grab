@@ -1,0 +1,15 @@
+# IMPORTANT — where this file has to live.
+#
+# The site is served from https://purffle.com/purffle-grab/ , but crawlers only
+# ever read robots.txt from the DOMAIN ROOT: https://purffle.com/robots.txt
+# A robots.txt inside /purffle-grab/ is ignored completely.
+#
+# So: do NOT rely on this copy. Instead add the Sitemap line below to the
+# robots.txt that already exists at the root of purffle.com. See DEPLOY.md.
+#
+# This copy is kept only so the rules travel with the project.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://purffle.com/purffle-grab/sitemap.xml

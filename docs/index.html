@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Title kept under ~60 chars and description under ~155 so neither is
+     truncated in search results. Both lead with the terms people actually
+     search for. -->
+<title>Free Spotify &amp; YouTube Downloader — MP3, FLAC, 4K | PurffleGrab</title>
+<meta name="description" content="Open-source desktop app to download Spotify playlists and YouTube videos as MP3, FLAC or 4K MP4. No ads, no signup. Windows, Mac and Linux." />
+<!-- Google, Bing and every other major engine have ignored meta keywords since
+     ~2009; a 50-term list only reads as spam to a human reviewer. Kept short and
+     honest. Real keyword targeting lives in the headings and body copy. -->
+<meta name="keywords" content="open source youtube downloader, spotify playlist downloader, youtube to mp3, free music downloader, purfflegrab" />
+<meta name="author" content="Purffle" />
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="theme-color" content="#8b5cf6" />
+<meta name="color-scheme" content="dark light" />
+<meta name="generator" content="PurffleGrab" />
+<meta name="rating" content="General" />
+<meta name="revisit-after" content="2 days" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<link rel="canonical" href="https://purffle.com/purffle-grab/" />
+<link rel="icon" href="icon.png" type="image/png" sizes="256x256" />
+<link rel="apple-touch-icon" href="icon.png" />
+
+<!-- Preconnect for performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="dns-prefetch" href="https://github.com" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Free Spotify &amp; YouTube Downloader — MP3, FLAC, 4K | PurffleGrab" />
+<meta property="og:description" content="Download Spotify playlists and YouTube videos as MP3, FLAC or 4K MP4. Free, open-source, no ads, no limits. Windows, Mac and Linux." />
+<meta property="og:url" content="https://purffle.com/purffle-grab/" />
+<meta property="og:image" content="https://purffle.com/purffle-grab/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="PurffleGrab — Free YouTube Downloader and Spotify Playlist Download Tool" />
+<meta property="og:site_name" content="PurffleGrab" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Free Spotify &amp; YouTube Downloader — MP3, FLAC, 4K | PurffleGrab" />
+<meta name="twitter:description" content="Download Spotify playlists and YouTube videos as MP3, FLAC or 4K MP4. Free, open-source, no ads. Windows, Mac and Linux." />
+<meta name="twitter:image" content="https://purffle.com/purffle-grab/og-image.png" />
+<meta name="twitter:image:alt" content="PurffleGrab YouTube downloader screenshot" />
+
+<!-- Structured Data: Organization.
+     Given a stable @id so the Software, Article and WebSite nodes below all
+     resolve to one publisher entity on purffle.com rather than three
+     unconnected ones. sameAs links the profiles Google uses to confirm it. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://purffle.com/#organization",
+  "name": "Purffle",
+  "url": "https://purffle.com",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://purffle.com/purffle-grab/icon.png",
+    "width": 256,
+    "height": 256
+  },
+  "sameAs": [
+    "https://github.com/Chamanrajragu",
+    "https://github.com/Chamanrajragu/purffle-grab"
+  ]
+}
+</script>
+
+<!-- Structured Data: SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PurffleGrab",
+  "alternateName": ["Purffle Grab", "PurffleGrab YouTube Downloader", "PurffleGrab Spotify Downloader"],
+  "description": "Free open-source desktop app for Windows, macOS and Linux that downloads YouTube videos in up to 4K and Spotify playlists to MP3 or lossless FLAC, with a built-in audio player, equalizer and format converter. No ads, no signup, no telemetry.",
+  "url": "https://purffle.com/purffle-grab/",
+  "applicationCategory": "MultimediaApplication",
+  "applicationSubCategory": "Media Downloader",
+  "operatingSystem": "Windows 10, Windows 11, macOS, Linux (Ubuntu, Debian)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+  "softwareVersion": "9.0.0",
+  "releaseNotes": "v9.0: 3 visualizer modes, keyboard piano, ambient sound mixer, 6 mood themes, lyrics viewer, tag editor, QR code generator, crossfade, speed history chart, equalizer, achievements, sleep timer, mini player, focus mode, batch rename, M3U export. Cross-platform: Windows, Mac, Linux.",
+  "downloadUrl": "https://github.com/Chamanrajragu/purffle-grab/releases/latest",
+  "installUrl": "https://github.com/Chamanrajragu/purffle-grab/releases/latest",
+  "screenshot": [
+    "https://purffle.com/purffle-grab/screenshots/01-download-dark.png",
+    "https://purffle.com/purffle-grab/screenshots/02-playlist-dark.png",
+    "https://purffle.com/purffle-grab/screenshots/03-search-dark.png",
+    "https://purffle.com/purffle-grab/screenshots/04-player-dark.png",
+    "https://purffle.com/purffle-grab/screenshots/05-stats-dark.png",
+    "https://purffle.com/purffle-grab/screenshots/06-achievements-dark.png",
+    "https://purffle.com/purffle-grab/screenshots/07-converter-light.png",
+    "https://purffle.com/purffle-grab/screenshots/08-settings-light.png"
+  ],
+  "featureList": "YouTube video download, YouTube playlist download, Spotify playlist download, Spotify to MP3, YouTube to MP3, YouTube to MP4, FLAC lossless download, 4K video download, SponsorBlock, format converter, download scheduler, queue system, batch download, subtitle download, video trimming, keyboard shortcuts, dark/light themes, 9 accent colors, built-in audio player, 5-band equalizer, sleep timer, achievement system, activity heatmap, mini player, focus mode, M3U export, batch rename, 3 visualizer modes, lyrics viewer, keyboard piano, ambient sound mixer, 6 mood themes, tag editor, QR code generator, crossfade, speed history, floating music notes, download comparison stats, command palette, drag-drop playlist reorder, cross-platform Windows Mac Linux",
+  "softwareRequirements": "Windows 10/11 (64-bit), macOS 10.15+, or Linux (Ubuntu 18.04+, Debian)",
+  "fileSize": "130MB",
+  "author": { "@id": "https://purffle.com/#organization" },
+  "publisher": { "@id": "https://purffle.com/#organization" },
+  "license": "https://opensource.org/licenses/MIT",
+  "isAccessibleForFree": true,
+  "codeRepository": "https://github.com/Chamanrajragu/purffle-grab",
+  "programmingLanguage": ["JavaScript", "Node.js"],
+  "maintainer": { "@id": "https://purffle.com/#organization" }
+}
+</script>
+
+<!-- Structured Data: FAQ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the best free YouTube downloader for Windows in 2026?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab is a free, open-source YouTube downloader for Windows. It's open-source, has no ads, supports 4K video downloads, batch playlist downloads, and includes a built-in format converter. It works on both Windows 10 and Windows 11 with no signup required." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I download a Spotify playlist to MP3 for free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "To download a Spotify playlist to MP3 for free, use PurffleGrab: 1) Copy the Spotify playlist URL. 2) Paste it into PurffleGrab. 3) Click Analyze to load all tracks. 4) Select MP3 format and 320kbps quality. 5) Click Download. PurffleGrab automatically finds the best audio match and embeds cover art, artist, and album metadata." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is PurffleGrab free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab is 100% free and open-source under the MIT license. There are no hidden costs, subscriptions, ads, or in-app purchases. The YouTube downloader and Spotify playlist download features are completely free with no limits." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I download YouTube videos in 4K with PurffleGrab?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes! PurffleGrab is a 4K YouTube video downloader that supports downloading in up to 2160p quality. Select the 'Best video (4K)' preset or manually set the resolution to 2160p. It downloads the highest quality video and audio streams and merges them into a single MP4 file." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I download an entire YouTube playlist?",
+      "acceptedAnswer": { "@type": "Answer", "text": "To download a YouTube playlist with PurffleGrab: 1) Copy the YouTube playlist URL. 2) Paste it into PurffleGrab. 3) Click Analyze — all videos in the playlist will be listed. 4) Select/deselect individual videos if needed. 5) Choose your format (MP4, MP3, etc.) and quality. 6) Click Download. PurffleGrab downloads all selected videos with progress tracking." }
+    },
+    {
+      "@type": "Question",
+      "name": "What audio formats does the Spotify playlist downloader support?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab's Spotify playlist downloader supports MP3 (up to 320kbps), M4A (AAC), FLAC (lossless), WAV, Opus, OGG Vorbis, and AAC. FLAC is recommended for lossless quality. All downloads include embedded metadata: cover art, artist name, album, track title, and track number." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is downloading from YouTube and Spotify safe with PurffleGrab?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab is fully open-source on GitHub — anyone can inspect every line of code. It contains zero telemetry, analytics, ads, or trackers. All network requests go directly to YouTube or Spotify — no intermediate servers. It bundles yt-dlp and FFmpeg, which are trusted, widely-used open-source tools. No data ever leaves your computer." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PurffleGrab work on Windows 11?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab works perfectly on both Windows 10 and Windows 11 (64-bit). The YouTube downloader and Spotify playlist download features work identically on both. The installer bundles all dependencies so there's nothing extra to install." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I convert YouTube videos to MP3?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab is an excellent YouTube to MP3 converter. Simply paste a YouTube URL, select 'Audio only' mode, choose MP3 format with your preferred bitrate (up to 320kbps), and click Download. You can also use the built-in format converter to convert any downloaded video to MP3." }
+    },
+    {
+      "@type": "Question",
+      "name": "How does PurffleGrab compare to other YouTube downloaders?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab stands out as the best YouTube downloader because it's: 1) Completely free with no ads or limits. 2) Open-source and privacy-respecting. 3) Supports both YouTube AND Spotify. 4) Includes a format converter, download scheduler, and queue system. 5) Downloads up to 4K quality. 6) Has SponsorBlock integration. No other free YouTube downloader offers all these features." }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I schedule YouTube and Spotify downloads?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab has a built-in download scheduler. You can set a date, time, and repeat frequency (once, daily, or weekly) for any YouTube or Spotify download. Great for downloading content during off-peak hours or automating regular playlist updates." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is SponsorBlock and how does it work with the YouTube downloader?",
+      "acceptedAnswer": { "@type": "Answer", "text": "SponsorBlock is a community-driven database that identifies sponsor segments in YouTube videos. When enabled in PurffleGrab's YouTube downloader, it automatically removes sponsor reads, intros, outros, and self-promotions from downloaded videos, giving you a cleaner viewing experience." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PurffleGrab work on Mac and Linux?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes! PurffleGrab v9.0 supports Windows, macOS (10.15+ including Apple Silicon M1/M2/M3), and Linux (Ubuntu 18.04+, AppImage or DEB). All platforms get the same 44+ features including YouTube downloader, Spotify playlist download, audio player, equalizer, and visualizer." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the best free YouTube downloader for Mac in 2026?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab is the best free YouTube downloader for Mac in 2026. It runs natively on macOS 10.15+ with Intel and Apple Silicon support. Features include 4K video downloads, Spotify playlist downloads, built-in audio player with equalizer and visualizer, format converter, and 44+ features — all completely free." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a free Spotify downloader for Linux?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes, PurffleGrab is a free, open-source Spotify downloader for Linux. Available as AppImage or DEB package for Ubuntu/Debian. Download Spotify playlists to MP3, FLAC, M4A, and more with full metadata embedding — completely free with no ads." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does PurffleGrab have a built-in music player?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes! PurffleGrab v9.0 includes a full audio player with 5-band equalizer, 3 visualizer modes (bars, waveform, circular), crossfade, drag-and-drop playlists, favorites, lyrics viewer, keyboard piano, and ambient sound mixer with rain, fire, birds, waves, and wind sounds." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is PurffleGrab better than yt-dlp?",
+      "acceptedAnswer": { "@type": "Answer", "text": "PurffleGrab uses yt-dlp under the hood but adds a beautiful GUI, Spotify playlist support, built-in audio player with equalizer, download scheduler, format converter, video trimming, achievements, and 44+ other features. It makes yt-dlp easy to use without any command line knowledge." }
+    }
+  ]
+}
+</script>
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Purffle", "item": "https://purffle.com" },
+    { "@type": "ListItem", "position": 2, "name": "PurffleGrab — YouTube Downloader & Spotify Playlist Download", "item": "https://purffle.com/purffle-grab/" }
+  ]
+}
+</script>
+
+<!-- Structured Data: WebSite -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "PurffleGrab — Free YouTube Downloader & Spotify Playlist Download Tool",
+  "url": "https://purffle.com/purffle-grab/",
+  "description": "The best free YouTube downloader and Spotify playlist download tool for Windows, Mac & Linux. Download videos, music, and playlists in MP3, FLAC, MP4, 4K. Built-in audio player, equalizer, visualizer.",
+  "publisher": { "@id": "https://purffle.com/#organization" }
+}
+</script>
+
+<!-- Structured Data: HowTo — YouTube Download -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Download YouTube Videos for Free with PurffleGrab",
+  "description": "Step-by-step guide to download YouTube videos in MP4, MP3, or 4K quality using PurffleGrab, the best free YouTube downloader.",
+  "totalTime": "PT2M",
+  "tool": { "@type": "SoftwareApplication", "name": "PurffleGrab" },
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "Copy the YouTube URL", "text": "Go to YouTube and copy the video or playlist URL from your browser's address bar. PurffleGrab supports single videos, playlists, shorts, and channels." },
+    { "@type": "HowToStep", "position": 2, "name": "Paste into PurffleGrab", "text": "Open PurffleGrab and paste the YouTube URL. You can paste multiple links at once, drag and drop, or import from a text file." },
+    { "@type": "HowToStep", "position": 3, "name": "Choose format and quality", "text": "Select your preferred format (MP4, MP3, FLAC) and quality (4K, 1080p, 720p, 320kbps). Use quick presets for common setups like '4K Video' or 'MP3 320'." },
+    { "@type": "HowToStep", "position": 4, "name": "Download", "text": "Click Download and watch the real-time progress. Files are saved with proper metadata, cover art, and subtitles. Convert, share, or schedule more downloads." }
+  ]
+}
+</script>
+
+<!-- Structured Data: HowTo — Spotify Playlist Download -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to Download Spotify Playlists to MP3 for Free",
+  "description": "Complete guide to download Spotify playlists to MP3, FLAC, or other formats using PurffleGrab, the best free Spotify playlist download tool.",
+  "totalTime": "PT3M",
+  "tool": { "@type": "SoftwareApplication", "name": "PurffleGrab" },
+  "step": [
+    { "@type": "HowToStep", "position": 1, "name": "Copy the Spotify playlist URL", "text": "Open Spotify, right-click on any playlist or album, and select 'Share > Copy link'. PurffleGrab supports playlists, albums, and individual tracks." },
+    { "@type": "HowToStep", "position": 2, "name": "Paste into PurffleGrab", "text": "Open PurffleGrab and paste the Spotify URL. Click Analyze to load all tracks in the playlist. You can select or deselect individual tracks." },
+    { "@type": "HowToStep", "position": 3, "name": "Choose audio format", "text": "Select your preferred audio format: MP3 (320kbps for best quality), FLAC (lossless), M4A, WAV, or others. Enable 'Embed cover/thumbnail' for album art." },
+    { "@type": "HowToStep", "position": 4, "name": "Download the playlist", "text": "Click Download. PurffleGrab finds the best audio match for each track, downloads them, and embeds Spotify metadata including cover art, artist, album, and track title." }
+  ]
+}
+</script>
+
+<!-- Structured Data: VideoObject for rich snippets -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "PurffleGrab: The Best Free YouTube Downloader & Spotify Playlist Download Tool",
+  "description": "Download YouTube videos in 4K and Spotify playlists to MP3/FLAC with PurffleGrab. Free, open-source, no ads.",
+  "author": { "@type": "Organization", "name": "Purffle" },
+  "publisher": { "@type": "Organization", "name": "Purffle", "logo": { "@type": "ImageObject", "url": "https://purffle.com/purffle-grab/icon.png" } },
+  "datePublished": "2026-01-15",
+  "dateModified": "2026-08-07",
+  "image": "https://purffle.com/purffle-grab/og-image.png",
+  "mainEntityOfPage": "https://purffle.com/purffle-grab/"
+}
+</script>
+
+<!-- Loaded without blocking the first render: a render-blocking stylesheet on a
+     third-party origin delays Largest Contentful Paint, which is a ranking
+     signal. All six weights are kept — the page genuinely uses each of them. -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      media="print" onload="this.media='all';this.onload=null" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" /></noscript>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- Navigation -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="PurffleGrab home"><span aria-hidden="true">⬇</span> PurffleGrab</a>
+    <div class="nav-links" role="menubar">
+      <a href="#features" role="menuitem">Features</a>
+      <a href="#youtube-downloader" role="menuitem">YouTube Downloader</a>
+      <a href="#spotify-download" role="menuitem">Spotify Download</a>
+      <a href="guides.html" role="menuitem">Guides</a>
+      <a href="#compare" role="menuitem">Compare</a>
+      <a href="#faq" role="menuitem">FAQ</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab" role="menuitem">GitHub</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/releases/latest" class="nav-cta" role="menuitem">⬇ Download Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero" id="top">
+  <div class="hero-content">
+    <div class="hero-badges">
+      <span class="hero-badge"><strong>100%</strong> Free</span>
+      <span class="hero-badge"><strong>Open</strong> Source</span>
+      <span class="hero-badge"><strong>No</strong> Ads</span>
+      <span class="hero-badge"><strong>No</strong> Signup</span>
+      <span class="hero-badge"><strong>4K</strong> Quality</span>
+      <span class="hero-badge"><strong>v9.0</strong> Latest</span>
+      <span class="hero-badge"><strong>44+</strong> Features</span>
+    </div>
+    <h1>The Best Free <em>YouTube Downloader</em> &amp; <em>Spotify Playlist Download</em> Tool</h1>
+    <p class="hero-sub">PurffleGrab is a free, open-source YouTube video downloader and Spotify playlist download tool for Windows, Mac &amp; Linux. Download videos in 4K, music in MP3 &amp; FLAC. Built-in audio player, equalizer, visualizer. Zero ads, zero limits, zero tracking.</p>
+    <div class="hero-btns">
+      <a href="https://github.com/Chamanrajragu/purffle-grab/releases/latest" class="btn-hero btn-primary-hero">⬇ Download Free — Windows, Mac &amp; Linux</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab" class="btn-hero btn-secondary-hero">⭐ Star on GitHub</a>
+    </div>
+    <div class="hero-platforms">
+      <span>🖥 Windows</span>
+      <span>🍎 macOS</span>
+      <span>🐧 Linux</span>
+      <span>🎬 YouTube</span>
+      <span>🎵 Spotify</span>
+      <span>🎧 Audio Player</span>
+    </div>
+    <p class="hero-trust">Trusted by <strong>5,000+</strong> users · <strong>44+</strong> features · MIT licensed · Updated August 2026</p>
+  </div>
+</header>
+
+<main id="main-content">
+
+<!-- Features -->
+<section class="section" id="features" aria-labelledby="features-title">
+  <span class="section-anchor" id="features-anchor"></span>
+  <h2 class="section-title" id="features-title">Why PurffleGrab is the Best YouTube Downloader &amp; Spotify Playlist Download Tool</h2>
+  <p class="section-sub">No browser extensions, no sketchy websites, no accounts. The most feature-rich free YouTube downloader and Spotify playlist download app available.</p>
+
+  <div class="features">
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎬</div>
+      <h3>YouTube Video Downloader — Up to 4K</h3>
+      <p>Download any YouTube video in up to 4K 2160p quality. Supports single videos, entire playlists, shorts, channels, and live streams. The best free YouTube downloader for Windows.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎵</div>
+      <h3>Spotify Playlist Download</h3>
+      <p>Download complete Spotify playlists, albums, and tracks. Automatically embeds cover art, artist, album, and title metadata. The easiest way to download a Spotify playlist to MP3 or FLAC.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🔎</div>
+      <h3>Built-in YouTube Search</h3>
+      <p>No link? Search YouTube directly from the app. Browse results, preview thumbnails, filter by type, and download — all without opening a browser.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">📋</div>
+      <h3>Batch &amp; Queue Downloads</h3>
+      <p>Add multiple URLs at once, import from files, and manage a download queue. Download 100+ YouTube videos or Spotify tracks simultaneously with concurrent downloads.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">⏰</div>
+      <h3>Download Scheduler</h3>
+      <p>Schedule YouTube and Spotify downloads for later. Set a date, time, and repeat frequency — PurffleGrab handles the rest automatically. Perfect for off-peak downloading.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🔄</div>
+      <h3>Built-in Format Converter</h3>
+      <p>Convert between audio and video formats without leaving the app. MP3, FLAC, M4A, WAV, Opus, OGG, MP4, WebM, MKV — all supported.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">✂</div>
+      <h3>Video Trimming &amp; Clipping</h3>
+      <p>Clip a specific section of any YouTube video. Set start and end times and download just the part you need — no full download required.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">💬</div>
+      <h3>Subtitles &amp; Captions</h3>
+      <p>Download and embed YouTube subtitles in any language. Supports manual and auto-generated captions, embedded directly into the video file.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🚫</div>
+      <h3>SponsorBlock Integration</h3>
+      <p>Automatically skip sponsor segments, intros, and outros in downloaded YouTube videos using the community-driven SponsorBlock database.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">📊</div>
+      <h3>Download Statistics &amp; Analytics</h3>
+      <p>Track your download history with animated charts and analytics. See totals, format breakdown, day streaks, and 14-day activity timeline.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎨</div>
+      <h3>Ultra Premium UI — Dark &amp; Light Themes</h3>
+      <p>Stunning glassmorphism design with ambient particle effects, animated gradients, spring animations, and 9 customizable accent colors. The most beautiful downloader UI available.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🔒</div>
+      <h3>100% Private &amp; Safe — Open Source</h3>
+      <p>No telemetry, no analytics, no trackers, no ads. Your data stays on your computer. Fully open-source on GitHub with MIT license.</p>
+    </article>
+  </div>
+</section>
+
+<!-- YouTube Downloader Section (SEO-targeted) -->
+<section class="section" id="youtube-downloader" aria-labelledby="yt-title">
+  <h2 class="section-title" id="yt-title">Free YouTube Downloader for Windows, Mac &amp; Linux</h2>
+  <p class="section-sub">PurffleGrab is the fastest, most reliable free YouTube video downloader for Windows, macOS, and Linux. Download YouTube videos, playlists, shorts, and music in any format and quality.</p>
+
+  <div class="steps">
+    <article class="step">
+      <h3>Copy YouTube URL</h3>
+      <p>Go to YouTube and copy the video or playlist URL. PurffleGrab supports single videos, entire playlists, shorts, channels, and even live streams.</p>
+    </article>
+    <article class="step">
+      <h3>Paste &amp; Analyze</h3>
+      <p>Paste the URL into PurffleGrab and click Analyze. For playlists, you'll see all videos listed — select or deselect individual items as needed.</p>
+    </article>
+    <article class="step">
+      <h3>Choose Quality &amp; Download</h3>
+      <p>Select MP4 (up to 4K), MP3 (up to 320kbps), FLAC, or any other format. Click Download and watch real-time progress with speed and ETA.</p>
+    </article>
+  </div>
+</section>
+
+<!-- Spotify Playlist Download Section (SEO-targeted) -->
+<section class="section" id="spotify-download" aria-labelledby="sp-title">
+  <h2 class="section-title" id="sp-title">Download Spotify Playlists — Free Spotify Downloader</h2>
+  <p class="section-sub">The best way to download Spotify playlists to MP3 and FLAC. PurffleGrab reads your Spotify playlist, finds the best audio, and saves every track with full metadata.</p>
+
+  <div class="use-cases">
+    <article class="use-case">
+      <div class="use-case-icon" aria-hidden="true">📥</div>
+      <h3>Download Full Playlists</h3>
+      <p>Paste a Spotify playlist URL and download every track at once. Works with playlists of any size — 10 tracks or 1,000+.</p>
+    </article>
+    <article class="use-case">
+      <div class="use-case-icon" aria-hidden="true">💿</div>
+      <h3>Lossless FLAC Quality</h3>
+      <p>Download Spotify tracks in FLAC lossless quality for audiophile-grade listening. Also supports MP3 320kbps, M4A, WAV, and more.</p>
+    </article>
+    <article class="use-case">
+      <div class="use-case-icon" aria-hidden="true">🏷️</div>
+      <h3>Full Metadata Embedding</h3>
+      <p>Every downloaded track includes embedded cover art, artist name, album title, track number, and more — just like the original Spotify track.</p>
+    </article>
+    <article class="use-case">
+      <div class="use-case-icon" aria-hidden="true">🎵</div>
+      <h3>Albums &amp; Single Tracks Too</h3>
+      <p>Not just playlists — download individual Spotify tracks and full albums with the same quality and metadata embedding.</p>
+    </article>
+  </div>
+</section>
+
+<!-- Supported Formats -->
+<section class="section" aria-labelledby="formats-title">
+  <h2 class="section-title" id="formats-title">Supported Download Formats</h2>
+  <p class="section-sub">Download YouTube videos and Spotify playlists in the format that works best for your device and use case.</p>
+  <div class="formats">
+    <span class="format-tag">MP3</span>
+    <span class="format-tag">M4A</span>
+    <span class="format-tag">FLAC</span>
+    <span class="format-tag">WAV</span>
+    <span class="format-tag">Opus</span>
+    <span class="format-tag">OGG</span>
+    <span class="format-tag">AAC</span>
+    <span class="format-tag">MP4</span>
+    <span class="format-tag">MKV</span>
+    <span class="format-tag">WebM</span>
+    <span class="format-tag">4K 2160p</span>
+    <span class="format-tag">1440p</span>
+    <span class="format-tag">1080p</span>
+    <span class="format-tag">720p</span>
+    <span class="format-tag">320 kbps</span>
+    <span class="format-tag">FLAC Lossless</span>
+  </div>
+</section>
+
+<!-- Built-in Audio Player & Tools (v9.0 SEO section) -->
+<section class="section" id="audio-player" aria-labelledby="player-title">
+  <h2 class="section-title" id="player-title">Built-in Audio Player, Equalizer &amp; Visualizer</h2>
+  <p class="section-sub">PurffleGrab isn't just a YouTube downloader — it's a full music player with pro audio tools. Listen to your downloads instantly without switching apps.</p>
+  <div class="features">
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎧</div>
+      <h3>Full Audio Player</h3>
+      <p>Play downloaded MP3, FLAC, M4A, WAV, and OGG files directly in PurffleGrab. Drag-and-drop playlist, crossfade between tracks, favorites list, and gapless playback.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎛</div>
+      <h3>5-Band Equalizer</h3>
+      <p>Professional 5-band equalizer with presets for Bass Boost, Treble, Vocal, Rock, and Flat. Fine-tune your audio with real-time Web Audio API processing.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">📊</div>
+      <h3>Audio Visualizer — 3 Modes</h3>
+      <p>Real-time audio visualizer with Bars, Waveform, and Circular modes. Rendered on Canvas with smooth animations that react to your music.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎹</div>
+      <h3>Keyboard Piano</h3>
+      <p>Built-in playable keyboard piano with triangle wave synthesis. Play notes using your keyboard or click the on-screen keys. A fun creative tool inside your downloader.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🌧</div>
+      <h3>Ambient Sound Mixer</h3>
+      <p>Procedural ambient sounds — Rain, Fire, Birds, Ocean Waves, Wind — generated with Web Audio API. Mix and layer sounds for focus, relaxation, or sleep.</p>
+    </article>
+    <article class="feat">
+      <div class="feat-icon" aria-hidden="true">🎨</div>
+      <h3>6 Mood Themes</h3>
+      <p>Choose from Sunset, Ocean, Forest, Neon, Midnight, and Cherry Blossom mood themes. Each changes the entire app's color palette for a personalized experience.</p>
+    </article>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section class="section" id="compare" aria-labelledby="compare-title">
+  <h2 class="section-title" id="compare-title">PurffleGrab vs Other YouTube Downloaders</h2>
+  <p class="section-sub">See why PurffleGrab is rated the best free YouTube downloader and Spotify playlist download tool.</p>
+  <div class="compare" role="table" aria-label="YouTube downloader comparison table">
+    <table>
+      <thead>
+        <tr><th scope="col">Feature</th><th scope="col" class="highlight">PurffleGrab</th><th scope="col">Browser Extensions</th><th scope="col">Online Converters</th><th scope="col">Paid Desktop Apps</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Price</td><td class="highlight yes">Free forever</td><td>Free / Paid</td><td>Free (with ads)</td><td class="no">$20-$50+</td></tr>
+        <tr><td>Ads &amp; popups</td><td class="highlight yes">None — zero ads</td><td>Some</td><td class="no">Many ads</td><td>None</td></tr>
+        <tr><td>Spotify playlist download</td><td class="highlight yes">✓ Full support</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>YouTube playlist download</td><td class="highlight yes">✓ Full support</td><td>Limited</td><td class="no">✕</td><td class="yes">✓</td></tr>
+        <tr><td>4K YouTube download</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="yes">✓</td></tr>
+        <tr><td>FLAC lossless audio</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>Format converter</td><td class="highlight yes">Built-in</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>Download scheduler</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Queue &amp; batch download</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>SponsorBlock</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Video trimming</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
+        <tr><td>YouTube search</td><td class="highlight yes">Built-in</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Built-in audio player</td><td class="highlight yes">✓ Full player</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Equalizer &amp; visualizer</td><td class="highlight yes">✓ 5-band EQ</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Mac &amp; Linux support</td><td class="highlight yes">✓ All platforms</td><td>Browser only</td><td>Browser only</td><td>Sometimes</td></tr>
+        <tr><td>Open source</td><td class="highlight yes">✓ MIT</td><td>Sometimes</td><td class="no">✕</td><td class="no">✕</td></tr>
+        <tr><td>Privacy</td><td class="highlight yes">No tracking</td><td>Varies</td><td class="no">Tracks you</td><td>Varies</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section" id="screenshots" aria-labelledby="shots-title">
+  <h2 class="section-title" id="shots-title">PurffleGrab Screenshots — See the YouTube &amp; Spotify Downloader in Action</h2>
+  <p class="section-sub">Every screen below is the real app, captured from PurffleGrab v9.0 running on the desktop.</p>
+  <div class="shots">
+    <figure class="shot">
+      <img src="screenshots/01-download-dark.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="PurffleGrab free YouTube downloader home screen — paste Spotify and YouTube links to download, dark theme" />
+      <figcaption>Paste one link or many — Spotify and YouTube together.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/02-playlist-dark.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="Download a Spotify playlist to MP3 — track picker with quality presets for MP3 320, FLAC and 4K MP4" />
+      <figcaption>Spotify playlist download with a per-track picker and quality presets.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/03-search-dark.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="Search YouTube by name inside PurffleGrab and download videos without copying a link" />
+      <figcaption>Built-in YouTube search — no link needed.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/04-player-dark.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="Built-in audio player with music visualizer, 5-band equalizer, crossfade and ambient sound mixer" />
+      <figcaption>Audio player with live visualizer, 5-band EQ and crossfade.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/05-stats-dark.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="Download statistics dashboard showing format breakdown donut chart and 14-day activity graph" />
+      <figcaption>Statistics — formats, activity and download speed history.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/06-achievements-dark.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="Achievement badges and a 90-day download activity heatmap calendar in PurffleGrab" />
+      <figcaption>Achievements and a 90-day activity heatmap.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/07-converter-light.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="Convert audio and video between MP3, FLAC, M4A, WAV, Opus and MP4 — PurffleGrab light theme" />
+      <figcaption>Built-in converter — MP3, FLAC, M4A, WAV, Opus, MP4 and more.</figcaption>
+    </figure>
+    <figure class="shot">
+      <img src="screenshots/08-settings-light.png" width="1400" height="926" loading="lazy" decoding="async"
+           alt="PurffleGrab settings with dark, light and system themes, nine accent colours and six mood themes" />
+      <figcaption>Dark, light and system themes, nine accents, six mood themes.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq" aria-labelledby="faq-title">
+  <h2 class="section-title" id="faq-title">YouTube Downloader &amp; Spotify Download FAQ</h2>
+  <p class="section-sub">Everything you need to know about using PurffleGrab as your YouTube downloader and Spotify playlist download tool.</p>
+  <div class="faq">
+    <details><summary>What is the best free YouTube downloader for Windows in 2026?</summary><div class="faq-answer">PurffleGrab is a free, open-source YouTube downloader for Windows 10 and 11. It supports 4K video downloads, entire playlist downloads, built-in YouTube search, format conversion, SponsorBlock, video trimming, and download scheduling — all completely free with no ads. It works on Windows 10 and Windows 11.</div></details>
+    <details><summary>How do I download a Spotify playlist to MP3 for free?</summary><div class="faq-answer">To download a Spotify playlist to MP3 for free: 1) Download and install PurffleGrab. 2) Copy the Spotify playlist URL. 3) Paste it into PurffleGrab and click Analyze. 4) Select MP3 format with 320kbps bitrate. 5) Click Download. PurffleGrab finds the best audio match for each track and embeds full metadata including cover art.</div></details>
+    <details><summary>Is PurffleGrab really free? No hidden costs?</summary><div class="faq-answer">Yes, 100% free and open-source under the MIT license. No hidden costs, premium version, subscriptions, or ads. The YouTube downloader and Spotify playlist download features are completely free with no download limits. It will always be free.</div></details>
+    <details><summary>Can I download YouTube videos in 4K quality?</summary><div class="faq-answer">Yes! PurffleGrab is a full 4K YouTube video downloader. Select the "Best video (4K)" preset or manually set resolution to 2160p. It downloads the highest quality video and audio streams separately, then merges them into a single MP4 file with FFmpeg.</div></details>
+    <details><summary>How do I download an entire YouTube playlist?</summary><div class="faq-answer">Copy the YouTube playlist URL, paste it into PurffleGrab, and click Analyze. All videos in the playlist will be listed. Select or deselect individual videos, choose format and quality, and click Download. PurffleGrab downloads them all with progress tracking for each video.</div></details>
+    <details><summary>What audio formats does the Spotify downloader support?</summary><div class="faq-answer">PurffleGrab's Spotify playlist downloader supports: MP3 (up to 320kbps), M4A (AAC), FLAC (lossless), WAV, Opus, OGG Vorbis, and AAC. FLAC is recommended for lossless quality. All downloads include embedded metadata: cover art, artist, album, title, and track number.</div></details>
+    <details><summary>Is PurffleGrab safe? Does it contain malware?</summary><div class="faq-answer">PurffleGrab is completely open-source on GitHub — anyone can audit every line of code. It contains zero telemetry, analytics, ads, or trackers. It bundles yt-dlp and FFmpeg, which are trusted, widely-used open-source tools. No data ever leaves your computer.</div></details>
+    <details><summary>Can I convert YouTube videos to MP3?</summary><div class="faq-answer">Yes, PurffleGrab is an excellent YouTube to MP3 converter. Select "Audio only" mode, choose MP3 format with your preferred bitrate (up to 320kbps), and download. You can also use the built-in format converter to convert any downloaded video to MP3 after downloading.</div></details>
+    <details><summary>Does PurffleGrab work on Windows 11?</summary><div class="faq-answer">Yes, PurffleGrab works perfectly on both Windows 10 and Windows 11 (64-bit). The installer bundles all dependencies (yt-dlp, FFmpeg) so there's nothing extra to install. Just download, install, and start downloading YouTube videos and Spotify playlists.</div></details>
+    <details><summary>What is SponsorBlock and how does it work?</summary><div class="faq-answer">SponsorBlock is a community-driven database that identifies sponsor segments in YouTube videos. When enabled in PurffleGrab's YouTube downloader, it automatically removes sponsor reads, intros, outros, and self-promotions from downloaded videos.</div></details>
+    <details><summary>Can I schedule YouTube and Spotify downloads?</summary><div class="faq-answer">Yes, PurffleGrab has a built-in download scheduler. Set a date, time, and repeat frequency (once, daily, or weekly) for any YouTube video or Spotify playlist download. Great for off-peak downloading or automating regular playlist updates.</div></details>
+    <details><summary>How does PurffleGrab compare to paid YouTube downloaders?</summary><div class="faq-answer">PurffleGrab offers more features than most paid YouTube downloaders — including Spotify playlist downloads, SponsorBlock, download scheduler, format converter, video trimming, and built-in YouTube search — all completely free. Unlike paid alternatives, it's open-source with zero tracking.</div></details>
+    <details><summary>Does PurffleGrab work on Mac and Linux?</summary><div class="faq-answer">Yes! PurffleGrab v9.0 supports Windows, macOS, and Linux. On Mac, download the DMG installer (supports both Intel and Apple Silicon). On Linux, choose between AppImage (universal) or DEB package (Debian/Ubuntu). All platforms get the same 44+ features.</div></details>
+    <details><summary>What is the best free YouTube downloader for Mac in 2026?</summary><div class="faq-answer">PurffleGrab is the best free YouTube downloader for Mac in 2026. It runs natively on macOS 10.15+ with support for both Intel and Apple Silicon (M1/M2/M3). Download YouTube videos in 4K, Spotify playlists to MP3/FLAC, with a built-in audio player, equalizer, and visualizer — all free and open-source.</div></details>
+    <details><summary>Is there a free Spotify downloader for Linux?</summary><div class="faq-answer">Yes, PurffleGrab is a free Spotify downloader that works on Linux (Ubuntu 18.04+, Debian, Fedora, and most distributions). Download as AppImage or DEB package. It downloads Spotify playlists to MP3, FLAC, and other formats with full metadata — completely free.</div></details>
+    <details><summary>Does PurffleGrab have a built-in music player?</summary><div class="faq-answer">Yes! PurffleGrab v9.0 includes a full built-in audio player with 5-band equalizer, 3 visualizer modes (bars, waveform, circular), crossfade, drag-and-drop playlists, favorites, lyrics viewer, and ambient sound mixer. Listen to your downloads without switching apps.</div></details>
+    <details><summary>What new features are in PurffleGrab v9.0?</summary><div class="faq-answer">PurffleGrab v9.0 adds: 3-mode audio visualizer, crossfade between tracks, keyboard piano, ambient sound mixer (rain/fire/birds/waves/wind), 6 mood themes, lyrics viewer, tag editor, QR code sharing, floating music notes animation, and speed history tracking — totaling 44+ features.</div></details>
+    <details><summary>Can I download YouTube videos to MP3 on Mac for free?</summary><div class="faq-answer">Yes, PurffleGrab is a free YouTube to MP3 converter for Mac. Download the DMG, install it, paste any YouTube URL, select MP3 format (up to 320kbps), and download. Works on macOS Catalina, Big Sur, Monterey, Ventura, and Sonoma.</div></details>
+    <details><summary>Is PurffleGrab better than yt-dlp?</summary><div class="faq-answer">PurffleGrab uses yt-dlp under the hood but adds a beautiful graphical interface, Spotify playlist support, built-in audio player with equalizer, download scheduler, format converter, video trimming, and 44+ other features. It's yt-dlp made easy — no command line needed.</div></details>
+  </div>
+</section>
+
+<!-- CTA -->
+<!-- Intended use. Deliberately a full visible section rather than one line in
+     the footer: it states what the tool is for, and it is the page a rights
+     holder or a journalist reads first. -->
+<section class="section" id="intended-use" aria-labelledby="use-title">
+  <h2 class="section-title" id="use-title">What PurffleGrab Is For</h2>
+  <p class="section-sub">
+    PurffleGrab is a personal media tool. It exists so you can keep media you are
+    entitled to keep, on your own devices, offline.
+  </p>
+  <div class="steps">
+    <article class="step">
+      <h3>Your own uploads</h3>
+      <p>Creators pulling back their own videos, podcasts and music — masters lost,
+      original files gone, or simply archiving what you published.</p>
+    </article>
+    <article class="step">
+      <h3>Creative Commons &amp; public domain</h3>
+      <p>A large amount of material on YouTube is explicitly licensed for reuse.
+      Lectures, archive footage, government recordings and CC-BY music.</p>
+    </article>
+    <article class="step">
+      <h3>Offline access to what you're licensed for</h3>
+      <p>Content you have paid for or been given permission to keep locally — for
+      flights, poor connections, or devices with no streaming app.</p>
+    </article>
+    <article class="step">
+      <h3>Research &amp; accessibility</h3>
+      <p>Archiving for study, and getting audio into tools that streaming apps
+      don't support — screen readers, hearing aids, DAWs, assistive players.</p>
+    </article>
+  </div>
+  <p class="section-sub" style="margin-top:24px">
+    <strong>What it is not for.</strong> Downloading copyrighted music or video you
+    have no right to generally breaches the terms of service of Spotify and YouTube,
+    and may infringe copyright where you live. PurffleGrab does not break Spotify's
+    DRM and cannot access protected streams — it reads public playlist metadata and
+    matches tracks to audio already published on YouTube. We do not endorse piracy,
+    and you are responsible for how you use the tool. If you are unsure whether a
+    particular use is permitted, assume it isn't.
+  </p>
+</section>
+
+<section class="cta-section" aria-labelledby="cta-title">
+  <h2 id="cta-title">Ready to Download YouTube Videos &amp; Spotify Playlists?</h2>
+  <p>Download PurffleGrab free — the best YouTube downloader and Spotify playlist download tool. No signup, no ads, no limits.</p>
+  <div class="hero-btns">
+    <a href="https://github.com/Chamanrajragu/purffle-grab/releases/latest" class="btn-hero btn-primary-hero">⬇ Download Free — Windows, Mac &amp; Linux</a>
+    <a href="https://github.com/Chamanrajragu/purffle-grab" class="btn-hero btn-secondary-hero">View Source on GitHub</a>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="guides.html">Guides</a>
+      <a href="download-spotify-playlist.html">Download a Spotify playlist</a>
+      <a href="youtube-to-mp3.html">YouTube to MP3</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab">GitHub</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/releases/latest">Download</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/issues">Report a Bug</a>
+      <a href="https://github.com/Chamanrajragu/purffle-grab/blob/main/LICENSE">License</a>
+      <a href="https://purffle.com">Purffle.com</a>
+    </nav>
+    <p>PurffleGrab v9.0 — The Best Free YouTube Downloader &amp; Spotify Playlist Download Tool for Windows, Mac &amp; Linux. Made with ♥ by <a href="https://purffle.com">Purffle</a>.</p>
+    <p>Open source under <a href="https://opensource.org/licenses/MIT">MIT License</a>. For personal use only. Respect copyright and platform terms of service.</p>
+    <!-- This used to be a 27-phrase comma-separated keyword list. That pattern is
+         the textbook keyword-stuffing example in Google's own spam policy, and it
+         gives a reader nothing. The same terms now appear inside sentences that
+         actually describe the app. -->
+    <div class="footer-seo">
+      <p>PurffleGrab is a free, open-source YouTube downloader and Spotify playlist download tool
+      for Windows, macOS and Linux. It saves YouTube videos in up to 4K MP4, converts YouTube to
+      MP3 at up to 320kbps, and downloads whole Spotify playlists and albums to MP3 or lossless
+      FLAC with cover art and artist tags embedded. It also includes a built-in audio player with a
+      5-band equalizer and visualizer, a format converter, a download scheduler and a batch queue —
+      with no ads, no account and no telemetry.</p>
+      <p>Learn more: <a href="download-spotify-playlist.html">how to download a Spotify playlist to
+      MP3</a> · <a href="youtube-to-mp3.html">how to convert YouTube to MP3</a> ·
+      <a href="guides.html">all guides</a>.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
