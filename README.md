@@ -71,14 +71,12 @@ and nothing extra to install: **FFmpeg** and the **yt-dlp** engine are bundled r
 ## 📸 Screenshots
 
 <div align="center">
-<img src="docs/screenshots/01-download-dark.png" width="49%" alt="PurffleGrab free YouTube downloader — paste Spotify and YouTube links, dark theme"/>
-<img src="docs/screenshots/02-playlist-dark.png" width="49%" alt="Download a Spotify playlist to MP3 with track picker and quality presets"/>
-<img src="docs/screenshots/03-search-dark.png" width="49%" alt="Search YouTube by name and download videos without a link"/>
-<img src="docs/screenshots/04-player-dark.png" width="49%" alt="Built-in audio player with music visualizer and 5-band equalizer"/>
-<img src="docs/screenshots/05-stats-dark.png" width="49%" alt="Download statistics dashboard with format breakdown and activity chart"/>
-<img src="docs/screenshots/06-achievements-dark.png" width="49%" alt="Achievement badges and 90-day download activity heatmap"/>
-<img src="docs/screenshots/07-converter-light.png" width="49%" alt="Convert audio and video files between MP3, FLAC, MP4 and more — light theme"/>
-<img src="docs/screenshots/08-settings-light.png" width="49%" alt="PurffleGrab settings — themes, accent colours and mood themes, light theme"/>
+<img src="docs/screenshots/01-download-dark.png" width="49%" alt="PurffleGrab free Spotify and YouTube downloader — paste links, dark theme"/>
+<img src="docs/screenshots/02-settings-dark.png" width="49%" alt="PurffleGrab settings — download folder, defaults, themes and accent colours"/>
+<img src="docs/screenshots/03-player-dark.png" width="49%" alt="Built-in audio player with five-band equaliser and visualiser"/>
+<img src="docs/screenshots/04-stats-dark.png" width="49%" alt="Download statistics with format breakdown and activity chart"/>
+<img src="docs/screenshots/05-queue-dark.png" width="49%" alt="Download queue with batch controls"/>
+<img src="docs/screenshots/06-download-light.png" width="49%" alt="PurffleGrab in the light theme"/>
 </div>
 
 ## 🚀 How to use
