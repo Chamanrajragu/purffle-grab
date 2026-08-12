@@ -2,6 +2,27 @@
 
 All notable changes to PurffleGrab are documented here.
 
+## [11.2.0]
+First release built for all three platforms from a single source revision.
+Windows, macOS and Linux installers are attached together.
+
+### Added
+- **Organise into Artist / Album folders.** A checkbox in the options. On the
+  YouTube path this is a yt-dlp output template with field fallbacks, so a video
+  with no album still lands somewhere sensible. The Spotify path builds the
+  directories itself, because there the filename comes from the Spotify metadata
+  rather than from whichever YouTube video happened to match.
+- **Automatic retry.** Every item now gets one silent second attempt before it is
+  reported as failed. Most failures in a long batch are transient — a dropped
+  connection, a throttled response — and losing a track to that used to mean
+  noticing afterwards and re-running the whole grab by hand.
+- **Ctrl+Shift+V — paste and go.** Takes a link straight from the clipboard
+  through analysis to a download using your last settings. Ctrl+V still just
+  fills the box.
+- **The last preset is remembered** between sessions.
+- **Copy link** in the history right-click menu. Recovering the original URL of a
+  past download previously meant exporting the entire history as JSON.
+
 ## [11.1.0]
 ### Added
 - **Retry failed downloads.** A failed item used to be a dead end — the only way
