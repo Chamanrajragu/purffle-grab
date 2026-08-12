@@ -2,6 +2,61 @@
 
 All notable changes to PurffleGrab are documented here.
 
+## [11.1.0]
+### Added
+- **Retry failed downloads.** A failed item used to be a dead end — the only way
+  to try again was to find the link and paste it back in. The completion card now
+  offers to re-run just what failed, with the same options.
+- **Already-downloaded warning.** Analyzing a link you have grabbed before now
+  says so, with when and how many files. History existed but was never consulted,
+  so re-downloading the same album was the easiest mistake in the app. It is a
+  note rather than a block: re-grabbing at better quality is a fair reason.
+- **Track range selection.** Enter a range such as 5-20 in a playlist to tick
+  exactly those tracks. Selecting tracks 40 to 60 of a 200-track album one
+  checkbox at a time is what makes people give up and take the whole thing.
+- **CSV history export**, alongside the existing JSON. JSON is for re-importing;
+  CSV is what you want when you open it in a spreadsheet. Includes size, format
+  and source columns.
+- **Lyrics are saved per track.** The pane previously rendered a textarea that
+  was never read back, so anything typed vanished on the next track.
+
+### Fixed
+- **The search filter chips did nothing.** All / Videos / Music / Shorts moved
+  their own highlight and then re-rendered the unfiltered list. They now filter
+  by length — the only thing a flat search result can support, since it carries
+  no view count and no upload date.
+- **Two sort options could not work.** "View count" was never handled and
+  "Upload date" simply reversed the array. Replaced with longest, shortest and
+  title, which the data supports.
+- **Mood themes corrupted the palette.** Choosing a mood and then an accent
+  colour left the mood's second and third colours behind — pick Sunset then blue
+  and you were stuck with a blue accent over Sunset's red and amber, saved to disk.
+- **"Zip selected" only zipped the first item.** Selecting five downloads
+  produced one file.
+- **History paging could go negative** when a filter matched nothing, indexing
+  the page slice from -20.
+
+## [11.0.0] — redesigned interface
+### Changed
+- Rebuilt the interface around a single accent colour, an SVG icon set on a
+  shared grid, and neutral surfaces separated by hairline borders. The previous
+  build put one violet-to-pink gradient on the logo, every button, progress bars,
+  badges and thumbnails, so nothing stood out.
+- Navigation grouped into Library, Tools, Insights and App, instead of twelve
+  entries at equal weight.
+- Removed four animated background layers (mesh gradient, particle canvas,
+  floating particles, noise overlay). Idle CPU cost is now effectively zero.
+- The view heading no longer types itself through five different words.
+- Visible keyboard focus throughout, and controls share a consistent height.
+- Three floating buttons removed; each duplicated an existing control.
+- About trimmed from 44 emoji rows to a short grouped summary.
+
+### Fixed
+- Player transport controls rendered bright cyan: emoji ignore CSS colour.
+  All are SVG now.
+- `ffprobe` is bundled again, so batch rename reads embedded tags rather than
+  falling back to filename parsing.
+
 ## [Unreleased]
 ### Added
 Eight features that the UI offered but that were never actually implemented now
