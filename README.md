@@ -163,6 +163,8 @@ audio player equalizer · music visualizer · youtube to mp3 mac · free music d
 
 | Tool | What it does |
 |------|--------------|
+| 🔄 **[Claude Multi](https://github.com/Chamanrajragu/claude-multi)** | Run Claude Code with multiple accounts — auto-switch on the 5-hour limit |
+| 📐 **[Purffle Chartwright](https://purffle.com/purffle-chartwright/)** | Desktop chart analysis where the AI cannot invent a price |
 | 🎵 **[PurffleGrab](https://github.com/Chamanrajragu/purffle-grab)** 👈 | Free Spotify &amp; YouTube downloader — MP3, MP4, FLAC, 4K |
 | 🎥 **[PurffleVision](https://github.com/Chamanrajragu/purffle-vision)** | AI video creation — any topic to a finished video |
 | ⚡ **[PurffleShorts](https://github.com/Chamanrajragu/purffle-shorts)** | Autonomous YouTube Shorts generator |
@@ -171,3 +173,21 @@ audio player equalizer · music visualizer · youtube to mp3 mac · free music d
 
 <sub>🌐 [purffle.com](https://purffle.com) · 💼 by [Chaman Raj](https://github.com/Chamanrajragu)</sub>
 </div>
+
+---
+
+## Need Something Like This Built for You?
+
+I built this app solo. I also take on freelance work — fixed price, agreed before I start.
+
+- **Custom AI chatbots** — trained on your own docs and FAQs, full source code, no monthly fee · *2–7 days*
+- **Python automation** — file processing, data cleaning, scheduled reports, API work · *1–5 days*
+- **Web scraping** — clean data as Excel, CSV, JSON or Sheets, plus the scraper itself · *1–4 days*
+- **Excel and Google Sheets** — formulas, dashboards, macros, Apps Script · *1–4 days*
+
+I only take work I can verify myself before delivering it. If I cannot check it, I will say so.
+
+[![Hire me on Fiverr](https://img.shields.io/badge/Hire_me_on_Fiverr-1DBF73?style=for-the-badge&logo=fiverr&logoColor=white)](https://www.fiverr.com/purffle)
+[![Email](https://img.shields.io/badge/info@purffle.com-d97757?style=for-the-badge&logo=maildotru&logoColor=white)](mailto:info@purffle.com)
+
+More of what I have built: [purffle.com](https://purffle.com) · [purffle.tools](https://purffle.tools) · [purffleai.com](https://purffleai.com) · [purfflestudios.com](https://purfflestudios.com)
