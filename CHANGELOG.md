@@ -111,6 +111,10 @@ and downloads repair themselves when a site changes.
   was left broken by the build, so macOS offered no way past the warning except
   Terminal. It is now validly (ad-hoc) signed, so *Privacy & Security → Open
   Anyway* works.
+- **Cancel at the last moment left a download stuck on "Cancelling…".** If the
+  last track finished just as Cancel was clicked, the finished download was
+  marked as cancelling and never left that state. A Cancel that lands between
+  two steps of a track also no longer lets that step run on to the end.
 - **Titles containing "%"** (e.g. "100% Hits") broke the output path.
 - **Pasting on macOS:** the app removed the application menu, which is what routes
   ⌘V/⌘C/⌘A into text fields. A standard menu is back on macOS.
