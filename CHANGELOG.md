@@ -58,8 +58,16 @@ and downloads repair themselves when a site changes.
 - **Converter:** several files at once, streamed instead of buffered in memory
   (the cap rises from 1 GB to 8 GB), saved into a "Converted" folder with Open /
   Show in folder, plus MOV and GIF targets.
+- **YouTube's challenge solver, built in.** YouTube now requires a JavaScript
+  runtime to unlock most formats, and without one yt-dlp falls back to a few
+  low-quality streams. PurffleGrab runs the solver on its own bundled runtime
+  (Electron 45, Node 24) — nothing to install. Settings → About shows it.
+- **Intel Macs.** A separate `x64` DMG alongside the Apple Silicon one.
 - **A gentle "enjoying it?" card** after your third successful download — once,
   easy to dismiss for good.
+- Every release is smoke-tested as an installed app before it is published: the
+  packaged app boots with `--smoke-test` and checks its bundled engines, every
+  encoder and the YouTube solver on Windows, macOS (both architectures) and Linux.
 - `npm test`: an offline end-to-end suite that drives the real server, yt-dlp and
   FFmpeg against locally generated media.
 
@@ -84,6 +92,8 @@ and downloads repair themselves when a site changes.
 - The player visualiser uses log-spaced bands across the full width at native
   resolution, and the album art no longer spins.
 - Default simultaneous downloads: 3 (new installs).
+- **Electron 31 → 45** (Chromium 156, Node 24): current security fixes. macOS
+  now needs **13 Ventura or newer** (Electron dropped 11 and 12).
 
 ### Fixed
 - **4K and 1440p downloaded as 1080p.** The format selector required H.264, which
@@ -93,6 +103,14 @@ and downloads repair themselves when a site changes.
   folder, a before/after folder comparison could credit one track's file to
   another — Open could open the wrong song and sizes were double-counted. Output
   paths now come straight from the engine.
+- **macOS: FFmpeg only worked on Macs with Homebrew.** The DMG shipped
+  Homebrew's FFmpeg, which loads its libraries from `/opt/homebrew`; on other Macs
+  every conversion failed. It now ships static FFmpeg builds with no outside
+  dependencies, checked at build time.
+- **macOS: "PurffleGrab is damaged and can't be opened."** The app's signature
+  was left broken by the build, so macOS offered no way past the warning except
+  Terminal. It is now validly (ad-hoc) signed, so *Privacy & Security → Open
+  Anyway* works.
 - **Titles containing "%"** (e.g. "100% Hits") broke the output path.
 - **Pasting on macOS:** the app removed the application menu, which is what routes
   ⌘V/⌘C/⌘A into text fields. A standard menu is back on macOS.

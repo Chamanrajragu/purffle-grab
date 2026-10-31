@@ -57,6 +57,7 @@ body:
         - Windows 11
         - Windows 10
         - macOS (Apple Silicon)
+        - macOS (Intel)
         - Linux (AppImage)
         - Linux (.deb)
     validations:

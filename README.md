@@ -34,7 +34,8 @@ engine keeps itself up to date, so downloads keep working when sites change.
 | Platform | File | Notes |
 |---|---|---|
 | 🖥 **Windows 10 / 11** (64-bit) | `PurffleGrab.Setup.x.y.z.exe` | First launch may show SmartScreen → **More info → Run anyway** |
-| 🍎 **macOS 11+** (Apple Silicon) | `PurffleGrab-x.y.z-arm64.dmg` | Not notarised by Apple → **right-click the app → Open** ([details](#-troubleshooting)) |
+| 🍎 **macOS 13+** (Apple Silicon — M1–M4) | `PurffleGrab-x.y.z-arm64.dmg` | Not notarised by Apple → **System Settings → Privacy & Security → Open Anyway** ([details](#-troubleshooting)) |
+| 🍎 **macOS 13+** (Intel) | `PurffleGrab-x.y.z-x64.dmg` | Same as above. Not sure which Mac you have? **Apple menu → About This Mac**: “Chip: Apple M…” = arm64, “Processor: Intel” = x64 |
 | 🐧 **Linux** (64-bit) | `.AppImage` or `.deb` | AppImage: `chmod +x PurffleGrab-*.AppImage`, then run it. Debian/Ubuntu: `sudo apt install ./purfflegrab_*_amd64.deb` |
 
 **[→ Get the latest release](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** — everything is in one installer; there's nothing else to set up.
@@ -177,10 +178,15 @@ minute at developer.spotify.com) and your own playlists download in full. Spotif
 at 100 — copy one into a playlist of your own to get all of it.
 </details>
 
-<details><summary><b>macOS says the app is “damaged” or from an unidentified developer</b></summary>
+<details><summary><b>macOS says “Apple could not verify PurffleGrab” (or that it is “damaged”)</b></summary>
 
-PurffleGrab isn't notarised by Apple (that needs a paid developer account). Drag it to **Applications**, then
-**right-click → Open → Open**. If macOS still refuses, run this in Terminal and open it again:
+PurffleGrab isn't notarised by Apple (that needs a paid developer account), so macOS asks you to confirm it once:
+
+1. Drag **PurffleGrab** to **Applications** and open it. Click **Done** on the warning.
+2. Open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to PurffleGrab, then confirm.
+
+(On macOS 15 Sequoia and newer, right-click → Open no longer skips this step — use Open Anyway.)
+Still blocked, or an older download says the app is “damaged”? Run this in Terminal, then open it again:
 
 ```bash
 xattr -cr /Applications/PurffleGrab.app
@@ -224,6 +230,10 @@ MP4; 1080p and below use H.264 for maximum compatibility.</details>
 FLAC is a lossless <i>format</i>, but YouTube and Spotify only stream compressed audio, so a FLAC made from them is a perfect
 copy of that compressed source — not CD quality. For the smallest files with no audible difference, MP3 320 or M4A is
 the better choice. The app says this where you pick the format.</details>
+
+<details><summary><b>Does it work on Mac and Linux?</b></summary>
+Yes. There are DMGs for Apple Silicon (M1–M4) and Intel Macs running macOS 13 Ventura or newer, and an AppImage and a
+.deb for 64-bit Linux. Every platform gets the same features and the same self-updating engine.</details>
 
 <details><summary><b>Do I need FFmpeg, Python or anything else?</b></summary>
 No. FFmpeg and yt-dlp are bundled inside PurffleGrab.</details>
