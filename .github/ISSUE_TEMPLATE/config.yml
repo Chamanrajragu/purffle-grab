@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Troubleshooting guide
+    url: https://github.com/Chamanrajragu/purffle-grab#-troubleshooting
+    about: Fixes for "not a bot", age-restricted videos, macOS "damaged" warnings and more.
+  - name: Website & guides
+    url: https://purffle.com/purffle-grab/
+    about: How-to guides for Spotify playlists, YouTube to MP3 and more.
+  - name: Security issue
+    url: https://github.com/Chamanrajragu/purffle-grab/security/advisories/new
+    about: Please report security problems privately, not as a public issue.

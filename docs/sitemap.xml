@@ -3,61 +3,53 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://purffle.com/purffle-grab/</loc>
-    <lastmod>2026-08-07</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://purffle.com/purffle-grab/screenshots/01-download-dark.png</image:loc>
-      <image:title>PurffleGrab free YouTube downloader — download screen</image:title>
+      <image:title>PurffleGrab — analyse a Spotify album and a YouTube video, then download as MP3 or 4K MP4</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://purffle.com/purffle-grab/screenshots/02-playlist-dark.png</image:loc>
-      <image:title>Download a Spotify playlist to MP3 with a track picker</image:title>
+      <image:loc>https://purffle.com/purffle-grab/screenshots/02-progress-dark.png</image:loc>
+      <image:title>Live download progress for each track in PurffleGrab</image:title>
     </image:image>
     <image:image>
       <image:loc>https://purffle.com/purffle-grab/screenshots/03-search-dark.png</image:loc>
-      <image:title>Search YouTube and download videos without a link</image:title>
+      <image:title>Search YouTube in PurffleGrab and download results as MP3 or MP4</image:title>
     </image:image>
     <image:image>
       <image:loc>https://purffle.com/purffle-grab/screenshots/04-player-dark.png</image:loc>
-      <image:title>Built-in audio player with visualizer and 5-band equalizer</image:title>
+      <image:title>PurffleGrab built-in music player with equaliser and visualiser</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://purffle.com/purffle-grab/screenshots/05-stats-dark.png</image:loc>
-      <image:title>Download statistics dashboard with format breakdown</image:title>
+      <image:loc>https://purffle.com/purffle-grab/screenshots/05-history-dark.png</image:loc>
+      <image:title>PurffleGrab download history with thumbnails</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://purffle.com/purffle-grab/screenshots/06-achievements-dark.png</image:loc>
-      <image:title>Achievement badges and 90-day download activity heatmap</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://purffle.com/purffle-grab/screenshots/07-converter-light.png</image:loc>
-      <image:title>Convert audio and video between MP3, FLAC, MP4 and more</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://purffle.com/purffle-grab/screenshots/08-settings-light.png</image:loc>
-      <image:title>PurffleGrab settings with themes and accent colours</image:title>
+      <image:loc>https://purffle.com/purffle-grab/screenshots/06-home-light.png</image:loc>
+      <image:title>PurffleGrab home screen in the light theme</image:title>
     </image:image>
   </url>
   <url>
     <loc>https://purffle.com/purffle-grab/guides.html</loc>
-    <lastmod>2026-08-07</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://purffle.com/purffle-grab/download-spotify-playlist.html</loc>
-    <lastmod>2026-08-07</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://purffle.com/purffle-grab/screenshots/02-playlist-dark.png</image:loc>
-      <image:title>Downloading a Spotify playlist to MP3 with the track picker</image:title>
+      <image:loc>https://purffle.com/purffle-grab/screenshots/01-download-dark.png</image:loc>
+      <image:title>Downloading a Spotify album to MP3 with the track picker</image:title>
     </image:image>
   </url>
   <url>
     <loc>https://purffle.com/purffle-grab/youtube-to-mp3.html</loc>
-    <lastmod>2026-08-07</lastmod>
+    <lastmod>2026-10-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>

@@ -105,7 +105,7 @@ h1,h2,h3{line-height:1.2}
 .shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:22px}
 .shot{margin:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .25s}
 .shot:hover{border-color:rgba(139,92,246,.28);transform:translateY(-2px)}
-.shot img{display:block;width:100%;height:auto;aspect-ratio:1400/926;background:var(--bg2)}
+.shot img{display:block;width:100%;height:auto;aspect-ratio:1440/900;background:var(--bg2)}
 .shot figcaption{padding:14px 18px;font-size:14px;line-height:1.5;color:var(--text2)}
 
 /* FAQ */
@@ -164,3 +164,14 @@ h1,h2,h3{line-height:1.2}
 .guide-card:hover{border-color:rgba(139,92,246,.28);transform:translateY(-2px)}
 .guide-card h3{font-size:19px;font-weight:800;margin-bottom:8px;color:var(--text)}
 .guide-card p{font-size:14.5px;line-height:1.6;color:var(--text2)}
+
+/* v12 */
+.nav-mark{width:34px;height:34px;border-radius:9px}
+.hero-shot{margin:56px auto 0;max-width:1060px;border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 0 1px rgba(139,92,246,.08)}
+.hero-shot img{width:100%;height:auto;aspect-ratio:1440/900}
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.dl-badge{display:inline-block;height:20px;width:auto}
+.sites-grid .feat{padding:22px 24px}
+.site-card h3{font-size:17px;margin-bottom:6px}
+.site-more{border-style:dashed}
+.hero-platforms{flex-wrap:wrap}

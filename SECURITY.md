@@ -1,26 +1,36 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 2.1.x   | :white_check_mark: |
-| 2.0.x   | :white_check_mark: |
-| < 2.0   | :x:                |
+Only the latest release receives fixes. PurffleGrab tells you in-app when a new
+version is out, with a direct link to the installer.
 
-## Reporting a Vulnerability
+| Version | Supported |
+| ------- | --------- |
+| 12.x    | ✅ |
+| < 12.0  | ❌ — please update |
 
-If you discover a security vulnerability in PurffleGrab, please report it responsibly:
+## Reporting a vulnerability
 
-1. **Do NOT** open a public GitHub issue for security vulnerabilities.
-2. Email the details to the maintainer or use [GitHub Security Advisories](https://github.com/Chamanrajragu/purffle-grab/security/advisories/new).
-3. Include steps to reproduce the vulnerability.
-4. We will respond within 48 hours and provide a fix timeline.
+Please **don't** open a public issue for a security problem.
 
-## Security Practices
+1. Report it privately through
+   [GitHub Security Advisories](https://github.com/Chamanrajragu/purffle-grab/security/advisories/new),
+   or email **chamanrajragu@purffle.com**.
+2. Include the version, your operating system and steps to reproduce.
+3. You'll get a reply within 72 hours with next steps and a fix timeline.
 
-- PurffleGrab contains **no telemetry, analytics, or tracking**.
-- All network requests go directly to Spotify/YouTube — no intermediate servers.
-- The app runs entirely locally on your machine.
-- Dependencies (yt-dlp, ffmpeg) are bundled from their official sources.
-- The source code is fully open for inspection.
+## How PurffleGrab protects you
+
+- **No telemetry, analytics or tracking.** The app contacts only the sites whose
+  links you paste, GitHub (to check for updates and refresh its download engine)
+  and — only if you ask for lyrics — LRCLIB.
+- **Local-only server.** The interface talks to a small server on your own
+  machine. It listens on loopback only and refuses requests from other web pages
+  (cross-site origins) and from foreign host names (DNS rebinding).
+- **Contained file access.** File actions are limited to the files a download
+  produced, with path-traversal checks on every file endpoint.
+- **Browser cookies stay local.** If you turn on "Use browser cookies", they are
+  read on your machine by the bundled yt-dlp and never sent anywhere else.
+- **Bundled tools from official sources.** yt-dlp and FFmpeg are fetched from
+  their official release channels at build time.
