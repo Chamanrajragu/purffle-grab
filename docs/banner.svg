@@ -25,7 +25,7 @@
 
   <!-- title -->
   <text x="208" y="150" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="800" fill="#f3f0fb">PurffleGrab</text>
-  <text x="210" y="196" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="600" fill="#a298c0">Free Spotify &amp; YouTube downloader for Windows — videos, playlists &amp; music in one click</text>
+  <text x="210" y="196" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="600" fill="#a298c0">Free downloader for YouTube, Spotify, TikTok &amp; 1,000+ sites</text>
 
   <!-- feature pills -->
   <g font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">
@@ -37,5 +37,7 @@
     <text x="590" y="259" fill="url(#brand)" text-anchor="middle">Playlists</text>
     <rect x="676" y="232" width="178" height="42" rx="21" fill="#171426" stroke="#2a2440"/>
     <text x="765" y="259" fill="url(#brand)" text-anchor="middle">No ads · Free</text>
+    <rect x="866" y="232" width="236" height="42" rx="21" fill="#171426" stroke="#2a2440"/>
+    <text x="984" y="259" fill="url(#brand)" text-anchor="middle">Windows · Mac · Linux</text>
   </g>
 </svg>

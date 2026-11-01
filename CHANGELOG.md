@@ -198,7 +198,7 @@ and downloads repair themselves when a site changes.
 - Settings and history are written atomically, so a crash mid-save can't truncate
   them.
 
-## [11.2.1 – 11.7.2]
+## [11.2.1 – 11.7.2] — 2026-08-16 to 2026-09-04
 ### Fixed (v11.7.2 — OGG downloads & same-format conversion)
 - **OGG Vorbis downloads no longer fail.** The audio-format picker offers "OGG
   Vorbis" as `ogg`, but yt-dlp only accepts that format as `vorbis` — so every
@@ -407,7 +407,7 @@ work end to end:
 - **"Load folder"** in the player and **"Pause all"** in the queue were buttons
   with no handler; Pause all was also permanently disabled.
 
-## [11.2.0]
+## [11.2.0] — 2026-08-12
 First release built for all three platforms from a single source revision.
 Windows, macOS and Linux installers are attached together.
 
@@ -428,7 +428,7 @@ Windows, macOS and Linux installers are attached together.
 - **Copy link** in the history right-click menu. Recovering the original URL of a
   past download previously meant exporting the entire history as JSON.
 
-## [11.1.0]
+## [11.1.0] — 2026-08-12
 ### Added
 - **Retry failed downloads.** A failed item used to be a dead end — the only way
   to try again was to find the link and paste it back in. The completion card now
@@ -462,7 +462,7 @@ Windows, macOS and Linux installers are attached together.
 - **History paging could go negative** when a filter matched nothing, indexing
   the page slice from -20.
 
-## [11.0.0] — redesigned interface
+## [11.0.0] — 2026-08-12 — redesigned interface
 ### Changed
 - Rebuilt the interface around a single accent colour, an SVG icon set on a
   shared grid, and neutral surfaces separated by hairline borders. The previous
@@ -483,7 +483,7 @@ Windows, macOS and Linux installers are attached together.
 - `ffprobe` is bundled again, so batch rename reads embedded tags rather than
   falling back to filename parsing.
 
-## [Unreleased]
+## [10.0.0] — 2026-08-10
 ### Added
 Eight features that the UI offered but that were never actually implemented now
 work end to end:
@@ -534,6 +534,12 @@ work end to end:
   minimize to system tray, and focus mode are now wired up.
 - **"Load folder"** in the player and **"Pause all"** in the queue were buttons
   with no handler; Pause all was also permanently disabled.
+
+## [3.0.0 – 9.0.0] — 2026-08-04 to 2026-08-06
+A run of quick releases that grew the interface: a redesigned UI and custom icon, the download scheduler, favourites
+and a command palette, the music player with equaliser, visualiser and sleep timer, and cross-platform builds for
+Windows, macOS and Linux. Notes for each version are on its
+[GitHub release](https://github.com/Chamanrajragu/purffle-grab/releases).
 
 ## [2.0.0] — 2026-06-28
 ### Added

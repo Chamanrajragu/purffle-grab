@@ -5,7 +5,7 @@
 # A robots.txt inside /purffle-grab/ is ignored completely.
 #
 # So: do NOT rely on this copy. Instead add the Sitemap line below to the
-# robots.txt that already exists at the root of purffle.com. See DEPLOY.md.
+# robots.txt that already exists at the root of purffle.com.
 #
 # This copy is kept only so the rules travel with the project.
 

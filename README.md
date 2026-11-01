@@ -31,16 +31,18 @@ engine keeps itself up to date, so downloads keep working when sites change.
 
 ## ⬇️ Download
 
-| Platform | File | Notes |
-|---|---|---|
-| 🖥 **Windows 10 / 11** (64-bit) | `PurffleGrab.Setup.x.y.z.exe` | First launch may show SmartScreen → **More info → Run anyway** |
-| 🍎 **macOS 13+** (Apple Silicon — M1–M4) | `PurffleGrab-x.y.z-arm64.dmg` | Not notarised by Apple → **System Settings → Privacy & Security → Open Anyway** ([details](#-troubleshooting)) |
-| 🍎 **macOS 13+** (Intel) | `PurffleGrab-x.y.z-x64.dmg` | Same as above. Not sure which Mac you have? **Apple menu → About This Mac**: “Chip: Apple M…” = arm64, “Processor: Intel” = x64 |
-| 🐧 **Linux** (64-bit) | `.AppImage` or `.deb` | AppImage: `chmod +x PurffleGrab-*.AppImage`, then run it. Debian/Ubuntu: `sudo apt install ./purfflegrab_*_amd64.deb` |
+[![Latest version](https://img.shields.io/github/v/release/Chamanrajragu/purffle-grab?style=for-the-badge&color=8b5cf6&label=latest%20version)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)
 
-**[→ Get the latest release](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** — everything is in one installer; there's nothing else to set up.
-On the release page, scroll to **Assets** and click the file for your system (on Windows, the `.exe`). The “Source code” links are not the app.
-Already installed? PurffleGrab tells you when an update is out and links straight to the right installer.
+| Your computer | Download | How to install |
+|---|---|---|
+| 🖥 **Windows 10 / 11** (64-bit) | **[Windows installer (.exe)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** | Run it. If SmartScreen appears: **More info → Run anyway** |
+| 🍎 **Mac with Apple Silicon** (M1–M4, macOS 13+) | **[Mac — Apple Silicon (arm64.dmg)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** | Open the `.dmg` and drag PurffleGrab to Applications. First launch: **System Settings → Privacy &amp; Security → Open Anyway** ([details](#-troubleshooting)) |
+| 🍎 **Mac with Intel** (macOS 13+) | **[Mac — Intel (x64.dmg)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** | Same as above. Not sure which Mac you have? **Apple menu → About This Mac** — “Chip: Apple M…” = Apple Silicon, “Processor: Intel” = Intel |
+| 🐧 **Linux** (64-bit) | **[AppImage](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** · **[.deb](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** | AppImage: `chmod +x PurffleGrab-*.AppImage`, then run it. Debian / Ubuntu: `sudo apt install ./purfflegrab_*_amd64.deb` |
+
+Every link opens the **[latest release](https://github.com/Chamanrajragu/purffle-grab/releases/latest)**. Scroll down to **Assets** and click the file for your computer —
+on Windows that's `PurffleGrab.Setup.<version>.exe`. (The two “Source code” archives at the bottom are not the app.)
+FFmpeg and yt-dlp are inside the installer, so there's nothing else to set up, and PurffleGrab tells you when an update is out.
 
 ## ✨ Why PurffleGrab
 
@@ -71,7 +73,7 @@ Already installed? PurffleGrab tells you when an update is out and links straigh
 ## 🚀 Features
 
 ### Downloading
-| | |
+| Feature | What it does |
 |---|---|
 | 📋 **Batch, drag &amp; drop** | Paste many links at once, drop them on the window, or import a `.txt` file. |
 | 🔎 **Song names &amp; tracklists** | Type “Artist - Song”, or paste a list of songs — each is matched to its best upload, with alternatives one click away. |
@@ -85,7 +87,7 @@ Already installed? PurffleGrab tells you when an update is out and links straigh
 | 🔗 **Send from your browser** | A bookmarklet (in Settings) opens the page you're on directly in PurffleGrab. |
 
 ### Video &amp; audio extras
-| | |
+| Feature | What it does |
 |---|---|
 | 🚫 **SponsorBlock** | Cut sponsor segments, intros and outros from YouTube videos. |
 | 💬 **Subtitles** | Download and embed subtitles in any language, including auto-generated ones. |
@@ -95,7 +97,7 @@ Already installed? PurffleGrab tells you when an update is out and links straigh
 | 📁 **Artist / Album folders** | Sort downloads into folders automatically. |
 
 ### The app
-| | |
+| Feature | What it does |
 |---|---|
 | 🎧 **Music player** | Press **Play** the moment a download finishes. 5-band equaliser, visualiser, crossfade, synced lyrics, sleep timer. |
 | 🔄 **Converter** | Convert many files at once between MP3, FLAC, M4A, WAV, Opus, OGG, MP4, MKV, WebM and MOV — or turn a clip into a GIF. |
@@ -254,9 +256,9 @@ No. There's no telemetry, analytics or tracking. PurffleGrab talks only to the s
 check for updates, and — only if you ask for lyrics — to LRCLIB.</details>
 
 <details><summary><b>Is PurffleGrab open source?</b></summary>
-PurffleGrab is free software distributed as ready-to-run installers under an end-user licence; versions up to 9.0 were
-MIT-licensed. The engines it bundles, yt-dlp and FFmpeg, are open source — see
-<a href="THIRD-PARTY-NOTICES.md">THIRD-PARTY-NOTICES.md</a>.</details>
+No. PurffleGrab is free to use (freeware): this repository publishes the ready-to-run installers under an
+end-user <a href="LICENSE">licence</a>, and versions up to 9.0 were MIT-licensed. The engines it bundles, yt-dlp and
+FFmpeg, are open source — see <a href="THIRD-PARTY-NOTICES.md">THIRD-PARTY-NOTICES.md</a>.</details>
 
 ## 🔒 Privacy
 

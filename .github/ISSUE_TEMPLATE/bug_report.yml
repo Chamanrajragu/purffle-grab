@@ -46,7 +46,7 @@ body:
     id: version
     attributes:
       label: PurffleGrab version
-      description: Shown at the bottom of the sidebar, e.g. v12.0.0.
+      description: Shown at the bottom of the sidebar, e.g. v12.1.0.
     validations:
       required: true
   - type: dropdown
