@@ -70,7 +70,7 @@
     "price": "0",
     "priceCurrency": "USD"
   },
-  "softwareVersion": "12.0.0",
+  "softwareVersion": "12.1.0",
   "releaseNotes": "https://github.com/Chamanrajragu/purffle-grab/blob/main/CHANGELOG.md",
   "downloadUrl": "https://github.com/Chamanrajragu/purffle-grab/releases/latest",
   "installUrl": "https://github.com/Chamanrajragu/purffle-grab/releases/latest",
@@ -129,6 +129,14 @@
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Out of the box PurffleGrab reads up to the first 100 tracks of a playlist — a limit of Spotify's public data. Add a free Spotify developer key in Settings and your own playlists download in full, however long. Spotify's own editorial playlists stay capped at 100 because Spotify blocks API access to them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can PurffleGrab keep a playlist in sync and download only new songs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Grab a Spotify or YouTube playlist into the same folder again and PurffleGrab downloads only the tracks added since — songs already there are skipped without being searched or fetched again. Schedule the playlist daily or weekly in the Scheduler and the folder stays mirrored to it. Delete a song and the next sync brings it back; turn the behaviour off in Settings if you want full re-downloads."
       }
     },
     {
@@ -406,8 +414,8 @@
     </article>
     <article class="feat">
       <div class="feat-icon" aria-hidden="true">⏰</div>
-      <h3>Queue and scheduler</h3>
-      <p>Line up downloads and start them together, or schedule them once, daily or weekly. Cancelled downloads resume where they stopped.</p>
+      <h3>Playlist sync and scheduler</h3>
+      <p>Grab a playlist again and only the new songs download. Schedule it daily or weekly to keep a folder mirrored, queue downloads, and resume cancelled ones where they stopped.</p>
     </article>
     <article class="feat">
       <div class="feat-icon" aria-hidden="true">📝</div>
@@ -463,7 +471,7 @@
     <article class="use-case">
       <div class="use-case-icon" aria-hidden="true">📥</div>
       <h3>Playlists, albums and tracks</h3>
-      <p>Up to 100 tracks with no setup; add a free Spotify developer key in Settings to download your own playlists in full.</p>
+      <p>Up to 100 tracks with no setup; add a free Spotify developer key in Settings to download your own playlists in full. Grab it again later and only the songs added since come down.</p>
     </article>
     <article class="use-case">
       <div class="use-case-icon" aria-hidden="true">📁</div>
@@ -499,6 +507,7 @@
         <tr><td>TikTok, Instagram, SoundCloud…</td><td class="highlight yes">✓ 1,000+ sites</td><td>Usually one site</td><td>A few</td><td>Varies</td></tr>
         <tr><td>Type a song name</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td class="no">✕</td></tr>
         <tr><td>Whole playlists and channels</td><td class="highlight yes">✓</td><td>Limited</td><td class="no">✕</td><td class="yes">✓</td></tr>
+        <tr><td>Playlist sync (only new songs)</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Rarely</td></tr>
         <tr><td>Real 4K video</td><td class="highlight yes">✓</td><td>Rarely</td><td>Rarely</td><td class="yes">✓</td></tr>
         <tr><td>Cover art and tags</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Sometimes</td></tr>
         <tr><td>Synced lyrics (.lrc)</td><td class="highlight yes">✓</td><td class="no">✕</td><td class="no">✕</td><td>Rarely</td></tr>
@@ -549,6 +558,7 @@
     <details><summary>Which sites can PurffleGrab download from?</summary><div class="faq-answer">YouTube, Spotify, TikTok, Instagram, SoundCloud, X (Twitter), Facebook, Vimeo, Reddit, Twitch, Bandcamp, Dailymotion, Bilibili, Mixcloud and well over a thousand more — any site the bundled yt-dlp engine supports. Paste a link and PurffleGrab tells you what it found.</div></details>
     <details><summary>How do I download a Spotify playlist to MP3?</summary><div class="faq-answer">Copy the playlist link in Spotify (Share → Copy link), paste it into PurffleGrab and press Analyze. Pick Audio → MP3 (or the MP3 320 preset), untick any tracks you don&#x27;t want, and press Download. Each track is matched to the best available audio and saved with its title, artist, album and cover art.</div></details>
     <details><summary>Can I download a whole Spotify playlist, even a big one?</summary><div class="faq-answer">Out of the box PurffleGrab reads up to the first 100 tracks of a playlist — a limit of Spotify&#x27;s public data. Add a free Spotify developer key in Settings and your own playlists download in full, however long. Spotify&#x27;s own editorial playlists stay capped at 100 because Spotify blocks API access to them.</div></details>
+    <details><summary>Can PurffleGrab keep a playlist in sync and download only new songs?</summary><div class="faq-answer">Yes. Grab a Spotify or YouTube playlist into the same folder again and PurffleGrab downloads only the tracks added since — songs already there are skipped without being searched or fetched again. Schedule the playlist daily or weekly in the Scheduler and the folder stays mirrored to it. Delete a song and the next sync brings it back; turn the behaviour off in Settings if you want full re-downloads.</div></details>
     <details><summary>Can I just type a song name instead of a link?</summary><div class="faq-answer">Yes. Type “Artist - Song” in the box, or paste a whole tracklist with one song per line, and PurffleGrab finds the best-matching upload for each — preferring official audio over live versions, covers and sped-up edits.</div></details>
     <details><summary>Can it download YouTube videos in 4K?</summary><div class="faq-answer">Yes. Choose the Best video (4K) preset or set the quality to 2160p. Earlier versions quietly fell back to 1080p for 4K requests; since v12 you get the real 4K or 1440p stream, merged into an MP4.</div></details>
     <details><summary>Can I download TikTok videos and Instagram Reels?</summary><div class="faq-answer">Yes — paste the TikTok, Instagram post or Reel link and download it as MP4, or as MP3 for the audio. Some Instagram posts need you to be logged in: turn on “Use browser cookies” in Settings and PurffleGrab reads your existing browser login locally.</div></details>

@@ -47,6 +47,7 @@ Already installed? PurffleGrab tells you when an update is out and links straigh
 - **No link? Type a song name.** Or paste a whole tracklist, one song per line — PurffleGrab finds the best match for each.
 - **The right version of each song.** Spotify tracks are matched by length, title and artist, preferring official studio audio over live versions, covers and sped-up edits.
 - **Real 4K.** Choose 4K or 1440p and get exactly that (not a quiet fallback to 1080p).
+- **Playlists that stay in sync.** Grab a playlist again and only the songs added since come down — schedule it daily or weekly and your folder mirrors it.
 - **Tidy files.** Cover art, artist, album, track number and year written into every song; playlists land in a folder named after them.
 - **Keeps working.** The engine updates itself and retries with a fresh copy when a site changes.
 - **Private.** No telemetry, no analytics, no ads, no account. Your downloads and history stay on your computer.
@@ -79,7 +80,7 @@ Already installed? PurffleGrab tells you when an update is out and links straigh
 | 🔊 **Formats** | Audio: MP3, M4A, FLAC, WAV, Opus, OGG, AAC. Video: MP4 (H.264 up to 1080p, VP9 for 1440p/4K). |
 | 🎤 **Synced lyrics** | Save time-synced `.lrc` lyrics next to each song (from the open [LRCLIB](https://lrclib.net) database). |
 | 📝 **Transcripts** | Save a video's spoken text as clean `.txt`, with or without timestamps — even for a whole channel. |
-| ⏩ **One-step download** | `Ctrl+Shift+V` takes the link on your clipboard straight to a finished download. |
+| ⏩ **One-step download** | `Ctrl+Shift+V` (`⌘⇧V` on Mac) takes the link on your clipboard straight to a finished download. |
 | 🔗 **Send from your browser** | A bookmarklet (in Settings) opens the page you're on directly in PurffleGrab. |
 
 ### Video &amp; audio extras
@@ -97,19 +98,27 @@ Already installed? PurffleGrab tells you when an update is out and links straigh
 |---|---|
 | 🎧 **Music player** | Press **Play** the moment a download finishes. 5-band equaliser, visualiser, crossfade, synced lyrics, sleep timer. |
 | 🔄 **Converter** | Convert many files at once between MP3, FLAC, M4A, WAV, Opus, OGG, MP4, MKV, WebM and MOV — or turn a clip into a GIF. |
-| 📋 **Queue &amp; scheduler** | Line up downloads, or schedule them once, daily or weekly. Cancelled downloads **resume** where they stopped. |
+| 🔁 **Playlist sync** | Re-grab a Spotify or YouTube playlist into the same folder and only **new songs** download — the rest are skipped in seconds, not re-fetched. |
+| 📋 **Queue &amp; scheduler** | Line up downloads, or schedule them once, daily or weekly — a scheduled playlist becomes an automatic sync. Cancelled downloads **resume** where they stopped. |
 | 🕘 **History** | Every download with its thumbnail, format and size — play, open, re-grab, zip or batch-rename. |
 | 🛠 **Self-healing engine** | yt-dlp refreshes itself daily, and again automatically if a site changes mid-download. |
 | 🍪 **Browser cookies &amp; proxy** | Fix age-restricted videos, “confirm you're not a bot” and login-only posts by using your browser's login — read locally, never uploaded. |
 | 🎨 **Themes** | Dark, light and system, with accent colours and mood themes. |
-| ⌨ **Keyboard first** | Command palette (`Ctrl+K`), `Ctrl+1–9` navigation, `?` for every shortcut. |
+| ⌨ **Keyboard first** | Command palette (`Ctrl+K` / `⌘K`), `Ctrl+1–9` / `⌘1–9` navigation, `?` for every shortcut. |
 
-## 🆕 New in v12
+## 🆕 New in v12.1
 
-Support for 1,000+ sites surfaced properly (TikTok, Instagram, SoundCloud…), download-by-song-name, smarter Spotify
-matching, **real 4K/1440p** (4K previously fell back to 1080p), synced lyrics, a self-healing engine with browser-cookie
-and proxy support, tidy folders instead of `job-1a2b3c4d`, instant Play after a download, resume, batch conversion and
-a lot of fixes. **[Full changelog →](CHANGELOG.md)**
+- **Playlist sync** — grab the same playlist again and only the tracks added since are downloaded. Delete a song and the
+  next sync brings it back. Schedule it daily or weekly and the folder stays mirrored to the playlist.
+- **History knows** — a sync shows as *Up to date* or *12 new* instead of a wall of “already downloaded”.
+- **Mac-native shortcuts** — `⌘K`, `⌘1–9`, `⌘⇧V` and friends (Ctrl still works), and Caps Lock no longer switches shortcuts off.
+- **The equaliser remembers** your bands and presets between sessions, and the player skips files you've moved or deleted.
+- **Clearer errors** when your connection or proxy is the problem, and audio-only sources in a video batch are saved as audio.
+- Lots of polish: smoother seeking, dark-theme native controls, a quieter selection bar, unified favourites and more.
+
+**v12** brought support for 1,000+ sites surfaced properly (TikTok, Instagram, SoundCloud…), download-by-song-name,
+smarter Spotify matching, **real 4K/1440p**, synced lyrics, a self-healing engine with browser-cookie and proxy support,
+tidy folders, instant Play, resume and batch conversion. **[Full changelog →](CHANGELOG.md)**
 
 ## 📸 Screenshots
 
@@ -133,7 +142,7 @@ a lot of fixes. **[Full changelog →](CHANGELOG.md)**
 Files are saved to **Music › PurffleGrab** (change it in Settings). Single downloads go straight in; a playlist or album
 gets its own folder.
 
-**Tips:** `Ctrl+Shift+V` pastes and downloads in one step · copy a link in your browser and PurffleGrab offers to grab
+**Tips:** `Ctrl+Shift+V` (`⌘⇧V` on Mac) pastes and downloads in one step · grab a playlist again to fetch only its new songs · copy a link in your browser and PurffleGrab offers to grab
 it (with a one-click **MP3** button) · drop audio/video files on the window to convert them · press `?` for shortcuts.
 
 ## ⚖️ How it compares
@@ -145,6 +154,7 @@ it (with a one-click **MP3** button) · drop audio/video files on the window to 
 | Spotify playlists | **✓** | Rarely | ✕ | Sometimes |
 | TikTok, Instagram, SoundCloud… | **✓ 1,000+ sites** | A few | Usually one site | Varies |
 | Whole playlists &amp; channels | **✓** | ✕ | Limited | ✓ |
+| Playlist sync (only new songs) | **✓** | ✕ | ✕ | Rarely |
 | Real 4K | **✓** | Rarely | Rarely | ✓ |
 | Cover art, tags, synced lyrics | **✓** | ✕ | ✕ | Sometimes |
 | Player, converter, scheduler | **✓** | ✕ | ✕ | Sometimes |

@@ -2,6 +2,63 @@
 
 All notable changes to PurffleGrab are documented here.
 
+## [12.1.0] — 2026-11-01
+Playlist sync, scheduled syncs that keep a folder mirrored to a playlist, Mac
+shortcuts, and a long list of fixes found by testing every screen on both themes.
+
+### Added
+- **Playlist sync.** Grab a playlist into a folder again and only the tracks added
+  since are downloaded. Tracks already there are marked "already in folder"
+  instead of being searched and fetched again (each Spotify song used to cost a
+  YouTube search before yt-dlp noticed the file existed). A track counts only
+  while its file is still on disk, so deleting a song brings it back on the next
+  sync. It follows History → Rename files, and can be turned off in Settings
+  ("Skip tracks already downloaded to the folder") or bypassed with Re-grab.
+- **Scheduled syncs.** The Scheduler has a "Save as" choice (Audio, Video, or
+  your defaults) and, combined with the daily or weekly repeat, keeps a folder
+  mirrored to a playlist. A scheduled grab now waits for a running download to
+  finish instead of taking over its progress view, refuses one-off times in the
+  past, and captures its options when it's saved rather than when it fires.
+- **History shows what a sync did:** "up to date" when nothing was new, or
+  "12/12 files (3 new)".
+- **The equalizer remembers.** EQ settings persist between sessions, and a preset
+  picked before the first track plays now applies (it used to do nothing).
+- **⌘ shortcuts on macOS.** Every shortcut takes ⌘ on a Mac (Ctrl still works),
+  and the shortcuts sheet, command palette, tooltips and tips all show ⌘.
+  Shortcuts no longer stop working when Caps Lock is on.
+
+### Changed
+- **Clearer network errors.** An offline machine, a broken proxy, a 404 and a
+  site's 5xx error each get their own message. Being offline used to come out as
+  "update the engine", which can't work without a connection.
+- **Audio-only sources in a Video batch** (SoundCloud, podcasts) are saved as
+  audio instead of an .mp4 with no picture that music players skip.
+- **A calmer player.** The visualizer parks itself when nothing is playing or the
+  window is hidden; a perpetual 60 fps loop kept the fan running while the app
+  sat idle in the tray. Seeking is smooth instead of jumping a second at a time.
+- Re-applying the last-used preset no longer overrides defaults you've just
+  changed in Settings.
+
+### Fixed
+- The player skips tracks whose file was moved or deleted (and says so) instead
+  of sitting on a dead track. It stops after one lap of failures, and the same
+  file downloaded twice is queued once.
+- "Load recent downloads" leaves out files that no longer exist and explains
+  what it loaded.
+- Stats: the success rate subtracted every failure from a number that never
+  included it. Empty days in the chart are a flat baseline, and a fresh install
+  no longer reads "1 FILES".
+- History CSV export includes the format column, and audio-only video jobs show
+  their real format.
+- Light mode: the seek, volume and crossfade sliders were white on a white card.
+- Dark mode: checkboxes, date and time pickers and the EQ sliders were drawn in
+  bright light-theme white.
+- The History bulk bar stays quiet until something is ticked.
+- Favorite buttons on source cards and in History use one themed star that shows
+  whether the link is already saved.
+- The elapsed-time line no longer ends in a stray "·".
+- Duplicate notes on analyzed links take playlist sync into account.
+
 ## [12.0.0] — 2026-10-31
 The biggest PurffleGrab update yet: every site the engine supports is a first-class
 citizen, songs can be found by name, Spotify matches are smarter, 4K is really 4K,
