@@ -1,0 +1,69 @@
+name: Bug report
+description: Something isn't working — a download fails, a button does nothing, the app crashes.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Before you start: many download errors are fixed by
+        **Settings → Download engine → Update engine**, and age-restricted / "not a bot" errors by
+        **Settings → Use browser cookies**. See [Troubleshooting](https://github.com/Chamanrajragu/purffle-grab#-troubleshooting).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: I pasted a Spotify playlist and pressed Download, but every track failed with…
+    validations:
+      required: true
+  - type: input
+    id: error
+    attributes:
+      label: Error message shown in the app
+      description: Copy the exact text, if there was one.
+  - type: dropdown
+    id: source
+    attributes:
+      label: Where is the link from?
+      options:
+        - YouTube
+        - Spotify
+        - TikTok
+        - Instagram
+        - SoundCloud
+        - X / Twitter
+        - Another site
+        - Not about a download
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link that fails (optional)
+      description: A public link we can test with. Leave it out if it's private.
+  - type: input
+    id: version
+    attributes:
+      label: PurffleGrab version
+      description: Shown at the bottom of the sidebar, e.g. v12.0.0.
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Linux (AppImage)
+        - Linux (.deb)
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, steps to reproduce, how often it happens.

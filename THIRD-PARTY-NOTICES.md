@@ -63,9 +63,13 @@ PurffleGrab is built on Electron, which incorporates Chromium and Node.js.
 
 ## Fonts and assets
 
-Interface typography uses the system UI font on each platform. The Inter typeface
-(SIL Open Font License 1.1) is loaded by the in-app interface where available —
+The interface uses the **Inter** typeface, bundled with the app (no font is fetched
+from the internet) — Copyright 2016 The Inter Project Authors, licensed under the SIL
+Open Font License 1.1. The licence text ships with the app as `fonts/OFL-Inter.txt`.
 https://github.com/rsms/inter
+
+Synced lyrics, when you ask for them, come from LRCLIB (https://lrclib.net), a free and
+open lyrics database. No lyrics are bundled with the app.
 
 ---
 

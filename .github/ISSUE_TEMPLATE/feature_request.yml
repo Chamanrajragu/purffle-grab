@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an idea, a site to support better, or an improvement.
+title: "[Idea] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like PurffleGrab to do?
+      description: Describe the problem you're trying to solve, not only the solution.
+      placeholder: When I download a playlist, I'd like…
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?
+      description: How often would you use it? What do you do today instead?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Downloading
+        - Spotify
+        - A specific site
+        - Player
+        - Converter
+        - Interface / settings
+        - Something else
