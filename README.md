@@ -11,7 +11,7 @@
 [![Download for Linux](https://img.shields.io/badge/Download-Linux-E95420?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)
 
 [![Latest release](https://img.shields.io/github/v/release/Chamanrajragu/purffle-grab?style=flat-square&color=8b5cf6&label=latest)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/Chamanrajragu/purffle-grab/total?style=flat-square&color=22d3ee)](https://github.com/Chamanrajragu/purffle-grab/releases)
+[![Downloads](https://img.shields.io/github/downloads/Chamanrajragu/purffle-grab/total?style=flat-square&color=22d3ee)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)
 [![Stars](https://img.shields.io/github/stars/Chamanrajragu/purffle-grab?style=flat-square&color=f59e0b)](https://github.com/Chamanrajragu/purffle-grab/stargazers)
 [![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-0078d6?style=flat-square)](https://github.com/Chamanrajragu/purffle-grab/releases/latest)
 [![Website](https://img.shields.io/badge/website-purffle.com%2Fpurffle--grab-22d3ee?style=flat-square)](https://purffle.com/purffle-grab/)
@@ -39,6 +39,7 @@ engine keeps itself up to date, so downloads keep working when sites change.
 | 🐧 **Linux** (64-bit) | `.AppImage` or `.deb` | AppImage: `chmod +x PurffleGrab-*.AppImage`, then run it. Debian/Ubuntu: `sudo apt install ./purfflegrab_*_amd64.deb` |
 
 **[→ Get the latest release](https://github.com/Chamanrajragu/purffle-grab/releases/latest)** — everything is in one installer; there's nothing else to set up.
+On the release page, scroll to **Assets** and click the file for your system (on Windows, the `.exe`). The “Source code” links are not the app.
 Already installed? PurffleGrab tells you when an update is out and links straight to the right installer.
 
 ## ✨ Why PurffleGrab
